@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-03-20T11:30:05.405043",
+  "total_fontes": 6,
+  "fontes_disponiveis": 4,
+  "fontes_com_erro": 2,
+  "resultados_detalhados": [
+    {
+      "nome": "GitLab Fiocruz - InfoGripe Principal",
+      "url": "https://gitlab.fiocruz.br/marcelo.gomes/infogripe/-/raw/master/Dados/InfoGripe/casos_br.csv",
+      "status": "DISPONÍVEL",
+      "tamanho": "Desconhecido",
+      "tipo_conteudo": "text/html; charset=utf-8"
+    },
+    {
+      "nome": "GitLab Fiocruz - Casos por UF",
+      "url": "https://gitlab.fiocruz.br/marcelo.gomes/infogripe/-/raw/master/Dados/InfoGripe/casos_uf.csv",
+      "status": "DISPONÍVEL",
+      "tamanho": "Desconhecido",
+      "tipo_conteudo": "text/html; charset=utf-8"
+    },
+    {
+      "nome": "Base dos Dados - InfoGripe",
+      "url": "https://basedosdados.org/dataset/736ad69a-5cb1-4e52-9a13-535d439853a6",
+      "status": "DISPONÍVEL",
+      "tamanho": "Desconhecido",
+      "tipo_conteudo": "text/html; charset=utf-8"
+    },
+    {
+      "nome": "Portal InfoGripe",
+      "url": "http://info.gripe.fiocruz.br/",
+      "status": "TIMEOUT",
+      "tamanho": null,
+      "tipo_conteudo": null
+    },
+    {
+      "nome": "OpenDataSUS - SIVEP 2024",
+      "url": "https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/SRAG/2024/INFLUD24-03-03-2025.csv",
+      "status": "DISPONÍVEL",
+      "tamanho": "194465783",
+      "tipo_conteudo": "text/csv"
+    },
+    {
+      "nome": "GitHub - SRAG Brasil",
+      "url": "https://raw.githubusercontent.com/belisards/srag_brasil/master/casos_uf.csv",
+      "status": "ERRO_HEAD_404",
+      "tamanho": null,
+      "tipo_conteudo": null
+    }
+  ]
+}

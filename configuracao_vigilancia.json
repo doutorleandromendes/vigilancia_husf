@@ -1,0 +1,26 @@
+{
+  "configuracoes_regionais": {
+    "husf_braganca": {
+      "codigo_municipio": "3507605",
+      "codigo_estado": "35",
+      "nome_regiao": "Bragança Paulista",
+      "parametros_epidemiologicos": {
+        "sensibilidade_antigeno": 0.85,
+        "especificidade_antigeno": 0.98,
+        "limiar_baixa_circulacao": 0.05,
+        "limiar_media_circulacao": 0.15,
+        "limiar_alta_circulacao": 0.25,
+        "janela_analise_dias": 14,
+        "janela_tendencia_dias": 28
+      }
+    }
+  },
+  "metadata": {
+    "hospital": "HUSF - Hospital Universitário São Francisco",
+    "cidade": "Bragança Paulista",
+    "estado": "SP",
+    "responsavel": "Dr. Leandro - SCIH/CCIH",
+    "versao_sistema": "2026.1",
+    "ultima_atualizacao": "2026-03-20"
+  }
+}

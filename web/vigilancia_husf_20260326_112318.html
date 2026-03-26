@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigilância Respiratória - HUSF Bragança Paulista</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --orange-color: #ff8c00;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+        
+        .subtitle {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content-section {
+            padding: 30px;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .vpn-card {
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            border: none;
+            overflow: hidden;
+        }
+        
+        .vpn-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .vpn-card.success {
+            border-left: 5px solid var(--success-color);
+        }
+        
+        .vpn-card.warning {
+            border-left: 5px solid var(--warning-color);
+        }
+        
+        .vpn-card.orange {
+            border-left: 5px solid var(--orange-color);
+        }
+        
+        .vpn-card.danger {
+            border-left: 5px solid var(--danger-color);
+        }
+        
+        .vpn-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .patogeno-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .orientacao-texto {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        
+        .badge-pressao {
+            font-size: 0.8rem;
+            padding: 8px 12px;
+        }
+        
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .summary-stats {
+                flex-direction: column;
+            }
+            
+            .vpn-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .alert-box {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .criteria-explanation {
+            background: #e8f4fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-shield-virus"></i> Vigilância Respiratória SRAG</h1>
+            <p class="subtitle">Hospital Universitário São Francisco - Bragança Paulista, SP</p>
+            <small>Última atualização: 26/03/2026 11:23 | Dr. Leandro - SCIH/CCIH</small>
+        </div>
+
+        <!-- Informações Gerais -->
+        <div class="content-section">
+            <div class="info-card">
+                <h4><i class="fas fa-chart-line text-primary"></i> Cenário Epidemiológico Nacional</h4>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">16,882</div>
+                        <div class="stat-label">Casos SRAG Nacionais</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">6,064</div>
+                        <div class="stat-label">Casos Positivos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">35.9%</div>
+                        <div class="stat-label">Taxa Positividade</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">SE 9</div>
+                        <div class="stat-label">Semana Epidemiológica</div>
+                    </div>
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-database"></i> Fonte: InfoGripe/Fiocruz - Boletim SE 9/2026 | 
+                    Período: 01-07 março 2026
+                </small>
+            </div>
+
+            <!-- Critério de Decisão -->
+            <div class="criteria-explanation">
+                <h5><i class="fas fa-info-circle text-info"></i> Critério de Liberação Otimizado</h5>
+                <p><strong>VPN ≥ 95%</strong> = <span class="badge bg-success">LIBERAÇÃO SEGURA</span> | 
+                   <strong>VPN 90-95%</strong> = <span class="badge bg-warning">CAUTELA</span> | 
+                   <strong>VPN &lt; 90%</strong> = <span class="badge bg-danger">RT-PCR RECOMENDADO</span></p>
+                <small class="text-muted">Baseado em sensibilidades de meta-análises: COVID-19 (70%), Influenza A (62%), Influenza B (58%)</small>
+            </div>
+
+            <!-- Cards VPN por Patógeno -->
+            <h4><i class="fas fa-virus text-primary"></i> Orientações por Patógeno</h4>
+            <div class="row">
+
+                <div class="col-lg-6 col-md-12">
+                    <div class="card vpn-card success">
+                        <div class="card-body">
+                            <div class="patogeno-title">
+                                <i class="fas fa-virus"></i> COVID19
+                            </div>
+                            <div class="vpn-value text-success">98.2%</div>
+                            <div class="mb-2">
+                                <span class="badge badge-pressao bg-success">
+                                    Pressão: MODERADA
+                                </span>
+                            </div>
+                            <div class="orientacao-texto">
+                                🟢 LIBERAÇÃO SEGURA - VPN alto com circulação controlada
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-lg-6 col-md-12">
+                    <div class="card vpn-card success">
+                        <div class="card-body">
+                            <div class="patogeno-title">
+                                <i class="fas fa-virus"></i> INFLUENZA A
+                            </div>
+                            <div class="vpn-value text-success">97.0%</div>
+                            <div class="mb-2">
+                                <span class="badge badge-pressao bg-success">
+                                    Pressão: MODERADA
+                                </span>
+                            </div>
+                            <div class="orientacao-texto">
+                                🟢 LIBERAÇÃO SEGURA - VPN alto com circulação controlada
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-lg-6 col-md-12">
+                    <div class="card vpn-card success">
+                        <div class="card-body">
+                            <div class="patogeno-title">
+                                <i class="fas fa-virus"></i> INFLUENZA B
+                            </div>
+                            <div class="vpn-value text-success">99.8%</div>
+                            <div class="mb-2">
+                                <span class="badge badge-pressao bg-success">
+                                    Pressão: BAIXA
+                                </span>
+                            </div>
+                            <div class="orientacao-texto">
+                                🟢 LIBERAÇÃO SEGURA - VPN alto com circulação controlada
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-lg-6 col-md-12">
+                    <div class="card vpn-card success">
+                        <div class="card-body">
+                            <div class="patogeno-title">
+                                <i class="fas fa-virus"></i> VSR
+                            </div>
+                            <div class="vpn-value text-success">98.7%</div>
+                            <div class="mb-2">
+                                <span class="badge badge-pressao bg-success">
+                                    Pressão: BAIXA
+                                </span>
+                            </div>
+                            <div class="orientacao-texto">
+                                🟢 LIBERAÇÃO SEGURA - VPN alto com circulação controlada
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-lg-6 col-md-12">
+                    <div class="card vpn-card orange">
+                        <div class="card-body">
+                            <div class="patogeno-title">
+                                <i class="fas fa-virus"></i> RINOVIRUS
+                            </div>
+                            <div class="vpn-value text-orange">91.9%</div>
+                            <div class="mb-2">
+                                <span class="badge badge-pressao bg-warning">
+                                    Pressão: MODERADA
+                                </span>
+                            </div>
+                            <div class="orientacao-texto">
+                                🟠 CAUTELA - VPN limítrofe com pressão epidemiológica
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-lg-6 col-md-12">
+                    <div class="card vpn-card success">
+                        <div class="card-body">
+                            <div class="patogeno-title">
+                                <i class="fas fa-virus"></i> OUTROS
+                            </div>
+                            <div class="vpn-value text-success">99.0%</div>
+                            <div class="mb-2">
+                                <span class="badge badge-pressao bg-success">
+                                    Pressão: BAIXA
+                                </span>
+                            </div>
+                            <div class="orientacao-texto">
+                                🟢 LIBERAÇÃO SEGURA - VPN alto com circulação controlada
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+
+            <!-- Alertas Especiais -->
+            <div class="alert alert-info alert-box">
+                <h6><i class="fas fa-exclamation-triangle"></i> Observações Importantes</h6>
+                <ul class="mb-0">
+                    <li><strong>COVID-19 e Influenza A:</strong> Sensibilidades menores (70% e 62%) requerem maior cautela</li>
+                    <li><strong>Rinovírus:</strong> VPN mais baixo devido à limitação dos testes de antígeno</li>
+                    <li><strong>RT-PCR:</strong> Recomendado quando VPN &lt; 90% ou alta suspeitabilidade clínica</li>
+                    <li><strong>Contexto clínico:</strong> Sempre considerar sintomas e fatores de risco do paciente</li>
+                </ul>
+            </div>
+
+            <!-- Contato -->
+            <div class="alert alert-secondary alert-box">
+                <h6><i class="fas fa-phone text-primary"></i> Suporte Técnico</h6>
+                <p class="mb-0">
+                    <strong>Dr. Leandro - SCIH/CCIH HUSF</strong><br>
+                    Discussão de casos complexos • Interpretação de resultados duvidosos • Atualização de protocolos
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="row">
+                <div class="col-md-6 text-md-start text-center">
+                    <i class="fas fa-code"></i> Sistema Vigilância Respiratória v2026.1
+                </div>
+                <div class="col-md-6 text-md-end text-center">
+                    <i class="fas fa-hospital"></i> HUSF - Bragança Paulista, SP
+                </div>
+            </div>
+            <hr style="margin: 10px 0; border-color: #ccc;">
+            <small class="text-muted">
+                Baseado em evidências científicas • Meta-análises recentes • InfoGripe/Fiocruz • OpenDataSUS
+            </small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-refresh a cada 30 minutos
+        setTimeout(function() {
+            window.location.reload();
+        }, 30 * 60 * 1000);
+        
+        // Adicionar timestamp de última visualização
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const timeString = now.toLocaleString('pt-BR');
+            console.log('Relatório carregado em:', timeString);
+        });
+    </script>
+</body>
+</html>

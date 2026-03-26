@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-03-20T14:20:06.240319",
+  "regiao": "Bragança Paulista",
+  "fonte_dados": "InfoGripe/Fiocruz - Boletim SE 9/2026",
+  "semana_epidemiologica": 9,
+  "periodo_analise": "01-07 março 2026",
+  "total_casos_nacionais": 16882,
+  "casos_positivos_nacionais": 6064,
+  "taxa_positividade_nacional": 0.359,
+  "prevalencia_regional": {
+    "COVID19": 0.056722,
+    "INFLUENZA_A": 0.07467199999999999,
+    "INFLUENZA_B": 0.004308,
+    "VSR": 0.048465,
+    "RINOVIRUS": 0.146472,
+    "OUTROS": 0.028361
+  },
+  "vpn_por_patogeno": {
+    "COVID19": 0.9908799326296465,
+    "INFLUENZA_A": 0.9877989883992353,
+    "INFLUENZA_B": 0.999338197584501,
+    "VSR": 0.9922643639713185,
+    "RINOVIRUS": 0.9744057814314218,
+    "OUTROS": 0.9955521941802984
+  },
+  "pressao_epidemiologica": {
+    "COVID19": "MODERADA",
+    "INFLUENZA_A": "MODERADA",
+    "INFLUENZA_B": "BAIXA",
+    "VSR": "BAIXA",
+    "RINOVIRUS": "MODERADA",
+    "OUTROS": "BAIXA"
+  },
+  "orientacoes_isolamento": {
+    "COVID19": "🟢 LIBERAÇÃO SEGURA - VPN alto com baixa/moderada circulação viral",
+    "INFLUENZA_A": "🟢 LIBERAÇÃO SEGURA - VPN alto com baixa/moderada circulação viral",
+    "INFLUENZA_B": "🟢 LIBERAÇÃO SEGURA - VPN alto com baixa/moderada circulação viral",
+    "VSR": "🟢 LIBERAÇÃO SEGURA - VPN alto com baixa/moderada circulação viral",
+    "RINOVIRUS": "🟢 LIBERAÇÃO SEGURA - VPN alto com baixa/moderada circulação viral",
+    "OUTROS": "🟢 LIBERAÇÃO SEGURA - VPN alto com baixa/moderada circulação viral"
+  },
+  "parametros_teste": {
+    "sensibilidade": 0.85,
+    "especificidade": 0.98,
+    "janela_analise_dias": 14
+  },
+  "configuracao_limiares": {
+    "baixa_circulacao": "< 5%",
+    "media_circulacao": "5% - 15%",
+    "alta_circulacao": "15% - 25%",
+    "muito_alta_circulacao": "> 25%"
+  }
+}

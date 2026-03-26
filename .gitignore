@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+venv_vigilancia/
+.env
+
+# Dados temporários
+dados/
+logs/
+relatorios/
+
+# Sistema
+.DS_Store

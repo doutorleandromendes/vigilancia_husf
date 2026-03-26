@@ -1,0 +1,59 @@
+{
+  "data_demonstracao": "2026-03-20T13:16:45.744781",
+  "tipo_dados": "SIMULADOS",
+  "configuracao": {
+    "hospital": "HUSF - Campinas (DEMONSTRAÇÃO)",
+    "sensibilidade_teste": 0.85,
+    "especificidade_teste": 0.98
+  },
+  "estatisticas_dados": {
+    "total_casos": 500,
+    "periodo_inicio": "18/02/2026",
+    "periodo_fim": "19/03/2026",
+    "covid_casos": 69,
+    "influenza_casos": 40,
+    "vsr_casos": 21,
+    "testados_pcr": 500
+  },
+  "positividade": {
+    "covid19": 0.138,
+    "influenza": 0.08,
+    "vsr": 0.042,
+    "outros": 0.074
+  },
+  "vpn_valores": {
+    "covid19": {
+      "vpn": 0.9760820835162803,
+      "vpp": 0.871859669986621,
+      "prevalencia_usada": 0.138
+    },
+    "influenza": {
+      "vpn": 0.9868651488616462,
+      "vpp": 0.787037037037037,
+      "prevalencia_usada": 0.08
+    },
+    "vsr": {
+      "vpn": 0.9933343208413569,
+      "vpp": 0.6507473569084942,
+      "prevalencia_usada": 0.042
+    },
+    "outros": {
+      "vpn": 0.9879161314202356,
+      "vpp": 0.7725374600835173,
+      "prevalencia_usada": 0.074
+    }
+  },
+  "pressao_epidemiologica": {
+    "covid19": "MODERADA",
+    "influenza": "MODERADA",
+    "vsr": "BAIXA",
+    "outros": "MODERADA"
+  },
+  "orientacoes": {
+    "covid19": "LIBERAÇÃO SEGURA - VPN alto com baixa circulação",
+    "influenza": "LIBERAÇÃO SEGURA - VPN alto com baixa circulação",
+    "vsr": "LIBERAÇÃO SEGURA - VPN alto com baixa circulação",
+    "outros": "LIBERAÇÃO SEGURA - VPN alto com baixa circulação"
+  },
+  "relatorio": "\n# RELATÓRIO EPIDEMIOLÓGICO - ORIENTAÇÕES ISOLAMENTO RESPIRATÓRIO\n## Período: March/2026\n## Hospital: HUSF\n## Responsável: Dr. Leandro - SCIH/CCIH\n\n---\n\n### PRESSÃO EPIDEMIOLÓGICA REGIONAL (HUSF - Campinas (DEMONSTRAÇÃO))\n\n**Positividade por Patógeno (últimas 2 semanas):**\n- **COVID19**: 13.8%\n- **INFLUENZA**: 8.0%\n- **VSR**: 4.2%\n- **OUTROS**: 7.4%\n\n\n### VALOR PREDITIVO NEGATIVO - TESTE DE ANTÍGENO\n\n**Parâmetros utilizados:**\n- Sensibilidade: 85%\n- Especificidade: 98%\n\n### ORIENTAÇÕES POR PATÓGENO\n\n**COVID19**: LIBERAÇÃO SEGURA - VPN alto com baixa circulação\n\n**INFLUENZA**: LIBERAÇÃO SEGURA - VPN alto com baixa circulação\n\n**VSR**: LIBERAÇÃO SEGURA - VPN alto com baixa circulação\n\n**OUTROS**: LIBERAÇÃO SEGURA - VPN alto com baixa circulação\n\n\n### RECOMENDAÇÕES GERAIS\n\n1. **Isolamento Precaucional**: Manter até resultado de teste confirmatório em cenário de alta circulação viral\n2. **Liberação com Teste Negativo**: Aplicar VPN conforme pressão epidemiológica local\n3. **Monitoramento Contínuo**: Reavaliar orientações quinzenalmente baseado em dados atualizados\n\n---\n*Relatório gerado automaticamente em 20/03/2026 13:16*\n*Base: Dados OpenDataSUS (SIVEP-Gripe)*\n"
+}
