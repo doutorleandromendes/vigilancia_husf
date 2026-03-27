@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCIH/CCIH — HUSF · IrAS & Determinantes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#07101f;font-family:'DM Sans',sans-serif;color:#ddeeff;overflow:hidden;
+    background-image:radial-gradient(circle,rgba(75,156,245,0.035) 1px,transparent 1px);
+    background-size:26px 26px}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:#172845;border-radius:4px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .fi{animation:fadeIn .2s ease-out}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .pulse{animation:pulse 2.2s ease-in-out infinite}
+  button{cursor:pointer}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+'use strict';
+const {useState,useEffect}=React;
+const h=React.createElement;
+
+const C={bg:'#07101f',surf:'#0c1829',card:'#101d35',hover:'#142444',brdr:'#172845',glow:'#1e3a68',
+  teal:'#00d4b4',blue:'#4b9cf5',amber:'#fbbf24',red:'#f87171',green:'#4ade80',
+  ti:'#ddeeff',ts:'#7da8d8',tm:'#294469',hist:'#1a3358',curr:'#4b9cf5'};
+
+// ─── FALLBACK DATA ────────────────────────────────────────────────────────────
+const FB={
+  periodo:'Janeiro 2026',
+  global:{taxaIH:[{p:'2020',v:2.40},{p:'2021',v:2.81},{p:'2022',v:1.80},{p:'2023',v:1.03},{p:'2024',v:1.10},{p:'2025',v:1.04},{p:'jan/26',v:0.86,c:1}]},
+  clinicaMedica:{taxaIH:[{p:'2020',v:0.82},{p:'2021',v:1.15},{p:'2022',v:1.18},{p:'2023',v:1.63},{p:'2024',v:1.57},{p:'2025',v:1.28},{p:'jan/26',v:1.20,c:1}],inf:{ac:2,itu:0,pneu:6,sc:null,total:8,pd:664}},
+  clinicaCirurgica:{taxaIH:[{p:'2020',v:0.91},{p:'2021',v:1.15},{p:'2022',v:1.61},{p:'2023',v:3.13},{p:'2024',v:3.00},{p:'2025',v:3.18},{p:'jan/26',v:2.68,c:1}],inf:{ac:4,itu:2,pneu:8,sc:6,total:20,pd:746}},
+  epm:{taxaIH:[{p:'2020',v:0.66},{p:'2021',v:0.83},{p:'2022',v:0.78},{p:'2023',v:1.20},{p:'2024',v:0.82},{p:'2025',v:1.01},{p:'jan/26',v:0.65,c:1}],inf:{ac:0,itu:0,pneu:2,sc:2,total:4,pd:619}},
+  hd:{
+    ilav:[{p:'2016',v:24.4},{p:'2017',v:27.8},{p:'2018',v:12.6},{p:'2019',v:10.4},{p:'2020',v:5.4},{p:'2021',v:5.71},{p:'2022',v:6.8},{p:'2023',v:3.15},{p:'2024',v:3.36},{p:'2025',v:2.12},{p:'jan/26',v:2.45,c:1}],
+    bact:[{p:'2016',v:12.5},{p:'2017',v:6.7},{p:'2018',v:5.9},{p:'2019',v:5.6},{p:'2020',v:5.1},{p:'2021',v:8.68},{p:'2022',v:6.79},{p:'2023',v:8.3},{p:'2024',v:24.32},{p:'2025',v:8.61},{p:'jan/26',v:11.53,c:1}],
+    vanco:[{p:'2016',v:8.8},{p:'2017',v:7.5},{p:'2018',v:8.5},{p:'2019',v:5.9},{p:'2020',v:4.5},{p:'2021',v:7.15},{p:'2022',v:7.79},{p:'2023',v:8.02},{p:'2024',v:10.22},{p:'2025',v:6.93},{p:'jan/26',v:5.88,c:1}],
+    audit:{ok:10,nc:4,pct:29}
+  },
+  utiAB:{
+    svd:[{p:'2020',v:77},{p:'2021',v:82},{p:'2022',v:76},{p:'2023',v:76},{p:'2024',v:76},{p:'2025',v:74},{p:'jan/26',v:75,c:1}],
+    cvc:[{p:'2020',v:74},{p:'2021',v:70},{p:'2022',v:74},{p:'2023',v:74},{p:'2024',v:72},{p:'2025',v:70},{p:'jan/26',v:65,c:1}],
+    tot:[{p:'2019',v:50},{p:'2020',v:55},{p:'2021',v:60},{p:'2022',v:62},{p:'2023',v:56},{p:'2024',v:55},{p:'2025',v:52},{p:'jan/26',v:57,c:1}],
+    pav:[{p:'2020',v:6},{p:'2021',v:7},{p:'2022',v:5},{p:'2023',v:8},{p:'2024',v:5},{p:'2025',v:4},{p:'jan/26',v:0,c:1}],
+    itu:[{p:'2020',v:3},{p:'2021',v:4},{p:'2022',v:2},{p:'2023',v:3},{p:'2024',v:2},{p:'2025',v:2},{p:'jan/26',v:0,c:1}],
+    ipcs:[{p:'2015',v:10},{p:'2016',v:8},{p:'2017',v:7},{p:'2018',v:12},{p:'2019',v:9},{p:'2020',v:9},{p:'2021',v:8},{p:'2022',v:7},{p:'2023',v:8},{p:'2024',v:5},{p:'2025',v:7},{p:'jan/26',v:0,c:1}],
+    dddPip:[{p:'2020',v:145},{p:'2021',v:155},{p:'2022',v:130},{p:'2023',v:125},{p:'2024',v:85},{p:'2025',v:58},{p:'jan/26',v:22,c:1}],
+    dddCarba:[{p:'2020',v:180},{p:'2021',v:155},{p:'2022',v:150},{p:'2023',v:150},{p:'2024',v:130},{p:'2025',v:120},{p:'jan/26',v:130,c:1}],
+    dddGlico:[{p:'2020',v:140},{p:'2021',v:120},{p:'2022',v:90},{p:'2023',v:90},{p:'2024',v:95},{p:'2025',v:100},{p:'jan/26',v:100,c:1}],
+    dddPoli:[{p:'2020',v:40},{p:'2021',v:40},{p:'2022',v:35},{p:'2023',v:35},{p:'2024',v:35},{p:'2025',v:30},{p:'jan/26',v:30,c:1}],
+    mdr:[{p:'2019',e:5,k:10,a:6},{p:'2020',e:5,k:10,a:6},{p:'2021',e:5,k:11,a:8},{p:'2022',e:8,k:10,a:5},{p:'2023',e:19,k:3,a:8},{p:'2024',e:22,k:6,a:11},{p:'2025',e:5,k:9,a:5}],
+    mdrMax:{e:34,k:17,a:28},
+    hm:[{p:'2021',v:50},{p:'2022',v:27},{p:'2023',v:38},{p:'2024',v:32},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],
+    audit:{ok:16,nc:0,pct:0},
+    limiares:{svdMax:null,svdMin:null,cvcMax:null,cvcMin:null,totMax:null,totMin:null,pavMax:null,ituMax:null,ipcsMax:null,pipMax:null,pipMin:null,carbaMax:null,carbaMin:null,glicoMax:null,glicoMin:null,poliMax:null,poliMin:null}
+  },
+  utic:{
+    svd:[{p:'2020',v:77},{p:'2021',v:82},{p:'2022',v:76},{p:'2023',v:76},{p:'2024',v:76},{p:'2025',v:74},{p:'jan/26',v:76,c:1}],
+    cvc:[{p:'2020',v:74},{p:'2021',v:70},{p:'2022',v:74},{p:'2023',v:74},{p:'2024',v:72},{p:'2025',v:72},{p:'jan/26',v:72,c:1}],
+    tot:[{p:'2019',v:50},{p:'2020',v:55},{p:'2021',v:60},{p:'2022',v:62},{p:'2023',v:60},{p:'2024',v:65},{p:'2025',v:62},{p:'jan/26',v:60,c:1}],
+    pav:[{p:'2024',v:0},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],
+    itu:[{p:'2024',v:0},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],
+    ipcs:[{p:'2024',v:0},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],
+    dddPip:[{p:'2024',v:80},{p:'2025',v:62},{p:'jan/26',v:65,c:1}],
+    dddCarba:[{p:'2024',v:160},{p:'2025',v:145},{p:'jan/26',v:128,c:1}],
+    dddGlico:[{p:'2024',v:100},{p:'2025',v:100},{p:'jan/26',v:110,c:1}],
+    dddPoli:[{p:'2024',v:50},{p:'2025',v:42},{p:'jan/26',v:70,c:1}],
+    mdr:[{p:'2021',e:19,k:6,a:6},{p:'2022',e:8,k:4,a:9},{p:'2023',e:6,k:3,a:4},{p:'2024',e:4,k:25,a:21},{p:'2025',e:7,k:22,a:14}],
+    mdrMax:{e:31,k:23,a:24},
+    hm:[{p:'2021',v:50},{p:'2022',v:27},{p:'2023',v:67},{p:'2024',v:35},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],
+    audit:{ok:35,nc:2,pct:5},
+    limiares:{svdMax:null,svdMin:null,cvcMax:null,cvcMin:null,totMax:null,totMin:null,pavMax:null,ituMax:null,ipcsMax:null,pipMax:null,pipMin:null,carbaMax:null,carbaMin:null,glicoMax:null,glicoMin:null,poliMax:null,poliMin:null}
+  },
+  utiNeo:{
+    ipcs:[{p:'2019',v:15},{p:'2020',v:12},{p:'2021',v:10},{p:'2022',v:8},{p:'2023',v:12},{p:'2024',v:10},{p:'2025',v:8},{p:'jan/26',v:0,c:1}],
+    audit:{ok:20,nc:8,pct:28},
+    limiares:{ipcsMax:null}
+  },
+  mdrInst:{
+    s:[{p:'2015',e:6,k:6,a:3},{p:'2016',e:10,k:6,a:6},{p:'2017',e:12,k:11,a:11},{p:'2018',e:24,k:10,a:12},{p:'2019',e:20,k:10,a:9},{p:'2020',e:38,k:10,a:9},{p:'2021',e:30,k:28,a:32},{p:'2022',e:27,k:28,a:28},{p:'2023',e:30,k:11,a:10},{p:'2024',e:52,k:10,a:14},{p:'2025',e:55,k:3,a:13}],
+    max:{e:37,k:11,a:10}
+  },
+  abio:{
+    gnCols:['Amicacina','Ampi/Sul','Cefepime','Ceftriaxona','Cipro','Gentamicina','Meropenem','Nitrofurantoína','Fosfomicina','Pip/Tazo','Polimixina B'],
+    gn:[{o:'Acinetobacter',vs:[8,null,null,null,0,null,0,null,null,0,100]},{o:'Citrobacter',vs:[100,null,100,80,65,100,100,100,100,100,null]},{o:'Enterobacter',vs:[100,null,95,75,87,98,100,89,96,85,null]},{o:'E. coli',vs:[99,84,81,83,70,87,99,99,100,83,100]},{o:'Klebsiella',vs:[99,43,45,45,42,68,79,90,93,45,78]},{o:'Morganella',vs:[100,50,50,50,83,100,100,null,null,50,null]},{o:'Proteus',vs:[99,75,87,87,96,77,100,null,96,76,null]},{o:'Pseudomonas',vs:[100,null,50,null,83,null,91,null,null,31,100]},{o:'Serratia',vs:[100,null,91,89,91,74,95,null,null,90,null]}],
+    gpCols:['Ampicilina','Oxacilina','Eritromicina','Clindamicina','Levofloxacina','Genta HLR','SMT/TMP','Vancomicina','Linezolida','Daptomicina'],
+    gp:[{o:'S. aureus',vs:[null,57,29,48,76,84,97,100,100,93]},{o:'S. coag-neg',vs:[null,19,17,33,null,38,34,100,100,98]},{o:'E. faecalis',vs:[100,null,null,null,100,null,null,100,100,null]},{o:'E. faecium',vs:[0,null,null,null,0,null,null,100,100,null]}]
+  }
+};
+
+// ─── RECHARTS SETUP ───────────────────────────────────────────────────────────
+const {BarChart,Bar,LineChart,Line,XAxis,YAxis,CartesianGrid,
+       Tooltip:RCTip,ResponsiveContainer,ReferenceLine,Cell,Legend}=Recharts;
+
+// FIX 1: Tooltip content MUST be a function — never a pre-built element.
+// Recharts calls content(tooltipProps), so we return a function closure.
+function makeTip(unit){
+  return function(props){
+    var active=props.active,payload=props.payload,label=props.label;
+    if(!active||!payload||!payload.length) return null;
+    return h('div',{style:{background:C.surf,border:'1px solid '+C.glow,borderRadius:8,padding:'8px 14px',fontSize:12}},
+      h('div',{style:{color:C.ts,fontSize:10,marginBottom:4}},label),
+      payload.map(function(p,i){
+        return h('div',{key:i,style:{color:p.color||C.blue,fontFamily:"'JetBrains Mono',monospace",fontWeight:600}},
+          (p.name&&p.name!=='v'?p.name+': ':'')+
+          (typeof p.value==='number'?p.value.toFixed(2):p.value)+(unit||'')
+        );
+      })
+    );
+  };
+}
+
+// FIX 2: Build chart children as explicit arrays, filtering out null values.
+// Never pass false/null as direct JSX children inside Recharts components.
+function refLines(specs){
+  // specs = [{y, stroke, dash, width, label}]
+  return specs
+    .filter(function(s){return s.y!=null;})
+    .map(function(s,i){
+      var props={key:'rl'+i,y:s.y,stroke:s.stroke,strokeDasharray:s.dash||'6 3',strokeWidth:s.width||1.5};
+      if(s.label) props.label=s.label;
+      return h(ReferenceLine,props);
+    });
+}
+
+// ─── BAR CHART COMPONENT ─────────────────────────────────────────────────────
+function BarS(props){
+  var title=props.title,data=props.data,unit=props.unit||'',badge=props.badge;
+  var maxY=props.maxY,lMax=props.lMax,lMin=props.lMin,refY=props.refY,refLbl=props.refLbl;
+  var ht=props.h||160,note=props.note;
+  var hasLim=lMax!=null||lMin!=null;
+
+  var chartChildren=[
+    h(CartesianGrid,{key:'cg',strokeDasharray:'2 4',stroke:C.tm,vertical:false,opacity:.5}),
+    h(XAxis,{key:'xa',dataKey:'p',tick:{fill:C.tm,fontSize:8,fontFamily:"'JetBrains Mono',monospace"},axisLine:false,tickLine:false}),
+    h(YAxis,{key:'ya',tick:{fill:C.tm,fontSize:8,fontFamily:"'JetBrains Mono',monospace"},axisLine:false,tickLine:false,domain:[0,maxY||'auto']}),
+    h(RCTip,{key:'tip',content:makeTip(unit)})
+  ].concat(
+    refLines([
+      {y:lMax,stroke:C.red,dash:'6 3',width:1.5},
+      {y:lMin,stroke:C.green,dash:'6 3',width:1.5},
+      {y:refY,stroke:C.amber,dash:'4 2',width:1,label:refLbl?{value:refLbl,fill:C.amber,fontSize:7,position:'insideTopRight'}:undefined}
+    ])
+  ).concat([
+    h(Bar,{key:'bar',dataKey:'v',radius:[3,3,0,0]},
+      data.map(function(d,i){return h(Cell,{key:i,fill:d.c?C.curr:C.hist,opacity:d.c?1:.65});}))
+  ]);
+
+  return h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:12,padding:'14px 14px 8px'}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:hasLim?5:8}},
+      h('span',{style:{fontFamily:"'Syne',sans-serif",fontSize:11,fontWeight:700,color:C.ti,maxWidth:'72%',lineHeight:1.35}},title),
+      badge?h('span',{style:{background:'#002920',color:C.teal,fontSize:8,fontWeight:700,letterSpacing:1.5,padding:'2px 7px',borderRadius:4,border:'1px solid '+C.teal+'44',whiteSpace:'nowrap'}},badge):null
+    ),
+    hasLim?h('div',{style:{display:'flex',gap:12,marginBottom:6,fontSize:8}},
+      lMax!=null?h('span',{style:{color:C.red,display:'flex',alignItems:'center',gap:4}},
+        h('span',{style:{display:'inline-block',width:16,height:0,borderTop:'1.5px dashed '+C.red}}),
+        'Máx previsto: '+lMax):null,
+      lMin!=null?h('span',{style:{color:C.green,display:'flex',alignItems:'center',gap:4}},
+        h('span',{style:{display:'inline-block',width:16,height:0,borderTop:'1.5px dashed '+C.green}}),
+        'Mín previsto: '+lMin):null
+    ):null,
+    h(ResponsiveContainer,{width:'100%',height:ht},
+      h.apply(null,[BarChart,{data:data,margin:{top:4,right:4,left:-28,bottom:0}}].concat(chartChildren))
+    ),
+    note?h('div',{style:{fontSize:8,color:C.tm,marginTop:3,fontFamily:"'JetBrains Mono',monospace"}},note):null
+  );
+}
+
+// ─── LINE MDR COMPONENT ───────────────────────────────────────────────────────
+function LineMDR(props){
+  var title=props.title,data=props.data,maxE=props.maxE,maxK=props.maxK,maxA=props.maxA,ht=props.h||200;
+
+  var chartChildren=[
+    h(CartesianGrid,{key:'cg',strokeDasharray:'2 4',stroke:C.tm,vertical:false,opacity:.5}),
+    h(XAxis,{key:'xa',dataKey:'p',tick:{fill:C.tm,fontSize:8,fontFamily:"'JetBrains Mono',monospace"},axisLine:false,tickLine:false}),
+    h(YAxis,{key:'ya',tick:{fill:C.tm,fontSize:8,fontFamily:"'JetBrains Mono',monospace"},axisLine:false,tickLine:false}),
+    h(RCTip,{key:'tip',content:makeTip('/mil pd')}),
+    h(Legend,{key:'leg',iconSize:7,wrapperStyle:{fontSize:9,color:C.ts,paddingTop:4}})
+  ].concat(
+    refLines([
+      {y:maxE,stroke:C.blue,dash:'4 2',width:1.5},
+      {y:maxK,stroke:C.red,dash:'4 2',width:1.5},
+      {y:maxA,stroke:C.green,dash:'4 2',width:1.5}
+    ])
+  ).concat([
+    h(Line,{key:'esbl',type:'monotone',dataKey:'e',name:'ESBL',stroke:C.blue,strokeWidth:2,dot:{r:2.5,fill:C.blue},activeDot:{r:4}}),
+    h(Line,{key:'kpc',type:'monotone',dataKey:'k',name:'KPC',stroke:C.red,strokeWidth:2,dot:{r:2.5,fill:C.red},activeDot:{r:4}}),
+    h(Line,{key:'acin',type:'monotone',dataKey:'a',name:'Acinetobacter',stroke:C.green,strokeWidth:2,dot:{r:2.5,fill:C.green},activeDot:{r:4}})
+  ]);
+
+  return h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:12,padding:'14px 14px 8px'}},
+    h('span',{style:{fontFamily:"'Syne',sans-serif",fontSize:11,fontWeight:700,color:C.ti,display:'block',marginBottom:10}},title),
+    h(ResponsiveContainer,{width:'100%',height:ht},
+      h.apply(null,[LineChart,{data:data,margin:{top:4,right:12,left:-28,bottom:0}}].concat(chartChildren))
+    ),
+    h('div',{style:{fontSize:8,color:C.tm,marginTop:2}},'Tracejado = limiar máximo de endemicidade · Clopper-Pearson (biênio base fixo)')
+  );
+}
+
+// ─── SHARED WIDGETS ───────────────────────────────────────────────────────────
+function AuditCard(props){
+  var data=props.data;
+  var pct=data.pct!=null?data.pct:Math.round(data.nc/(Math.max(1,data.ok+data.nc))*100);
+  var col=pct===0?C.teal:pct<15?C.green:pct<30?C.amber:C.red;
+  return h('div',{style:{background:C.card,border:'1px solid '+(pct>20?col+'55':C.brdr),borderRadius:12,padding:16}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
+      h('span',{style:{fontFamily:"'Syne',sans-serif",fontSize:11,fontWeight:700,color:C.ti}},'Auditoria — Inserção de CVC'),
+      h('span',{style:{fontFamily:"'JetBrains Mono',monospace",fontSize:22,fontWeight:700,color:col}},pct+'% NC')
+    ),
+    h('div',{style:{height:10,borderRadius:5,overflow:'hidden',display:'flex',gap:2}},
+      h('div',{style:{flex:data.ok,background:C.teal,opacity:.75,borderRadius:5}}),
+      data.nc>0?h('div',{style:{flex:data.nc,background:col,borderRadius:5}}):null
+    ),
+    h('div',{style:{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:9,color:C.tm,fontFamily:"'JetBrains Mono',monospace"}},
+      h('span',{style:{color:C.teal}},'✓ '+data.ok+' conformes'),
+      h('span',{style:{color:col}},data.nc+' não-conformes')
+    )
+  );
+}
+
+function SH(props){
+  return h('div',{style:{fontSize:8,color:C.ts,letterSpacing:2.5,fontWeight:700,textTransform:'uppercase',
+    margin:'16px 0 8px',paddingBottom:5,borderBottom:'1px solid '+C.brdr,display:'flex',alignItems:'center',gap:8}},
+    h('span',{style:{width:14,height:1,background:C.teal,display:'inline-block'}}),
+    props.t
+  );
+}
+
+function LimLegenda(){
+  return h('div',{style:{display:'flex',gap:16,padding:'6px 12px',background:C.surf,borderRadius:7,
+    border:'1px solid '+C.brdr,marginBottom:12,fontSize:8,color:C.tm,alignItems:'center',flexWrap:'wrap'}},
+    h('span',{style:{color:C.ts,fontWeight:600}},'Limiares por Regressão de Poisson/Bin-Neg (mensais):'),
+    h('span',{style:{color:C.red,display:'flex',alignItems:'center',gap:4}},
+      h('span',{style:{display:'inline-block',width:20,height:0,borderTop:'1.5px dashed '+C.red}}),
+      'Máximo previsto'),
+    h('span',{style:{color:C.green,display:'flex',alignItems:'center',gap:4}},
+      h('span',{style:{display:'inline-block',width:20,height:0,borderTop:'1.5px dashed '+C.green}}),
+      'Mínimo previsto'),
+    h('span',{style:{fontStyle:'italic'}},'Linhas ausentes = não informadas para esta competência')
+  );
+}
+
+// ─── SECTIONS ─────────────────────────────────────────────────────────────────
+function OverviewSection(props){
+  var D=props.D;
+  var curr=D.global.taxaIH.filter(function(d){return d.c;})[0];
+  var mdrLast=D.mdrInst.s[D.mdrInst.s.length-1];
+  var kpis=[
+    {l:'Taxa IH Global',v:curr?curr.v.toFixed(2)+'%':'—',ok:true,s:'Endêmica'},
+    {l:'ESBL Institucional',v:mdrLast.e+'/mil pd',ok:mdrLast.e<=D.mdrInst.max.e,s:'Limiar: '+D.mdrInst.max.e},
+    {l:'KPC Institucional',v:mdrLast.k+'/mil pd',ok:mdrLast.k<=D.mdrInst.max.k,s:'Limiar: '+D.mdrInst.max.k},
+    {l:'UTI AB — CVC NC',v:D.utiAB.audit.pct+'%',ok:D.utiAB.audit.pct===0,s:'Auditoria inserção'},
+  ];
+  return h('div',{className:'fi'},
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:14}},
+      kpis.map(function(k,i){
+        return h('div',{key:i,style:{background:C.card,border:'1px solid '+(k.ok?C.brdr:C.amber+'44'),borderRadius:12,padding:'14px 16px',position:'relative',overflow:'hidden'}},
+          k.ok?null:h('div',{style:{position:'absolute',top:0,left:0,width:'100%',height:2,background:C.amber}}),
+          h('div',{style:{fontSize:9,color:C.ts,marginBottom:4}},k.l),
+          h('div',{style:{fontSize:24,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:k.ok?C.teal:C.amber,lineHeight:1}},k.v),
+          h('div',{style:{fontSize:8,color:k.ok?C.teal:C.amber,marginTop:5,fontWeight:600}},k.s)
+        );
+      })
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
+      h(BarS,{title:'Taxa de Infecção Hospitalar Global — HUSF',data:D.global.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:4,h:190}),
+      h(LineMDR,{title:'MDR Institucional (/1000 pac-dia)',data:D.mdrInst.s,maxE:D.mdrInst.max.e,maxK:D.mdrInst.max.k,maxA:D.mdrInst.max.a,h:190})
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
+      h(BarS,{title:'Taxa IH — Clínica Médica',data:D.clinicaMedica.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:5}),
+      h(BarS,{title:'Taxa IH — Clínica Cirúrgica',data:D.clinicaCirurgica.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:5}),
+      h(BarS,{title:'Taxa IH — EPM / Apartamentos',data:D.epm.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:5})
+    )
+  );
+}
+
+function UtiSection(props){
+  var D=props.D,u=props.u;
+  var ud=D[u];
+  var L=ud.limiares||{};
+  return h('div',{className:'fi'},
+    h(LimLegenda),
+    h(SH,{t:'IrAS — Densidade de Incidência (infecções / 1000 dispositivo-dia)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
+      h(BarS,{title:'PAV (/1000 VM-dia)',data:ud.pav,maxY:20,lMax:L.pavMax!=null?L.pavMax:null}),
+      h(BarS,{title:'ITU Relacionada a SVD (/1000 SVD-dia)',data:ud.itu,maxY:14,lMax:L.ituMax!=null?L.ituMax:null}),
+      h(BarS,{title:'IPCS Laboratorial — CVC (/1000 CVC-dia)',data:ud.ipcs,maxY:30,lMax:L.ipcsMax!=null?L.ipcsMax:null})
+    ),
+    h(SH,{t:'Utilização de Dispositivos (%)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
+      h(BarS,{title:'SVD',data:ud.svd,unit:'%',maxY:100,lMax:L.svdMax!=null?L.svdMax:null,lMin:L.svdMin!=null?L.svdMin:null}),
+      h(BarS,{title:'CVC',data:ud.cvc,unit:'%',maxY:100,lMax:L.cvcMax!=null?L.cvcMax:null,lMin:L.cvcMin!=null?L.cvcMin:null}),
+      h(BarS,{title:'TOT / TQT',data:ud.tot,unit:'%',maxY:100,lMax:L.totMax!=null?L.totMax:null,lMin:L.totMin!=null?L.totMin:null})
+    ),
+    h(SH,{t:'Consumo de Antimicrobianos Estratégicos (DDD / 1000 pac-dia)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+      h(BarS,{title:'Pip/Tazo + Cefepime',data:ud.dddPip,maxY:250,lMax:L.pipMax!=null?L.pipMax:null,lMin:L.pipMin!=null?L.pipMin:null}),
+      h(BarS,{title:'Carbapenêmicos',data:ud.dddCarba,maxY:250,lMax:L.carbaMax!=null?L.carbaMax:null,lMin:L.carbaMin!=null?L.carbaMin:null}),
+      h(BarS,{title:'Glicopeptídeos',data:ud.dddGlico,maxY:250,lMax:L.glicoMax!=null?L.glicoMax:null,lMin:L.glicoMin!=null?L.glicoMin:null}),
+      h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200,lMax:L.poliMax!=null?L.poliMax:null,lMin:L.poliMin!=null?L.poliMin:null})
+    ),
+    h(SH,{t:'Bactérias Multirresistentes · Clopper-Pearson (biênio base fixo)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:10}},
+      h(LineMDR,{title:'MDR — Densidade de Incidência (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
+      h(BarS,{title:'Higiene das Mãos (ml/pac-dia)',data:ud.hm,refY:20,refLbl:'OMS',unit:'ml',maxY:70,h:175,note:'OMS recomenda ≥ 20 ml/pac-dia'})
+    ),
+    h(AuditCard,{data:ud.audit})
+  );
+}
+
+function UtiNeoSection(props){
+  var D=props.D;
+  var L=D.utiNeo.limiares||{};
+  return h('div',{className:'fi'},
+    h(LimLegenda),
+    h(SH,{t:'IrAS — IPCS Clinicamente Definida Associada a CVC'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
+      h(BarS,{title:'IPCS Clinicamente Definida (/1000 CVC-dia)',data:D.utiNeo.ipcs,maxY:25,h:230,lMax:L.ipcsMax!=null?L.ipcsMax:null}),
+      h(AuditCard,{data:D.utiNeo.audit})
+    )
+  );
+}
+
+function HdSection(props){
+  var D=props.D;
+  return h('div',{className:'fi'},
+    h(SH,{t:'Infecções Relacionadas ao Cateter de Hemodiálise · Clopper-Pearson (biênio base fixo)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:10}},
+      h(BarS,{title:'ILAV — Infecção Local / Externa (/1000 cat-dia)',data:D.hd.ilav,badge:'ENDÊMICA',maxY:35}),
+      h(BarS,{title:'Bacteremia / ICS (/1000 cat-dia)',data:D.hd.bact,badge:'ENDÊMICA',maxY:35}),
+      h(BarS,{title:'Pacientes em uso de Vancomicina (%)',data:D.hd.vanco,unit:'%',maxY:15})
+    ),
+    h(AuditCard,{data:D.hd.audit})
+  );
+}
+
+function ClinicaSection(props){
+  var D=props.D,which=props.which;
+  var labels={clinicaMedica:'Clínica Médica',clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos'};
+  var cd=D[which],hasSC=which!=='clinicaMedica';
+  var rows=[
+    {l:'Inf. Acesso Central',v:cd.inf.ac},
+    {l:'Inf. Urinária',v:cd.inf.itu},
+    {l:'Pneumonias',v:cd.inf.pneu}
+  ];
+  if(hasSC) rows.push({l:'Inf. Sítio Cirúrgico',v:cd.inf.sc});
+  rows.push({l:'Total',v:cd.inf.total,b:true});
+  rows.push({l:'Pacientes-dia',v:cd.inf.pd,m:true});
+  rows.push({l:'Taxa IH',v:(cd.inf.total/cd.inf.pd*100).toFixed(2)+'%',b:true,col:C.teal});
+
+  return h('div',{className:'fi',style:{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:12}},
+    h(BarS,{title:'Taxa IH — '+labels[which],data:cd.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:6,h:260}),
+    h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:12,padding:18}},
+      h('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:12,fontWeight:700,color:C.ti,marginBottom:14}},'Infecções — '+D.periodo),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:5}},
+        rows.map(function(r,i){
+          return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',
+            padding:'7px 10px',borderRadius:7,background:r.b?C.hover:'transparent',
+            borderBottom:!r.b?'1px solid '+C.brdr+'33':'none'}},
+            h('span',{style:{fontSize:11,color:r.b?C.ti:r.m?C.tm:C.ts,fontWeight:r.b?600:400}},r.l),
+            h('span',{style:{fontFamily:"'JetBrains Mono',monospace",fontSize:15,fontWeight:r.b?700:500,
+              color:r.col||(r.b?C.ti:r.m?C.tm:C.ts)}},r.v)
+          );
+        })
+      )
+    )
+  );
+}
+
+function MdrInstSection(props){
+  var D=props.D;
+  var s=D.mdrInst.s,last=s[s.length-1],prev=s[s.length-2];
+  var items=[{l:'ESBL',k:'e',col:C.blue},{l:'KPC',k:'k',col:C.red},{l:'Acinetobacter MDR',k:'a',col:C.green}];
+  return h('div',{className:'fi'},
+    h(LineMDR,{title:'Densidade de Incidência de Bactérias MDR — HUSF (/1000 pacientes-dia)',data:D.mdrInst.s,maxE:D.mdrInst.max.e,maxK:D.mdrInst.max.k,maxA:D.mdrInst.max.a,h:280}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginTop:12}},
+      items.map(function(item,i){
+        var val=last[item.k],tr=val>prev[item.k]?'↑':val<prev[item.k]?'↓':'→',ok=val<=D.mdrInst.max[item.k];
+        return h('div',{key:i,style:{background:C.card,border:'1px solid '+(ok?C.brdr:item.col+'55'),borderRadius:12,padding:'16px 18px'}},
+          h('div',{style:{fontSize:9,color:C.ts,marginBottom:6}},item.l),
+          h('div',{style:{display:'flex',alignItems:'baseline',gap:7}},
+            h('span',{style:{fontSize:30,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:item.col}},val),
+            h('span',{style:{fontSize:16,color:item.col,fontWeight:700}},tr)
+          ),
+          h('div',{style:{fontSize:8,color:C.tm,marginTop:4}},'Limiar Clopper-Pearson: '+D.mdrInst.max[item.k]+'/mil pd'),
+          h('div',{style:{fontSize:9,marginTop:3,color:ok?C.teal:C.amber,fontWeight:600}},ok?'✓ Endêmico':'⚠ Acima do limiar')
+        );
+      })
+    )
+  );
+}
+
+function AbioSection(props){
+  var D=props.D;
+  function cc(v){
+    if(v===null||v===undefined) return{bg:'transparent',c:C.tm,t:'—'};
+    if(v>=90) return{bg:'#002918',c:C.teal,t:v+'%'};
+    if(v>=70) return{bg:'#1a2d00',c:C.green,t:v+'%'};
+    if(v>=50) return{bg:'#2d2000',c:C.amber,t:v+'%'};
+    return{bg:'#2d0000',c:C.red,t:v+'%'};
+  }
+  function Tbl(tp){
+    var title=tp.title,cols=tp.cols,rows=tp.rows;
+    return h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:12,padding:16,overflowX:'auto',marginBottom:12}},
+      h('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:12,fontWeight:700,color:C.ti,marginBottom:12}},title),
+      h('table',{style:{borderCollapse:'collapse',width:'100%',fontSize:10,minWidth:580}},
+        h('thead',{},h('tr',{},
+          [h('th',{key:'o',style:{textAlign:'left',padding:'5px 10px',color:C.ts,fontWeight:600,borderBottom:'1px solid '+C.brdr,minWidth:120,background:C.surf}},'Organismo')]
+          .concat(cols.map(function(c,i){return h('th',{key:i,style:{padding:'5px 5px',color:C.ts,fontWeight:600,borderBottom:'1px solid '+C.brdr,textAlign:'center',fontSize:8,whiteSpace:'nowrap',background:C.surf}},c);}))
+        )),
+        h('tbody',{},rows.map(function(row,ri){
+          return h('tr',{key:ri,style:{background:ri%2===0?'transparent':C.hover+'44'}},
+            [h('td',{key:'o',style:{padding:'6px 10px',color:C.ti,fontFamily:"'JetBrains Mono',monospace",fontSize:10,borderBottom:'1px solid '+C.brdr+'22'}},row.o)]
+            .concat(row.vs.map(function(v,ci){
+              var r=cc(v);
+              return h('td',{key:ci,style:{padding:'5px 4px',textAlign:'center',background:r.bg,color:r.c,fontFamily:"'JetBrains Mono',monospace",fontSize:10,fontWeight:v!=null?700:400,borderBottom:'1px solid '+C.brdr+'22'}},r.t);
+            }))
+          );
+        }))
+      ),
+      h('div',{style:{marginTop:8,display:'flex',gap:14,fontSize:8,color:C.tm}},
+        h('span',{style:{color:C.teal}},'■ ≥90%'),h('span',{style:{color:C.green}},'■ 70–89%'),
+        h('span',{style:{color:C.amber}},'■ 50–69%'),h('span',{style:{color:C.red}},'■ <50%'),
+        h('span',{},'— não testado')
+      )
+    );
+  }
+  return h('div',{className:'fi'},
+    h(Tbl,{title:'Gram-Negativos — Sensibilidade (%)',cols:D.abio.gnCols,rows:D.abio.gn}),
+    h(Tbl,{title:'Gram-Positivos — Sensibilidade (%)',cols:D.abio.gpCols,rows:D.abio.gp})
+  );
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+var NAV=[
+  {id:'overview',l:'Visão Geral',g:'Institucional',ic:'◈'},
+  {id:'mdrInst',l:'Multirresistentes',g:'Institucional',ic:'⬡'},
+  {id:'abio',l:'Antibiograma',g:'Institucional',ic:'⬟'},
+  {id:'utiAB',l:'UTI Adulto',g:'Unidades Críticas',ic:'▣'},
+  {id:'utic',l:'UTIC',g:'Unidades Críticas',ic:'▣'},
+  {id:'utiNeo',l:'UTI Neonatal',g:'Unidades Críticas',ic:'◉'},
+  {id:'hd',l:'Hemodiálise',g:'Unidades Críticas',ic:'◈'},
+  {id:'clinicaMedica',l:'Clínica Médica',g:'Enfermarias',ic:'▤'},
+  {id:'clinicaCirurgica',l:'Clínica Cirúrgica',g:'Enfermarias',ic:'▤'},
+  {id:'epm',l:'EPM / Apartamentos',g:'Enfermarias',ic:'▤'},
+];
+var TITLES={overview:'Visão Geral — IrAS & MDR',mdrInst:'Multirresistentes — Institucional',
+  abio:'Antibiograma Institucional',utiAB:'UTI Adulto (UTIAB)',utic:'UTI Cardiotorácica (UTIC)',
+  utiNeo:'UTI Neonatal',hd:'Hemodiálise / Nefrologia',clinicaMedica:'Clínica Médica',
+  clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos'};
+var groups=NAV.reduce(function(acc,n){if(n.g&&acc.indexOf(n.g)===-1)acc.push(n.g);return acc;},[]);
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+function App(){
+  var state=useState('overview'); var active=state[0],setActive=state[1];
+  var dstate=useState(null); var D=dstate[0],setD=dstate[1];
+  var lstate=useState(true); var loading=lstate[0],setLoading=lstate[1];
+
+  useEffect(function(){
+    fetch('./data_iras.json?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){setD(d);setLoading(false);})
+      .catch(function(){setD(FB);setLoading(false);});
+  },[]);
+
+  if(loading) return h('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',flexDirection:'column',gap:14}},
+    h('div',{className:'pulse',style:{width:40,height:40,borderRadius:'50%',background:C.teal,opacity:.5}}),
+    h('div',{style:{fontFamily:"'Syne',sans-serif",color:C.ts,fontSize:13}},'Carregando dados...')
+  );
+
+  function renderSection(){
+    switch(active){
+      case 'overview': return h(OverviewSection,{D:D});
+      case 'mdrInst':  return h(MdrInstSection,{D:D});
+      case 'abio':     return h(AbioSection,{D:D});
+      case 'utiAB':    return h(UtiSection,{D:D,u:'utiAB'});
+      case 'utic':     return h(UtiSection,{D:D,u:'utic'});
+      case 'utiNeo':   return h(UtiNeoSection,{D:D});
+      case 'hd':       return h(HdSection,{D:D});
+      case 'clinicaMedica':    return h(ClinicaSection,{D:D,which:'clinicaMedica'});
+      case 'clinicaCirurgica': return h(ClinicaSection,{D:D,which:'clinicaCirurgica'});
+      case 'epm':      return h(ClinicaSection,{D:D,which:'epm'});
+      default: return null;
+    }
+  }
+
+  return h('div',{style:{display:'flex',height:'100vh',background:C.bg,
+    backgroundImage:'radial-gradient(circle,rgba(75,156,245,0.035) 1px,transparent 1px)',backgroundSize:'26px 26px'}},
+
+    // SIDEBAR
+    h('div',{style:{width:205,minWidth:205,background:C.surf,borderRight:'1px solid '+C.brdr,display:'flex',flexDirection:'column',overflow:'hidden'}},
+      h('div',{style:{padding:'18px 16px 14px',borderBottom:'1px solid '+C.brdr}},
+        h('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:15,fontWeight:800,color:C.teal}},'SCIH / CCIH'),
+        h('div',{style:{fontSize:9,color:C.ts,marginTop:1}},'Hospital Universitário São Francisco'),
+        h('div',{style:{fontSize:8,color:C.tm,marginTop:1}},'Bragança Paulista · SP'),
+        h('div',{style:{display:'inline-flex',alignItems:'center',gap:5,marginTop:9,background:'#001a14',padding:'3px 9px',borderRadius:4,border:'1px solid '+C.teal+'33'}},
+          h('div',{className:'pulse',style:{width:5,height:5,borderRadius:'50%',background:C.teal}}),
+          h('span',{style:{fontSize:8,color:C.teal,fontWeight:700}},D.periodo)
+        ),
+        h('a',{href:'./entrada_dados.html',style:{display:'block',marginTop:10,background:C.hover,border:'1px solid '+C.glow,borderRadius:6,padding:'5px 10px',color:C.ts,fontSize:9,textDecoration:'none',textAlign:'center',fontWeight:600}},
+          '⊕ Atualizar dados')
+      ),
+      h('div',{style:{flex:1,overflowY:'auto',padding:'6px 0'}},
+        groups.map(function(g){
+          return h('div',{key:g},
+            h('div',{style:{padding:'10px 16px 3px',fontSize:8,color:C.tm,letterSpacing:2,fontWeight:700,textTransform:'uppercase'}},g),
+            NAV.filter(function(n){return n.g===g;}).map(function(item){
+              var isA=active===item.id;
+              return h('button',{key:item.id,onClick:function(){setActive(item.id);},style:{
+                width:'100%',display:'flex',alignItems:'center',gap:8,padding:'8px 16px',
+                border:'none',cursor:'pointer',background:isA?C.hover:'transparent',
+                borderLeft:isA?'3px solid '+C.teal:'3px solid transparent',
+                color:isA?C.teal:C.ts,fontFamily:"'DM Sans',sans-serif",
+                fontSize:11,fontWeight:isA?600:400,textAlign:'left',transition:'all .12s'
+              },
+                h('span',{style:{fontSize:10,color:isA?C.teal:C.tm,minWidth:12}},item.ic),
+                item.l
+              );
+            })
+          );
+        })
+      ),
+      h('div',{style:{padding:'10px 16px',borderTop:'1px solid '+C.brdr}},
+        h('div',{style:{fontSize:8,color:C.tm,lineHeight:1.7}},
+          h('div',{},'Metodologia NHSN'),
+          h('div',{},'Clopper-Pearson · Poisson/Bin-Neg')
+        )
+      )
+    ),
+
+    // MAIN
+    h('div',{style:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}},
+      h('div',{style:{padding:'12px 20px',borderBottom:'1px solid '+C.brdr,background:C.surf,display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}},
+        h('div',{},
+          h('h1',{style:{fontFamily:"'Syne',sans-serif",fontSize:16,fontWeight:800,color:C.ti,margin:0}},TITLES[active]),
+          h('div',{style:{fontSize:9,color:C.ts,marginTop:2}},'HUSF · SCIH/CCIH · Competência: '+D.periodo+' · IrAS & Determinantes')
+        ),
+        h('div',{style:{display:'flex',alignItems:'center',gap:6,background:C.hover,padding:'6px 12px',borderRadius:8,border:'1px solid '+C.brdr}},
+          h('div',{className:'pulse',style:{width:6,height:6,borderRadius:'50%',background:C.teal,boxShadow:'0 0 6px '+C.teal}}),
+          h('span',{style:{fontSize:9,color:C.ts}},'Atividade ENDÊMICA')
+        )
+      ),
+      h('div',{key:active,style:{flex:1,overflowY:'auto',padding:16}},renderSection())
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
