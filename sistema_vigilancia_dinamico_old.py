@@ -356,7 +356,7 @@ class GeradorRelatorio:
     def gerar_html_completo(self, dados_2026: Dict, prevalencia: Dict, 
                           vpn_por_patogeno: Dict, orientacoes: Dict,
                           pressao: Dict) -> str:
-        """Gerar relatório HTML MOBILE-FIRST otimizado"""
+        """Gerar relatório HTML completo e responsivo"""
         
         timestamp = datetime.now().strftime("%d/%m/%Y às %H:%M")
         
@@ -364,576 +364,378 @@ class GeradorRelatorio:
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>HUSF Vigilância - Liberação de Isolamento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigilância Respiratória - HUSF Bragança Paulista</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* MOBILE-FIRST DESIGN */
-        * {{
-            box-sizing: border-box;
-        }}
-        
         body {{
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
-            padding: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 14px;
-            line-height: 1.4;
+            padding: 20px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }}
         
-        .container-fluid {{
-            max-width: 100%;
-            padding: 0;
+        .main-container {{
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
         }}
         
-        /* HEADER COMPACTO MOBILE */
-        .header-mobile {{
+        .header {{
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
-            padding: 15px;
+            padding: 40px;
             text-align: center;
-            border-radius: 15px 15px 0 0;
-            margin-bottom: 0;
+            position: relative;
         }}
         
-        .header-mobile h1 {{
-            font-size: 1.4rem;
-            margin: 5px 0;
-            font-weight: 700;
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)" /></svg>');
+            opacity: 0.3;
         }}
         
-        .header-mobile p {{
-            font-size: 0.85rem;
-            margin: 2px 0;
-            opacity: 0.9;
+        .header-content {{
+            position: relative;
+            z-index: 1;
         }}
         
-        /* CARDS DE DECISÃO CLÍNICA - PRIORITÁRIOS */
-        .decisao-section {{
-            background: white;
-            margin: 0;
-            padding: 15px;
+        .content {{
+            padding: 40px;
         }}
         
-        .decisao-title {{
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            text-align: center;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 8px;
-        }}
-        
-        .patogeno-card {{
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border-left: 4px solid;
-        }}
-        
-        /* STATUS COLORS */
-        .status-liberar {{ border-left-color: #28a745; }}
-        .status-cautela {{ border-left-color: #ffc107; }}
-        .status-nao-liberar {{ border-left-color: #dc3545; }}
-        
-        .patogeno-header {{
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }}
-        
-        .patogeno-nome {{
-            font-weight: 700;
-            font-size: 1rem;
-            color: #2c3e50;
-        }}
-        
-        .patogeno-vpn {{
-            font-weight: 700;
-            font-size: 1.1rem;
-            padding: 4px 8px;
-            border-radius: 8px;
-            color: white;
-        }}
-        
-        .vpn-liberar {{ background: #28a745; }}
-        .vpn-cautela {{ background: #ffc107; color: #000; }}
-        .vpn-nao-liberar {{ background: #dc3545; }}
-        
-        .patogeno-decisao {{
-            padding: 0 15px 12px 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }}
-        
-        .decisao-liberar {{ color: #28a745; }}
-        .decisao-cautela {{ color: #d39e00; }}
-        .decisao-nao-liberar {{ color: #dc3545; }}
-        
-        /* RESUMO EPIDEMIOLÓGICO - COMPACTO */
-        .resumo-section {{
-            background: white;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }}
-        
-        .resumo-title {{
-            font-size: 1rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }}
-        
-        .stats-mobile {{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }}
-        
-        .stat-mobile {{
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }}
-        
-        .stat-mobile-value {{
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #2c3e50;
-            display: block;
-        }}
-        
-        .stat-mobile-label {{
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 4px;
-        }}
-        
-        /* CRITÉRIO VISUAL - COMPACTO */
-        .criterio-mobile {{
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 10px 0;
-            border-left: 4px solid #2196f3;
-        }}
-        
-        .criterio-grid {{
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            text-align: center;
-        }}
-        
-        .criterio-item {{
-            padding: 8px;
-        }}
-        
-        .criterio-valor {{
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: block;
-        }}
-        
-        .criterio-label {{
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 4px;
-        }}
-        
-        .valor-liberar {{ color: #28a745; }}
-        .valor-cautela {{ color: #ffc107; }}
-        .valor-pcr {{ color: #dc3545; }}
-        
-        /* SEÇÃO DETALHES - COLAPSÍVEL */
-        .detalhes-section {{
-            background: white;
-            margin: 10px 0;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }}
-        
-        .detalhes-toggle {{
-            background: #f8f9fa;
-            padding: 12px 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: none;
-            width: 100%;
-            font-weight: 600;
-            color: #2c3e50;
-        }}
-        
-        .detalhes-content {{
-            padding: 15px;
-            display: none;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }}
-        
-        .detalhes-content.show {{
-            display: block;
-        }}
-        
-        /* PATÓGENOS DISTRIBUIÇÃO - COMPACTO */
-        .patogeno-badge-mobile {{
-            display: inline-block;
-            padding: 6px 10px;
+        .info-card {{
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin: 3px;
-            white-space: nowrap;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #007bff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }}
         
-        .badge-rinovirus {{ background: #fff3e0; color: #f57c00; }}
-        .badge-influenza {{ background: #fce4ec; color: #c2185b; }}
-        .badge-covid {{ background: #e8f5e8; color: #388e3c; }}
-        .badge-vsr {{ background: #e3f2fd; color: #1976d2; }}
-        .badge-outros {{ background: #f3e5f5; color: #7b1fa2; }}
-        
-        /* ALERTA ESPECIAL */
-        .alerta-especial {{
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 2px solid #ffc107;
-            border-radius: 12px;
-            padding: 15px;
+        .vpn-card {{
+            border-radius: 15px;
+            padding: 25px;
             margin: 15px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }}
         
-        /* FOOTER COMPACTO */
-        .footer-info {{
-            background: #f8f9fa;
-            padding: 15px;
+        .vpn-card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }}
+        
+        .vpn-liberacao-segura {{
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+        }}
+        
+        .vpn-cautela {{
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 5px solid #ffc107;
+        }}
+        
+        .vpn-atencao {{
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 5px solid #dc3545;
+        }}
+        
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }}
+        
+        .stat-item {{
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
             text-align: center;
-            font-size: 0.8rem;
-            color: #6c757d;
-            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-top: 3px solid #007bff;
         }}
         
-        /* TIMESTAMP FIXO */
-        .timestamp-mobile {{
+        .stat-value {{
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }}
+        
+        .criterio-box {{
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #2196f3;
+        }}
+        
+        .fonte-info {{
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }}
+        
+        .patogeno-badge {{
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+            font-size: 0.9rem;
+        }}
+        
+        .badge-rinovirus {{ background: #fff3e0; color: #f57c00; border: 2px solid #ffb74d; }}
+        .badge-influenza {{ background: #fce4ec; color: #c2185b; border: 2px solid #f06292; }}
+        .badge-covid {{ background: #e8f5e8; color: #388e3c; border: 2px solid #66bb6a; }}
+        .badge-vsr {{ background: #e3f2fd; color: #1976d2; border: 2px solid #42a5f5; }}
+        .badge-outros {{ background: #f3e5f5; color: #7b1fa2; border: 2px solid #ab47bc; }}
+        
+        .alert-destaque {{
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 2px solid #ffa000;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }}
+        
+        @media (max-width: 768px) {{
+            .content {{ padding: 20px; }}
+            .header {{ padding: 20px; }}
+            .stats-grid {{ grid-template-columns: 1fr; }}
+        }}
+        
+        .ultima-atualizacao {{
             position: fixed;
-            top: 10px;
-            right: 10px;
+            bottom: 20px;
+            right: 20px;
             background: rgba(0,0,0,0.8);
             color: white;
-            padding: 6px 10px;
-            border-radius: 15px;
-            font-size: 0.7rem;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             z-index: 1000;
-        }}
-        
-        /* RESPONSIVO - TABLETS E DESKTOP */
-        @media (min-width: 768px) {{
-            body {{ padding: 20px; font-size: 16px; }}
-            .header-mobile h1 {{ font-size: 1.8rem; }}
-            .decisao-title {{ font-size: 1.3rem; }}
-            .stats-mobile {{ grid-template-columns: repeat(4, 1fr); }}
-            .patogeno-header {{ padding: 15px 20px; }}
-            .resumo-section, .decisao-section {{ padding: 20px; }}
-        }}
-        
-        /* MODO ESCURO - DETECÇÃO AUTOMÁTICA */
-        @media (prefers-color-scheme: dark) {{
-            body {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }}
-            .header-mobile {{ background: linear-gradient(135deg, #0f3460 0%, #0e2954 100%); }}
-        }}
-        
-        /* ANIMAÇÕES SUAVES */
-        .patogeno-card, .resumo-section {{
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }}
-        
-        .patogeno-card:active {{
-            transform: scale(0.98);
         }}
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <!-- HEADER COMPACTO -->
-        <div class="header-mobile">
-            <h1><i class="fas fa-shield-virus"></i> HUSF Vigilância</h1>
-            <p>Liberação de Isolamento Respiratório</p>
-            <small>SE {dados_2026['semana_epidemiologica']}/2026 • {dados_2026['periodo']} • Dr. Leandro CCIH</small>
+    <div class="main-container">
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-shield-virus"></i> Vigilância Respiratória</h1>
+                <p class="mb-2">HUSF - Hospital Universitário São Francisco</p>
+                <p class="mb-2">Bragança Paulista, SP</p>
+                <small>Dr. Leandro - CCIH/SCIH | Sistema com Dados Dinâmicos</small>
+            </div>
         </div>
         
-        <!-- SEÇÃO PRINCIPAL: DECISÕES CLÍNICAS -->
-        <div class="decisao-section">
-            <div class="decisao-title">
-                <i class="fas fa-stethoscope"></i> Orientações de Liberação
-            </div>'''
+        <div class="content">
+            <!-- ALERTA ESPECIAL PARA DADOS ATUALIZADOS -->
+            <div class="alert alert-success">
+                <h4><i class="fas fa-sync-alt"></i> Sistema Atualizado!</h4>
+                <p><strong>Dados mais recentes:</strong> SE {dados_2026['semana_epidemiologica']}/2026 ({dados_2026['periodo']})</p>
+                <p class="mb-0"><strong>Total de casos SRAG nacional:</strong> {self.formatar_numero(dados_2026['total_casos_srag'])} casos</p>
+            </div>
+            
+            <!-- CRITÉRIO PRINCIPAL -->
+            <div class="criterio-box">
+                <h3><i class="fas fa-bullseye"></i> Critério de Liberação Otimizado</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div style="font-size: 3rem; color: #28a745;">≥95%</div>
+                            <strong style="color: #28a745;">LIBERAÇÃO SEGURA</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div style="font-size: 2.5rem; color: #ffc107;">90-95%</div>
+                            <strong style="color: #ffc107;">CAUTELA</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div style="font-size: 2.5rem; color: #dc3545;">&lt;90%</div>
+                            <strong style="color: #dc3545;">RT-PCR</strong>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-0"><strong>Base Científica:</strong> Meta-análises com +50.000 participantes | VPN = Valor Preditivo Negativo</p>
+            </div>
+            
+            <!-- CENÁRIO EPIDEMIOLÓGICO ATUAL -->
+            <div class="info-card">
+                <h3><i class="fas fa-globe-americas"></i> Cenário Nacional Atual</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <i class="fas fa-procedures" style="font-size: 2rem; color: #007bff;"></i>
+                        <div class="stat-value">{self.formatar_numero(dados_2026['total_casos_srag'])}</div>
+                        <small>Casos SRAG Notificados</small>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-percentage" style="font-size: 2rem; color: #28a745;"></i>
+                        <div class="stat-value">{dados_2026['taxa_positividade_geral']:.1%}</div>
+                        <small>Taxa de Positividade</small>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-calendar-week" style="font-size: 2rem; color: #ffc107;"></i>
+                        <div class="stat-value">SE {dados_2026['semana_epidemiologica']}</div>
+                        <small>Semana Epidemiológica</small>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-virus" style="font-size: 2rem; color: #dc3545;"></i>
+                        <div class="stat-value">{self.formatar_numero(dados_2026['casos_positivos'])}</div>
+                        <small>Casos Positivos</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DISTRIBUIÇÃO VIRAL -->
+            <div class="info-card">
+                <h3><i class="fas fa-chart-pie"></i> Distribuição dos Patógenos</h3>
+                <div class="row">'''
         
-        # CARDS DE DECISÃO CLÍNICA PARA CADA PATÓGENO
-        patogenos_ordem = ['COVID19', 'INFLUENZA_A', 'INFLUENZA_B', 'VSR', 'RINOVIRUS', 'OUTROS']
-        patogenos_nomes = {
-            'COVID19': 'COVID-19',
-            'INFLUENZA_A': 'Influenza A', 
-            'INFLUENZA_B': 'Influenza B',
-            'VSR': 'VSR',
-            'RINOVIRUS': 'Rinovírus',
-            'OUTROS': 'Outros'
+        # Adicionar badges dos patógenos
+        patogenos_info = {
+            'RINOVIRUS': ('badge-rinovirus', 'fas fa-wind'),
+            'INFLUENZA_A': ('badge-influenza', 'fas fa-temperature-high'), 
+            'COVID19': ('badge-covid', 'fas fa-lungs'),
+            'VSR': ('badge-vsr', 'fas fa-baby'),
+            'INFLUENZA_B': ('badge-influenza', 'fas fa-thermometer'),
+            'OUTROS': ('badge-outros', 'fas fa-question-circle')
         }
         
-        for patogeno in patogenos_ordem:
-            if patogeno not in vpn_por_patogeno:
-                continue
-                
-            vpn = vpn_por_patogeno[patogeno]
-            orientacao = orientacoes[patogeno]
-            nome_display = patogenos_nomes.get(patogeno, patogeno)
-            
-            # Determinar status visual
-            if vpn >= 0.95:
-                status_class = "status-liberar"
-                vpn_class = "vpn-liberar" 
-                decisao_class = "decisao-liberar"
-                decisao_icon = "fas fa-check-circle"
-                decisao_text = "LIBERAR ISOLAMENTO"
-            elif vpn >= 0.90:
-                status_class = "status-cautela"
-                vpn_class = "vpn-cautela"
-                decisao_class = "decisao-cautela" 
-                decisao_icon = "fas fa-exclamation-triangle"
-                decisao_text = "AVALIAR CLINICAMENTE"
-            else:
-                status_class = "status-nao-liberar"
-                vpn_class = "vpn-nao-liberar"
-                decisao_class = "decisao-nao-liberar"
-                decisao_icon = "fas fa-times-circle"
-                decisao_text = "RT-PCR RECOMENDADO"
-            
-            # Extrair texto limpo da orientação
-            orientacao_limpa = orientacao.split(" - ", 1)[-1] if " - " in orientacao else orientacao
-            orientacao_limpa = orientacao_limpa.replace("**", "").replace("🟢", "").replace("🟡", "").replace("🟠", "").replace("🔴", "").strip()
-            
-            html += f'''
-            <!-- CARD {nome_display} -->
-            <div class="patogeno-card {status_class}">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">{nome_display}</div>
-                    <div class="patogeno-vpn {vpn_class}">{vpn:.0%}</div>
-                </div>
-                <div class="patogeno-decisao {decisao_class}">
-                    <i class="{decisao_icon}"></i> {decisao_text}
-                </div>
-            </div>'''
+        for patogeno, (badge_class, icon) in patogenos_info.items():
+            if patogeno in dados_2026:
+                percentual = dados_2026[patogeno] * 100
+                html += f'''
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <span class="patogeno-badge {badge_class}">
+                            <i class="{icon}"></i> {patogeno.replace('_', ' ')}: {percentual:.1f}%
+                        </span>
+                    </div>'''
         
         html += '''
-        </div>
+                </div>
+            </div>
+            
+            <!-- VPNs E ORIENTAÇÕES POR PATÓGENO -->
+            <div class="info-card">
+                <h3><i class="fas fa-stethoscope"></i> Orientações por Patógeno</h3>'''
         
-        <!-- CRITÉRIO VISUAL COMPACTO -->
-        <div class="criterio-mobile">
-            <div style="text-align: center; margin-bottom: 10px; font-weight: 700; color: #2c3e50;">
-                <i class="fas fa-bullseye"></i> Critério de Liberação
-            </div>
-            <div class="criterio-grid">
-                <div class="criterio-item">
-                    <span class="criterio-valor valor-liberar">≥95%</span>
-                    <div class="criterio-label valor-liberar">LIBERAR</div>
-                </div>
-                <div class="criterio-item">
-                    <span class="criterio-valor valor-cautela">90-95%</span>
-                    <div class="criterio-label valor-cautela">CAUTELA</div>
-                </div>
-                <div class="criterio-item">
-                    <span class="criterio-valor valor-pcr">&lt;90%</span>
-                    <div class="criterio-label valor-pcr">RT-PCR</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- RESUMO EPIDEMIOLÓGICO COMPACTO -->
-        <div class="resumo-section">
-            <div class="resumo-title">
-                <i class="fas fa-chart-line"></i>
-                Cenário Epidemiológico
-            </div>
-            <div class="stats-mobile">
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">{self.formatar_numero(dados_2026['total_casos_srag'])}</span>
-                    <div class="stat-mobile-label">Casos SRAG</div>
-                </div>
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">{dados_2026['taxa_positividade_geral']:.0%}</span>
-                    <div class="stat-mobile-label">Positividade</div>
-                </div>
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">SE {dados_2026['semana_epidemiologica']}</span>
-                    <div class="stat-mobile-label">Sem. Epidem.</div>
-                </div>
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">{self.formatar_numero(dados_2026['casos_positivos'])}</span>
-                    <div class="stat-mobile-label">Positivos</div>
-                </div>
-            </div>
-        </div>'''
+        # Gerar cards de VPN para cada patógeno
+        for patogeno in vpn_por_patogeno:
+            vpn = vpn_por_patogeno[patogeno]
+            orientacao = orientacoes[patogeno]
+            
+            # Determinar classe CSS baseada no VPN
+            if vpn >= 0.95:
+                card_class = "vpn-liberacao-segura"
+                icon_class = "fas fa-check-circle"
+                icon_color = "#28a745"
+            elif vpn >= 0.90:
+                card_class = "vpn-cautela"
+                icon_class = "fas fa-exclamation-triangle"
+                icon_color = "#ffc107"
+            else:
+                card_class = "vpn-atencao"
+                icon_class = "fas fa-times-circle"
+                icon_color = "#dc3545"
+            
+            html += f'''
+                <div class="vpn-card {card_class}">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            <i class="{icon_class}" style="font-size: 3rem; color: {icon_color};"></i>
+                        </div>
+                        <div class="col-md-3">
+                            <h5 class="mb-1">{patogeno.replace('_', ' ')}</h5>
+                            <h4 class="mb-0" style="color: {icon_color};">VPN: {vpn:.1%}</h4>
+                        </div>
+                        <div class="col-md-7">
+                            <p class="mb-0">{orientacao}</p>
+                        </div>
+                    </div>
+                </div>'''
         
         # Alerta especial para Rinovírus se aplicável
         if 'RINOVIRUS' in vpn_por_patogeno and vpn_por_patogeno['RINOVIRUS'] < 0.95:
             html += '''
-        <!-- ALERTA ESPECIAL RINOVÍRUS -->
-        <div class="alerta-especial">
-            <div style="font-weight: 700; margin-bottom: 8px;">
-                <i class="fas fa-exclamation-triangle"></i> Atenção: Rinovírus
-            </div>
-            <div style="font-size: 0.9rem;">
-                <strong>Principal patógeno circulante.</strong> Sensibilidade limitada (50%). 
-                Teste negativo + sintomas → RT-PCR recomendado.
-            </div>
-        </div>'''
-        
-        # Seções colapsíveis de detalhes
-        html += '''
-        <!-- DETALHES: DISTRIBUIÇÃO DE PATÓGENOS -->
-        <div class="detalhes-section">
-            <button class="detalhes-toggle" onclick="toggleDetalhes('distribuicao')">
-                <span><i class="fas fa-chart-pie"></i> Distribuição dos Patógenos</span>
-                <i class="fas fa-chevron-down" id="icon-distribuicao"></i>
-            </button>
-            <div class="detalhes-content" id="content-distribuicao">'''
-                
-        # Adicionar badges dos patógenos
-        patogenos_info = {
-            'RINOVIRUS': ('badge-rinovirus', 'Rinovírus'),
-            'INFLUENZA_A': ('badge-influenza', 'Influenza A'), 
-            'COVID19': ('badge-covid', 'COVID-19'),
-            'VSR': ('badge-vsr', 'VSR'),
-            'INFLUENZA_B': ('badge-influenza', 'Influenza B'),
-            'OUTROS': ('badge-outros', 'Outros')
-        }
-        
-        for patogeno, (badge_class, nome_display) in patogenos_info.items():
-            if patogeno in dados_2026:
-                percentual = dados_2026[patogeno] * 100
-                html += f'''<span class="patogeno-badge-mobile {badge_class}">{nome_display}: {percentual:.1f}%</span>'''
+            <div class="alert-destaque">
+                <h5><i class="fas fa-exclamation-triangle"></i> Atenção Especial: Rinovírus</h5>
+                <p><strong>Principal patógeno circulante</strong> - Sensibilidade limitada dos testes de antígeno (50%).</p>
+                <p class="mb-0">Teste negativo + sintomas respiratórios → <strong>RT-PCR recomendado</strong></p>
+            </div>'''
         
         html += f'''
             </div>
-        </div>
-        
-        <!-- DETALHES: BASE CIENTÍFICA -->
-        <div class="detalhes-section">
-            <button class="detalhes-toggle" onclick="toggleDetalhes('cientifica')">
-                <span><i class="fas fa-microscope"></i> Base Científica</span>
-                <i class="fas fa-chevron-down" id="icon-cientifica"></i>
-            </button>
-            <div class="detalhes-content" id="content-cientifica">
-                <div style="margin-bottom: 15px;">
-                    <strong>Sensibilidades (Meta-análises):</strong><br>
-                    • COVID-19: 70% (60 estudos)<br>
-                    • Influenza A: 62% (159 estudos)<br>  
-                    • Influenza B: 58% (159 estudos)<br>
-                    • VSR: 75% (literatura)<br>
-                    • Rinovírus: 50% (conservadora)
+            
+            <!-- INFORMAÇÕES CIENTÍFICAS -->
+            <div class="info-card">
+                <h3><i class="fas fa-microscope"></i> Base Científica</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Sensibilidades por Meta-análise:</h6>
+                        <ul>
+                            <li><strong>COVID-19:</strong> 70% (Meta-análise 60 estudos)</li>
+                            <li><strong>Influenza A:</strong> 62% (Meta-análise 159 estudos)</li>
+                            <li><strong>Influenza B:</strong> 58% (Meta-análise 159 estudos)</li>
+                            <li><strong>VSR:</strong> 75% (Literatura disponível)</li>
+                            <li><strong>Rinovírus:</strong> 50% (Estimativa conservadora)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Parâmetros do Sistema:</h6>
+                        <ul>
+                            <li><strong>Especificidade:</strong> 98% (todos os testes)</li>
+                            <li><strong>Critério liberação:</strong> VPN ≥ 95%</li>
+                            <li><strong>Atualização:</strong> Quinzenal</li>
+                            <li><strong>Dados:</strong> InfoGripe/Fiocruz</li>
+                        </ul>
+                    </div>
                 </div>
-                <div>
-                    <strong>Parâmetros do Sistema:</strong><br>
-                    • Especificidade: 98% (todos os testes)<br>
-                    • VPN ≥ 95% = Liberação segura<br>
-                    • Atualização: Quinzenal<br>
-                    • Fonte: InfoGripe/Fiocruz
-                </div>
             </div>
-        </div>
-        
-        <!-- FOOTER COMPACTO -->
-        <div class="footer-info">
-            <div style="margin-bottom: 8px;">
-                <strong>{dados_2026['fonte']}</strong>
+            
+            <!-- FONTE E RODAPÉ -->
+            <div class="fonte-info text-center">
+                <h6><i class="fas fa-database"></i> Fonte dos Dados</h6>
+                <p>{dados_2026['fonte']}</p>
+                <p><strong>Sistema HUSF:</strong> Baseado em evidências científicas para vigilância hospitalar</p>
+                <p class="mb-0"><small>Desenvolvido para orientar liberação de isolamento respiratório | Dr. Leandro - CCIH/SCIH</small></p>
             </div>
-            <div style="margin-bottom: 5px;">
-                Sistema HUSF - Dr. Leandro CCIH/SCIH
-            </div>
-            <div style="font-size: 0.75rem;">
-                Baseado em evidências científicas para vigilância hospitalar
-            </div>
-        </div>
-        
-        <!-- TIMESTAMP FLUTUANTE -->
-        <div class="timestamp-mobile">
-            <i class="fas fa-clock"></i> {timestamp}
         </div>
     </div>
     
+    <!-- Timestamp flutuante -->
+    <div class="ultima-atualizacao">
+        <i class="fas fa-clock"></i> Atualizado em {timestamp}
+    </div>
+    
     <script>
-        // Função para toggle das seções colapsíveis
-        function toggleDetalhes(secao) {{
-            const content = document.getElementById('content-' + secao);
-            const icon = document.getElementById('icon-' + secao);
-            
-            if (content.classList.contains('show')) {{
-                content.classList.remove('show');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }} else {{
-                content.classList.add('show');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            }}
-        }}
-        
-        // Auto-refresh da página a cada 30 minutos (1800000 ms)
+        // Auto-refresh da página a cada 30 minutos
         setTimeout(function() {{
             location.reload();
         }}, 1800000);
         
-        // PWA-like behavior: add to homescreen hint
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {{
-            deferredPrompt = e;
-        }});
-        
-        // Vibração no toque dos cards (se suportado)
-        document.querySelectorAll('.patogeno-card').forEach(card => {{
-            card.addEventListener('touchstart', () => {{
-                if (navigator.vibrate) {{
-                    navigator.vibrate(50);
-                }}
-            }});
-        }});
-        
         // Log para debug
-        console.log('HUSF Vigilância Mobile - Sistema carregado');
+        console.log('HUSF Vigilância Respiratória - Sistema carregado');
         console.log('Dados SE {dados_2026["semana_epidemiologica"]}/2026 - {dados_2026["total_casos_srag"]:,} casos');
-        console.log('Layout otimizado para smartphone');
-        
-        // Service Worker para cache (básico)
-        if ('serviceWorker' in navigator) {{
-            window.addEventListener('load', () => {{
-                // Registrar SW seria aqui, mas não implementamos arquivo SW
-                console.log('Service Worker support detected');
-            }});
-        }}
-        
-        // Detectar orientação e ajustar layout
-        function adjustForOrientation() {{
-            const isLandscape = window.innerWidth > window.innerHeight;
-            document.body.classList.toggle('landscape', isLandscape);
-        }}
-        
-        window.addEventListener('orientationchange', adjustForOrientation);
-        window.addEventListener('resize', adjustForOrientation);
-        adjustForOrientation();
     </script>
 </body>
 </html>'''
