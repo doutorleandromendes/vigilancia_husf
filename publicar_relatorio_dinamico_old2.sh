@@ -2,7 +2,6 @@
 
 # PUBLICAÇÃO HUSF - VERSÃO DINÂMICA ATUALIZADA
 # Sistema que busca dados mais recentes automaticamente
-# Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH
 
 echo "🏥 Publicando relatório HUSF com dados dinâmicos - $(date '+%d/%m/%Y %H:%M')"
 
