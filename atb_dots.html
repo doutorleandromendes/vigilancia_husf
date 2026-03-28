@@ -468,13 +468,28 @@ function App(){
   var ps=useState('2026');  var periodo=ps[0],setPeriodo=ps[1];
 
   useEffect(function(){
-    // Apply 2026 fallback immediately based on current periodo default
-    var yearGuess = '2026'; // current operational year
-    if(yearGuess === '2026') RAW = RAW_2026;
     fetch('./data_iras.json?t='+Date.now())
       .then(function(r){return r.json();})
       .then(function(d){
-        if(d.dots){RAW=flattenDots(d.dots);}
+        if(d.dots){
+          // O JSON acumula todos os meses de 2026 via entrada_dados.
+          // Empurra TODOS os pontos acumulados (não só c:1) para RAW_2026
+          // no índice de mês correto, preservando RAW_2025 intacto.
+          var MORD=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+          Object.keys(d.dots).forEach(function(atk){
+            if(!RAW_2026[atk]) return;
+            Object.keys(d.dots[atk]).forEach(function(uk){
+              if(!RAW_2026[atk][uk]) return;
+              // Garante que o array tem 12 posições
+              while(RAW_2026[atk][uk].length<12) RAW_2026[atk][uk].push(null);
+              d.dots[atk][uk].forEach(function(pt){
+                var moIdx=MORD.indexOf((pt.p||'').split('/')[0]);
+                if(moIdx>=0) RAW_2026[atk][uk][moIdx]=pt.v;
+              });
+            });
+          });
+          RAW=RAW_2026;
+        }
         if(d.periodo) setPeriodo(d.periodo);
       }).catch(function(){});
   },[]);

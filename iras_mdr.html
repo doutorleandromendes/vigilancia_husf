@@ -574,7 +574,23 @@ function App(){
     setD(FB); setLoading(false);
     fetch('./data_iras.json?t='+Date.now())
       .then(function(r){return r.json();})
-      .then(function(d){setD(d);})
+      .then(function(d){
+        // Para HD: ilavTemp/ilavPerm/bactTemp/bactPerm só vêm com o mês corrente no JSON.
+        // Preserva a série histórica mensal do FB e apende o ponto atual do JSON.
+        var HD_MONTHLY=['ilavTemp','ilavPerm','bactTemp','bactPerm'];
+        if(d.hd){
+          HD_MONTHLY.forEach(function(k){
+            var jv=d.hd[k], fbv=FB.hd&&FB.hd[k];
+            if(!Array.isArray(jv)||!Array.isArray(fbv)) return;
+            var onlyCurr=jv.length>0&&jv.every(function(x){return x.c;});
+            if(onlyCurr){
+              var hist=fbv.filter(function(x){return !x.c;});
+              d.hd[k]=hist.concat(jv);
+            }
+          });
+        }
+        setD(d);
+      })
       .catch(function(){});
   },[]);
 

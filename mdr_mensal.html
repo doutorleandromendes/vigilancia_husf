@@ -358,7 +358,70 @@ function App(){
     fetch('./data_iras.json?t='+Date.now())
       .then(function(r){return r.json();})
       .then(function(d){
-        if(d.mdrMensal){ setData(d.mdrMensal); }
+        if(d.mdrMensal){
+          // Mescla histórico do FALLBACK com série acumulada do JSON.
+          // O JSON acumula mês a mês via entrada_dados (appS/appendMdr).
+          // A série do FALLBACK cobre 2025; a do JSON cobre os meses de 2026 já inseridos.
+          // Resultado: FALLBACK como base, sobrescrito por qualquer mês que exista no JSON.
+          var merged=JSON.parse(JSON.stringify(FALLBACK_MDR));
+          ['utiAB','utic'].forEach(function(unit){
+            var src=d.mdrMensal[unit];
+            if(!src||!merged[unit]) return;
+
+            // Índice de pac-dia por rótulo (para cálculo de taxa quando v:null)
+            var pdByLabel={};
+            (src.pd||[]).forEach(function(x){if(x.p)pdByLabel[x.p]=x.v;});
+
+            // Para cada organismo: mescla série do JSON sobre o FALLBACK
+            ['esbl','kpc','acin','pseu'].forEach(function(org){
+              var jsonSeries=src[org]||[];
+              if(!jsonSeries.length) return;
+              var jsonCounts=src.counts&&src.counts[org]||[];
+              var series=merged[unit][org];
+              if(!series) return;
+
+              // Remove o marcador c:1 da série base (será recolocado)
+              series=series.filter(function(x){return !x.c;});
+
+              jsonSeries.forEach(function(jpt,ji){
+                var pd=pdByLabel[jpt.p]||null;
+                var countForPt=jsonCounts[ji]!=null?jsonCounts[ji]:null;
+                var rate=jpt.v!==null&&jpt.v!==undefined
+                  ? jpt.v
+                  : (pd&&countForPt!=null?parseFloat((countForPt/pd*1000).toFixed(2)):null);
+                var entry={p:jpt.p,v:rate};
+                if(pd!=null) entry.pd=pd;
+                if(jpt.c) entry.c=1;
+
+                // Substitui se já existe no FALLBACK, senão adiciona
+                var idx=series.findIndex(function(x){return x.p===jpt.p;});
+                if(idx>=0) series[idx]=entry; else series.push(entry);
+              });
+
+              merged[unit][org]=series;
+
+              // Atualiza counts: FALLBACK counts + counts do JSON
+              // (FALLBACK tem counts de 2025; JSON tem os de 2026 acumulados)
+              var fbCounts=merged[unit].counts&&merged[unit].counts[org]||[];
+              if(jsonCounts.length){
+                merged[unit].counts=merged[unit].counts||{};
+                // Mantém os counts do FALLBACK e adiciona os do JSON no final
+                // (evita duplicatas contando pontos únicos)
+                merged[unit].counts[org]=fbCounts.slice(0,-1).concat(jsonCounts);
+              }
+            });
+
+            // Atualiza série de pac-dia
+            var pdArr=merged[unit].pd||[];
+            pdArr=pdArr.filter(function(x){return !x.c;});
+            (src.pd||[]).forEach(function(jpt){
+              var idx=pdArr.findIndex(function(x){return x.p===jpt.p;});
+              if(idx>=0) pdArr[idx]=jpt; else pdArr.push(jpt);
+            });
+            merged[unit].pd=pdArr;
+          });
+          setData(merged);
+        }
         if(d.periodo){ setPeriodo(d.periodo); }
       })
       .catch(function(){ /* keep fallback */ });
