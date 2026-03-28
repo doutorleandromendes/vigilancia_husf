@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCIH/HUSF — MDR Mensal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0f2f5;font-family:'IBM Plex Sans',sans-serif;color:#ddeeff;min-height:100vh;
+    background-image:radial-gradient(circle,rgba(75,156,245,0.035) 1px,transparent 1px);
+    background-size:26px 26px}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .fi{animation:fadeIn .18s ease-out}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .pulse{animation:pulse 2.2s ease-in-out infinite}
+  button{cursor:pointer;transition:all .12s}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.min.js"></script>
+<script>
+'use strict';
+if (!window.React||!window.ReactDOM||!window.Recharts){
+  document.getElementById('root').innerHTML='<div style="color:#f87171;padding:40px;font-family:monospace">Erro: biblioteca não carregada.</div>';
+  throw new Error('lib fail');
+}
+var h=React.createElement,useState=React.useState,useEffect=React.useEffect,useMemo=React.useMemo;
+
+// ── Tokens ────────────────────────────────────────────────────────────────────
+var C={bg:'#f0f2f5',surf:'#ffffff',card:'#ffffff',hover:'#f0f2f5',brdr:'#d0d7de',glow:'#b0bec5',teal:'#00695c',blue:'#1565c0',indigo:'#4527a0',amber:'#e65100',red:'#c62828',green:'#2e7d32',ti:'#1a2744',ts:'#4a5568',tm:'#8898aa',hist:'#9eaab8',curr:'#1565c0'};
+
+// Organism metadata — KPC and Acinetobacter are PRIORITY
+var ORGS=[
+  {key:'kpc',  label:'KPC',            color:'#c62828', priority:true,  stroke:2.5, dot:4},
+  {key:'acin', label:'Acinetobacter',  color:'#1565c0', priority:true,  stroke:2.5, dot:4},
+  {key:'esbl', label:'ESBL',           color:'#2e7d32', priority:false, stroke:1.5, dot:3},
+  {key:'pseu', label:'Pseudomonas',    color:'#6a1b9a', priority:false, stroke:1.5, dot:2},
+];
+
+var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ── Recharts ──────────────────────────────────────────────────────────────────
+var RC=Recharts;
+var ComposedChart=RC.ComposedChart,BarChart=RC.BarChart,Bar=RC.Bar;
+var LineChart=RC.LineChart,Line=RC.Line;
+var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
+var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer,Legend=RC.Legend;
+var RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea,Cell=RC.Cell,Area=RC.Area;
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+function makeTip(unit){
+  return function T(p){
+    if(!p.active||!p.payload||!p.payload.length) return null;
+    var items=p.payload.filter(function(x){return x.value!=null&&x.value>0;})
+                       .sort(function(a,b){return b.value-a.value;});
+    if(!items.length) return null;
+    return h('div',{style:{background:C.surf,border:'1px solid '+C.glow,borderRadius:8,
+      padding:'10px 14px',fontSize:12,minWidth:160}},
+      h('div',{style:{color:C.ts,fontSize:10,marginBottom:6,fontWeight:600}},p.label),
+      items.map(function(it,i){
+        return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',
+          gap:14,marginBottom:2}},
+          h('span',{style:{color:it.color||C.ts,fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11}},it.name),
+          h('span',{style:{color:it.color||C.ti,fontFamily:"'IBM Plex Mono',monospace",
+            fontSize:11,fontWeight:700}},
+            typeof it.value==='number'?it.value.toFixed(2):it.value)
+        );
+      }),
+      p.payload[0]&&p.payload[0].payload&&p.payload[0].payload.pd>0
+        ? h('div',{style:{color:C.tm,fontSize:9,marginTop:5,borderTop:'1px solid '+C.brdr,paddingTop:4}},
+            p.payload[0].payload.pd+' pac-dia')
+        : null
+    );
+  };
+}
+
+// ── Build 13-month window from series data ─────────────────────────────────────
+function buildChartData(unitData, orgs){
+  // Use esbl series as the timeline reference (longest series)
+  var ref=(unitData.esbl||unitData.kpc||[]);
+  // Take last 13 points (or fewer if not enough data)
+  var pts=ref.slice(-13);
+  if(!pts.length) return [];
+
+  // Determine "current year" from last point's label (e.g. 'fev/26' → '26')
+  var lastLbl=(pts[pts.length-1]||{}).p||'';
+  var currYr=lastLbl.split('/')[1]||'';
+
+  return pts.map(function(refPt,i){
+    var lbl=refPt.p;
+    var ptYr=(lbl||'').split('/')[1]||'';
+    var prev=ptYr!==currYr;
+    var row={m:lbl,prev:prev,pd:refPt.pd};
+    orgs.forEach(function(org){
+      var series=unitData[org.key]||[];
+      // Find matching point by label
+      var sp=series.find(function(s){return s.p===lbl;});
+      var v=sp&&sp.v!=null?sp.v:null;
+      row[org.key]=v;
+      // Split into prev/curr segments for faded line rendering
+      row[org.key+'_prev']=prev?v:null;
+      row[org.key+'_curr']=!prev?v:null;
+      // Share boundary point on both segments for visual continuity
+      var isFirst=!prev&&i>0&&pts[i-1]&&(pts[i-1].p||'').split('/')[1]!==currYr;
+      if(isFirst){ row[org.key+'_prev']=v; }
+    });
+    return row;
+  });
+}
+
+// ── CHART: Multi-line with KPC/Acin emphasis, year-split fading ───────────────
+function LineChart4(props){
+  var data=props.data, ht=props.h||280, showLegend=props.showLegend!==false;
+  var orgs=props.orgs||ORGS;
+
+  // Find prev-year zone boundaries for ReferenceArea
+  var pvFirst=null,pvLast=null;
+  data.forEach(function(d){if(d.prev){if(!pvFirst)pvFirst=d.m;pvLast=d.m;}});
+
+  return h(RCont,{width:'100%',height:ht},
+    h(ComposedChart,{data:data,margin:{top:8,right:12,left:-20,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+      // Shade prev-year zone
+      pvFirst?h(RefArea,{x1:pvFirst,x2:pvLast,fill:'#f0f2f5',fillOpacity:0.7,stroke:'none'}):null,
+      // Year boundary line
+      pvLast?h(RefLine,{x:pvLast,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2}):null,
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false,allowDecimals:true}),
+      h(RCTip,{content:makeTip('‰')}),
+      showLegend?h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:C.ts,paddingTop:6}}):null,
+      // Render each organism as two Lines: prev year (faded) + curr year (full)
+      orgs.map(function(org){
+        return [
+          // Prev-year segment — faded, no legend entry
+          h(Line,{key:org.key+'_p',type:'monotone',dataKey:org.key+'_prev',
+            stroke:org.color,strokeWidth:org.stroke||1.5,strokeOpacity:0.25,
+            dot:false,connectNulls:true,legendType:'none',name:undefined}),
+          // Current-year segment — full, carries legend
+          h(Line,{key:org.key+'_c',type:'monotone',dataKey:org.key+'_curr',
+            stroke:org.color,strokeWidth:org.stroke||1.5,strokeOpacity:1,
+            dot:{r:org.dot||3,fill:org.color,stroke:'#fff',strokeWidth:1.5},
+            connectNulls:true,legendType:'plainline',
+            name:org.label,
+            activeDot:{r:5,fill:org.color,stroke:'#fff',strokeWidth:2}})
+        ];
+      }).reduce(function(a,b){return a.concat(b);},[])
+    )
+  );
+}
+
+// ── CHART: Stacked bar — counts per organism ──────────────────────────────────
+function CountBarChart(props){
+  var unitData=props.unitData, ht=props.h||180;
+  // Use same 13-point window as LineChart4 — key from counts array position
+  var ref=(unitData.esbl||unitData.kpc||[]);
+  var pts=ref.slice(-13);
+  var lastLbl=(pts[pts.length-1]||{}).p||'';
+  var currYr=(lastLbl.split('/')[1])||'';
+  var data=pts.map(function(refPt,i){
+    var lbl=refPt.p;
+    var prev=(lbl.split('/')[1]||'')!==currYr;
+    var row={m:lbl,prev:prev};
+    // Find absolute index in the full series for counts lookup
+    var absIdx=ref.length-13+i;
+    ORGS.forEach(function(org){
+      var counts=(unitData.counts&&unitData.counts[org.key])||[];
+      row[org.key]=counts[absIdx]!=null?counts[absIdx]:0;
+    });
+    return row;
+  });
+  var pvFirst=null,pvLast=null;
+  data.forEach(function(d){if(d.prev){if(!pvFirst)pvFirst=d.m;pvLast=d.m;}});
+  return h(RCont,{width:'100%',height:ht},
+    h(BarChart,{data:data,margin:{top:4,right:8,left:-24,bottom:0},barCategoryGap:'25%'},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+      pvFirst?h(RefArea,{x1:pvFirst,x2:pvLast,fill:'#f0f2f5',fillOpacity:0.7,stroke:'none'}):null,
+      pvLast?h(RefLine,{x:pvLast,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2}):null,
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false,allowDecimals:false}),
+      h(RCTip,{content:makeTip('')}),
+      ORGS.map(function(org){
+        return h(Bar,{key:org.key,dataKey:org.key,name:org.label,
+          fill:org.color,stackId:'s',maxBarSize:28},
+          data.map(function(d,i){
+            return h(Cell,{key:i,fill:org.color,
+              opacity:d.prev?(org.priority?0.3:0.18):(org.priority?1:0.6)});
+          })
+        );
+      })
+    )
+  );
+}
+
+// ── KPI strip ─────────────────────────────────────────────────────────────────
+function KpiStrip(props){
+  var unitData=props.unitData,orgs=props.orgs||ORGS;
+  return h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}},
+    orgs.map(function(org){
+      var series=unitData[org.key]||[];
+      var currPt=series.filter(function(d){return d.c&&d.v!=null;})[0];
+      var curr=currPt?currPt.v:null;
+      var currLabel=currPt?currPt.p:'—';
+      var histVals=series.filter(function(d){return d.v!=null&&!d.c;}).map(function(d){return d.v;});
+      var max=histVals.length?Math.max.apply(null,histVals):0;
+      var mean=histVals.length?(histVals.reduce(function(a,b){return a+b;},0)/histVals.length):0;
+      var counts=(unitData.counts&&unitData.counts[org.key])||[];
+      var totalCounts=counts.reduce(function(a,b){return a+(b||0);},0);
+      var alert=curr!=null&&curr>mean&&org.priority;
+      return h('div',{key:org.key,style:{background:'#ffffff',
+        border:'2px solid '+(org.priority?(alert?org.color:org.color+'66'):C.brdr),
+        borderRadius:8,padding:'12px 14px',flex:'1',minWidth:150,
+        position:'relative',overflow:'hidden',
+        boxShadow:alert?'0 2px 8px '+org.color+'33':'0 1px 3px rgba(0,0,0,0.06)'}},
+        h('div',{style:{position:'absolute',top:0,left:0,width:org.priority?'100%':'40%',
+          height:3,background:org.priority?org.color:C.brdr}}),
+        h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',
+          marginBottom:6,marginTop:2}},
+          h('span',{style:{fontSize:9,color:org.priority?org.color:C.ts,
+            fontWeight:org.priority?700:500}},org.label),
+          h('span',{style:{fontSize:8,color:C.tm,fontFamily:"'IBM Plex Mono',monospace"}},currLabel)
+        ),
+        h('div',{style:{display:'flex',alignItems:'baseline',gap:5,marginBottom:8}},
+          curr!=null
+            ?h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:28,
+                fontWeight:700,lineHeight:1,color:alert?org.color:(curr>0?C.ti:'#9ca3af')}},
+                curr.toFixed(2))
+            :h('span',{style:{fontSize:18,color:'#9ca3af'}},'—'),
+          h('span',{style:{fontSize:9,color:C.tm,marginLeft:2}},'‰')
+        ),
+        h('div',{style:{display:'flex',gap:10,borderTop:'1px solid '+C.brdr,paddingTop:5}},
+          h('span',{style:{fontSize:9,color:C.tm}},'Pico ',
+            h('span',{style:{color:C.ts,fontWeight:600,fontFamily:"'IBM Plex Mono',monospace"}},max.toFixed(1))),
+          h('span',{style:{fontSize:9,color:C.tm}},'Média ',
+            h('span',{style:{color:C.ts,fontWeight:600,fontFamily:"'IBM Plex Mono',monospace"}},mean.toFixed(1))),
+          h('span',{style:{fontSize:9,color:C.tm}},'n ',
+            h('span',{style:{color:C.ts,fontWeight:600}},totalCounts))
+        ),
+        alert?h('div',{style:{position:'absolute',top:10,right:10,background:org.color,
+          color:'#fff',fontSize:7,fontWeight:700,padding:'1px 5px',borderRadius:3}},
+          '↑ ACIMA DA MÉDIA'):null
+      );
+    })
+  );
+}
+
+// ── DUAL UNIT comparison (UTI AB vs UTIC side by side) ───────────────────────
+function DualComparison(props){
+  var ab=props.ab, uc=props.uc, org=props.org;
+  var abData=buildChartData(ab,[org]);
+  var ucData=buildChartData(uc,[org]);
+  // merge into single series for comparison
+  var merged=MESES.map(function(m,i){
+    return {m:m,
+      utiab:(ab[org.key]||[])[i]?((ab[org.key]||[])[i].v):null,
+      utic: (uc[org.key]||[])[i]?((uc[org.key]||[])[i].v):null};
+  });
+  return h(RCont,{width:'100%',height:props.h||220},
+    h(ComposedChart,{data:merged,margin:{top:8,right:12,left:-20,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false}),
+      h(RCTip,{content:makeTip('‰')}),
+      h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:C.ts,paddingTop:6}}),
+      h(Line,{type:'monotone',dataKey:'utiab',name:'UTI A/B',
+        stroke:C.blue,strokeWidth:2,dot:{r:3,fill:C.blue},connectNulls:false}),
+      h(Line,{type:'monotone',dataKey:'utic',name:'UTI C',
+        stroke:C.teal,strokeWidth:2,dot:{r:3,fill:C.teal},connectNulls:false,
+        strokeDasharray:'5 3'})
+    )
+  );
+}
+
+// ── Pill button ───────────────────────────────────────────────────────────────
+function Pill(props){
+  var a=props.active,col=props.color||C.teal;
+  return h('button',{onClick:props.onClick,style:{padding:'5px 13px',
+    borderRadius:20,border:'none',
+    background:a?col:'#e9ecef',
+    color:a?'#ffffff':C.ts,
+    fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:a?700:400,
+    boxShadow:a?'0 0 0 2px '+col+'33':'none'}},props.label);
+}
+
+// ── Section label ─────────────────────────────────────────────────────────────
+function SH(props){
+  return h('div',{style:{fontSize:8,color:C.ts,letterSpacing:2.5,fontWeight:700,
+    textTransform:'uppercase',margin:'16px 0 8px',paddingBottom:5,
+    borderBottom:'1px solid '+C.brdr,display:'flex',alignItems:'center',gap:8}},
+    h('span',{style:{width:14,height:1,background:C.teal,display:'inline-block'}}),
+    props.t);
+}
+
+
+function MetodFooter(){
+  return h('div',{style:{marginTop:24,borderTop:'1px solid #d0d7de',paddingTop:14}},
+    h('div',{style:{fontSize:9,color:'#8898aa',fontWeight:600,letterSpacing:1,
+      textTransform:'uppercase',marginBottom:10}},'Notas metodológicas'),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+      h('div',{style:{background:'#fafbfc',border:'1px solid #d0d7de',borderRadius:6,padding:'10px 12px'}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:'#4a5568',marginBottom:4}},
+          'Densidades mensais — /1000 pac-dia'),
+        h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+          'Analisado mensalmente por modelo de regressão multivariada de Poisson com teste de tendência de Cochran-Armitage. Organismos: ESBL, KPC, Acinetobacter MDR e Pseudomonas aeruginosa MDR.')
+      ),
+      h('div',{style:{background:'#fafbfc',border:'1px solid #d0d7de',borderRadius:6,padding:'10px 12px'}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:'#4a5568',marginBottom:4}},
+          'Limiares de endemicidade'),
+        h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+          'Limiar máximo de endemicidade definido pelo intervalo de confiança de 95% de Clopper-Pearson sobre biênio de referência fixo. KPC e Acinetobacter sinalizados como organismos de alerta clínico e epidemiológico prioritário.')
+      )
+    )
+    ,
+    h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
+      display:'flex',justifyContent:'space-between',alignItems:'center',
+      flexWrap:'wrap',gap:8}},
+      h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+        h('span',{style:{fontWeight:600,color:'#4a5568'}},'Autoria · '),
+        'Sistema de interface desenvolvido por Dr. Leandro Mendes · ',
+        'Análises epidemiológicas e estatísticas realizadas por Dr. Leandro Mendes'
+      ),
+      h('div',{style:{fontSize:8,color:'#b0bec5',fontFamily:"'IBM Plex Mono',monospace"}},
+        'SCIH/CCIH · HUSF · Bragança Paulista')
+    )
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App(){
+  var vs=useState('overview'); var view=vs[0],setView=vs[1];
+  var ds=useState(null);       var data=ds[0],setData=ds[1];
+  var ls=useState(true);       var loading=ls[0],setLoading=ls[1];
+  var ps=useState('2025');     var periodo=ps[0],setPeriodo=ps[1];
+
+  // Embedded fallback — always available, fetch overwrites if server present
+  var FALLBACK_MDR = {"utiAB": {"esbl": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 22.11, "pd": 407}, {"p": "mar/25", "v": 13.13, "pd": 457}, {"p": "abr/25", "v": 21.28, "pd": 470}, {"p": "mai/25", "v": 30.19, "pd": 530}, {"p": "jun/25", "v": 9.21, "pd": 543}, {"p": "jul/25", "v": 19.61, "pd": 561}, {"p": "ago/25", "v": 11.86, "pd": 590}, {"p": "set/25", "v": 22.73, "pd": 528}, {"p": "out/25", "v": 24.67, "pd": 527}, {"p": "nov/25", "v": 10.71, "pd": 560}, {"p": "dez/25", "v": 11.71, "pd": 598}, {"p": "jan/26", "v": 5.4}, {"p": "fev/26", "v": 18.95, "c": 1}], "acin": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 9.83, "pd": 407}, {"p": "mar/25", "v": 0.0, "pd": 457}, {"p": "abr/25", "v": 2.13, "pd": 470}, {"p": "mai/25", "v": 9.43, "pd": 530}, {"p": "jun/25", "v": 7.37, "pd": 543}, {"p": "jul/25", "v": 3.57, "pd": 561}, {"p": "ago/25", "v": 6.78, "pd": 590}, {"p": "set/25", "v": 13.26, "pd": 528}, {"p": "out/25", "v": 13.28, "pd": 527}, {"p": "nov/25", "v": 5.36, "pd": 560}, {"p": "dez/25", "v": 3.34, "pd": 598}, {"p": "jan/26", "v": 12.6}, {"p": "fev/26", "v": 14.74, "c": 1}], "kpc": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 0.0, "pd": 407}, {"p": "mar/25", "v": 8.75, "pd": 457}, {"p": "abr/25", "v": 4.26, "pd": 470}, {"p": "mai/25", "v": 0.0, "pd": 530}, {"p": "jun/25", "v": 3.68, "pd": 543}, {"p": "jul/25", "v": 1.78, "pd": 561}, {"p": "ago/25", "v": 6.78, "pd": 590}, {"p": "set/25", "v": 5.68, "pd": 528}, {"p": "out/25", "v": 5.69, "pd": 527}, {"p": "nov/25", "v": 5.36, "pd": 560}, {"p": "dez/25", "v": 10.03, "pd": 598}, {"p": "jan/26", "v": 10.8}, {"p": "fev/26", "v": 14.74, "c": 1}], "pseu": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 0.0, "pd": 407}, {"p": "mar/25", "v": 4.38, "pd": 457}, {"p": "abr/25", "v": 0.0, "pd": 470}, {"p": "mai/25", "v": 1.89, "pd": 530}, {"p": "jun/25", "v": 1.84, "pd": 543}, {"p": "jul/25", "v": 1.78, "pd": 561}, {"p": "ago/25", "v": 0.0, "pd": 590}, {"p": "set/25", "v": 0.0, "pd": 528}, {"p": "out/25", "v": 0.0, "pd": 527}, {"p": "nov/25", "v": 0.0, "pd": 560}, {"p": "dez/25", "v": 0.0, "pd": 598}, {"p": "jan/26", "v": 0.0}, {"p": "fev/26", "v": 0.0, "c": 1}], "pd": [{"p": "jan/25", "v": 0}, {"p": "fev/25", "v": 407}, {"p": "mar/25", "v": 457}, {"p": "abr/25", "v": 470}, {"p": "mai/25", "v": 530}, {"p": "jun/25", "v": 543}, {"p": "jul/25", "v": 561}, {"p": "ago/25", "v": 590}, {"p": "set/25", "v": 528}, {"p": "out/25", "v": 527}, {"p": "nov/25", "v": 560}, {"p": "dez/25", "v": 598}, {"p": "jan/26", "v": 559}, {"p": "fev/26", "v": 422, "c": 1}], "counts": {"esbl": [11, 9, 6, 10, 16, 5, 11, 7, 12, 13, 6, 7, 4, 8], "acin": [4, 4, 0, 1, 5, 4, 2, 4, 7, 7, 3, 2, 4, 6], "kpc": [1, 0, 4, 2, 0, 2, 1, 4, 3, 3, 3, 6, 3, 6], "pseu": [0, 0, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]}}, "utic": {"esbl": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 27.03, "pd": 222}, {"p": "mar/25", "v": 16.39, "pd": 244}, {"p": "abr/25", "v": 18.43, "pd": 217}, {"p": "mai/25", "v": 35.86, "pd": 251}, {"p": "jun/25", "v": 26.32, "pd": 266}, {"p": "jul/25", "v": 23.65, "pd": 296}, {"p": "ago/25", "v": 3.44, "pd": 291}, {"p": "set/25", "v": 10.95, "pd": 274}, {"p": "out/25", "v": 21.43, "pd": 280}, {"p": "nov/25", "v": 21.05, "pd": 285}, {"p": "dez/25", "v": 13.2, "pd": 303}, {"p": "jan/26", "v": 14.6}, {"p": "fev/26", "v": 11.95, "c": 1}], "acin": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 9.01, "pd": 222}, {"p": "mar/25", "v": 8.2, "pd": 244}, {"p": "abr/25", "v": 13.82, "pd": 217}, {"p": "mai/25", "v": 15.94, "pd": 251}, {"p": "jun/25", "v": 11.28, "pd": 266}, {"p": "jul/25", "v": 0.0, "pd": 296}, {"p": "ago/25", "v": 17.18, "pd": 291}, {"p": "set/25", "v": 21.9, "pd": 274}, {"p": "out/25", "v": 17.86, "pd": 280}, {"p": "nov/25", "v": 14.04, "pd": 285}, {"p": "dez/25", "v": 3.3, "pd": 303}, {"p": "jan/26", "v": 3.65}, {"p": "fev/26", "v": 7.97, "c": 1}], "kpc": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 0.0, "pd": 222}, {"p": "mar/25", "v": 0.0, "pd": 244}, {"p": "abr/25", "v": 0.0, "pd": 217}, {"p": "mai/25", "v": 0.0, "pd": 251}, {"p": "jun/25", "v": 11.28, "pd": 266}, {"p": "jul/25", "v": 3.38, "pd": 296}, {"p": "ago/25", "v": 20.62, "pd": 291}, {"p": "set/25", "v": 10.95, "pd": 274}, {"p": "out/25", "v": 14.29, "pd": 280}, {"p": "nov/25", "v": 10.53, "pd": 285}, {"p": "dez/25", "v": 23.1, "pd": 303}, {"p": "jan/26", "v": 21.9}, {"p": "fev/26", "v": 7.97, "c": 1}], "pseu": [{"p": "jan/25", "v": null, "pd": 0}, {"p": "fev/25", "v": 0.0, "pd": 222}, {"p": "mar/25", "v": 0.0, "pd": 244}, {"p": "abr/25", "v": 0.0, "pd": 217}, {"p": "mai/25", "v": 0.0, "pd": 251}, {"p": "jun/25", "v": 7.52, "pd": 266}, {"p": "jul/25", "v": 0.0, "pd": 296}, {"p": "ago/25", "v": 0.0, "pd": 291}, {"p": "set/25", "v": 0.0, "pd": 274}, {"p": "out/25", "v": 0.0, "pd": 280}, {"p": "nov/25", "v": 0.0, "pd": 285}, {"p": "dez/25", "v": 0.0, "pd": 303}, {"p": "jan/26", "v": 0.0}, {"p": "fev/26", "v": 0.0, "c": 1}], "pd": [{"p": "jan/25", "v": 0}, {"p": "fev/25", "v": 222}, {"p": "mar/25", "v": 244}, {"p": "abr/25", "v": 217}, {"p": "mai/25", "v": 251}, {"p": "jun/25", "v": 266}, {"p": "jul/25", "v": 296}, {"p": "ago/25", "v": 291}, {"p": "set/25", "v": 274}, {"p": "out/25", "v": 280}, {"p": "nov/25", "v": 285}, {"p": "dez/25", "v": 303}, {"p": "jan/26", "v": 274}, {"p": "fev/26", "v": 251, "c": 1}], "counts": {"esbl": [3, 6, 4, 4, 9, 7, 7, 1, 3, 6, 6, 4, 4, 3], "acin": [3, 2, 2, 3, 4, 3, 0, 5, 6, 5, 4, 1, 1, 2], "kpc": [0, 0, 0, 0, 0, 3, 1, 6, 3, 4, 3, 7, 6, 2], "pseu": [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]}}, "utiNeo": {"counts": {"esbl": [null, null, null, 1, null, null, null, null, 1, 2, 0, 0], "acin": [null, null, null, 0, null, null, null, null, 0, 0, 0, 0], "kpc": [null, null, null, 0, null, null, null, null, 0, 0, 0, 0], "pseu": [null, null, null, 0, null, null, null, null, 0, 0, 0, 0]}, "pd": [null, null, null, 62, null, null, null, null, 161, 7, 0, 0], "esbl_rate": [null, null, null, 16.13, null, null, null, null, 6.21, 285.71, null, null], "esbl_flag": [null, null, null, null, null, null, null, null, null, "insuf", null, null]}};
+  var FALLBACK_PERIODO = 'Fevereiro 2026';
+
+  useEffect(function(){
+    // Apply fallback immediately so visualizer works without a server
+    setData(FALLBACK_MDR);
+    setPeriodo(FALLBACK_PERIODO);
+    setLoading(false);
+    // Then try to fetch updated data from server
+    fetch('./data_iras.json?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.mdrMensal){ setData(d.mdrMensal); }
+        if(d.periodo){ setPeriodo(d.periodo); }
+      })
+      .catch(function(){ /* keep fallback */ });
+  },[]);
+
+  if(loading) return h('div',{style:{display:'flex',alignItems:'center',
+    justifyContent:'center',height:'100vh',flexDirection:'column',gap:14}},
+    h('div',{className:'pulse',style:{width:40,height:40,borderRadius:'50%',
+      background:C.teal,opacity:.5}}),
+    h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",color:C.ts,fontSize:13}},'Carregando...')
+  );
+
+  if(!data) return h('div',{style:{color:C.red,padding:40,fontFamily:"'IBM Plex Sans',sans-serif"}},
+    'Dados MDR mensal não encontrados no JSON.');
+
+  var ab=data.utiAB, uc=data.utic;
+  var abData=buildChartData(ab,ORGS);
+  var ucData=buildChartData(uc,ORGS);
+
+  // Topbar
+  var topBar=h('div',{style:{background:'#ffffff',borderBottom:'1px solid #d0d7de',
+    padding:'12px 28px',position:'sticky',top:0,zIndex:20,
+    display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}},
+    h('div',{},
+      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:13,fontWeight:600,color:'#1a2744'}},
+        'Bactérias Multirresistentes — Incidência Mensal'),
+      h('div',{style:{fontSize:9,color:'#6b7280',marginTop:1}},
+        'HUSF · SCIH/CCIH · '+periodo)
+    ),
+    h('div',{style:{marginLeft:'auto',display:'flex',gap:8,alignItems:'center'}},
+      h('div',{style:{display:'flex',gap:5,alignItems:'center',
+        background:C.hover,padding:'4px 10px',borderRadius:6,fontSize:9,color:C.ts}},
+        h('span',{style:{width:18,height:2,background:'#f87171',display:'inline-block'}}),
+        'KPC — ALERTA',
+        h('span',{style:{width:18,height:2,background:'#fb923c',display:'inline-block',marginLeft:8}}),
+        'Acinetobacter'
+      ),
+      h('a',{href:'./iras_mdr.html',style:{fontSize:9,color:C.ts,textDecoration:'none',
+        padding:'4px 10px',border:'1px solid '+C.brdr,borderRadius:6}},
+        '← Dashboard')
+    )
+  );
+
+  // View selector
+  var viewSel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:18}},
+    h(Pill,{label:'Visão Geral',    active:view==='overview',  onClick:function(){setView('overview');}}),
+    h(Pill,{label:'UTI A/B',     active:view==='utiab',     onClick:function(){setView('utiab');}}),
+    h(Pill,{label:'UTI C',           active:view==='utic',      onClick:function(){setView('utic');}}),
+    h(Pill,{label:'Comparar UTIs',  active:view==='compare',   onClick:function(){setView('compare');},color:C.amber}),
+    h(Pill,{label:'Contagens Abs.', active:view==='counts',    onClick:function(){setView('counts');},color:'#94a3b8'})
+  );
+
+  // ── Views ──────────────────────────────────────────────────────────────────
+  var content;
+
+  switch(view){
+
+    case 'overview':
+      content=h('div',{className:'fi'},
+        h(SH,{t:'UTI A/B — /1000 pac-dia · KPC e Acinetobacter em destaque'}),
+        h(KpiStrip,{unitData:ab}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:'14px 14px 8px',marginBottom:12}},
+          h(LineChart4,{data:abData,h:250})
+        ),
+        h(SH,{t:'UTI C — /1000 pac-dia'}),
+        h(KpiStrip,{unitData:uc}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:'14px 14px 8px'}},
+          h(LineChart4,{data:ucData,h:250})
+        )
+      );
+      break;
+
+    case 'utiab':
+      content=h('div',{className:'fi'},
+        h(KpiStrip,{unitData:ab}),
+        h(SH,{t:'Densidade de Incidência — /1000 pac-dia'}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:'16px 16px 10px',marginBottom:12}},
+          h('div',{style:{fontSize:9,color:C.tm,marginBottom:10}},
+            '— = meses sem pac-dia válido (jan e nov/25). Linhas quebradas = dados ausentes.'),
+          h(LineChart4,{data:abData,h:300})
+        ),
+        h(SH,{t:'Detalhamento por Organismo de Alerta'}),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          ORGS.filter(function(o){return o.priority;}).map(function(org){
+            var data2=buildChartData(ab,[org]);
+            return h('div',{key:org.key,style:{background:C.card,
+              border:'1px solid '+org.color+'44',borderRadius:12,
+              padding:'14px 14px 8px',position:'relative',overflow:'hidden'}},
+              h('div',{style:{position:'absolute',top:0,left:0,width:'100%',height:2,background:org.color}}),
+              h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:12,fontWeight:700,
+                color:org.color,marginBottom:10}},org.label+' — UTI AB'),
+              h(RCont,{width:'100%',height:200},
+                h(ComposedChart,{data:data2,margin:{top:4,right:8,left:-24,bottom:0}},
+                  h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+                  h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+                    axisLine:false,tickLine:false}),
+                  h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+                    axisLine:false,tickLine:false}),
+                  h(RCTip,{content:makeTip('‰')}),
+                  h(Area,{type:'monotone',dataKey:org.key,name:org.label,
+                    stroke:org.color,strokeWidth:2,
+                    fill:org.color,fillOpacity:0.08,
+                    dot:{r:3.5,fill:org.color,strokeWidth:0},
+                    activeDot:{r:5},connectNulls:false})
+                )
+              )
+            );
+          })
+        ),
+        h(SH,{t:'Pacientes-dia por Mês'}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',padding:'14px 14px 8px'}},
+          h(RCont,{width:'100%',height:120},
+            h(BarChart,{data:ab.pd||[],margin:{top:4,right:8,left:-24,bottom:0}},
+              h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+              h(XAxis,{dataKey:'p',tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+                axisLine:false,tickLine:false}),
+              h(YAxis,{tick:{fill:C.tm,fontSize:8},axisLine:false,tickLine:false}),
+              h(RCTip,{content:makeTip('')}),
+              h(Bar,{dataKey:'v',name:'pac-dia',radius:[2,2,0,0]},
+                (ab.pd||[]).map(function(d,i){
+                  return h(Cell,{key:i,fill:d.v>0?C.blue:C.brdr,opacity:d.v>0?.7:.3});
+                })
+              )
+            )
+          )
+        )
+      );
+      break;
+
+    case 'utic':
+      content=h('div',{className:'fi'},
+        h(KpiStrip,{unitData:uc}),
+        h(SH,{t:'Densidade de Incidência — /1000 pac-dia'}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:'16px 16px 10px',marginBottom:12}},
+          h('div',{style:{fontSize:9,color:C.tm,marginBottom:10}},
+            '— = meses sem pac-dia válido. Linhas quebradas = dados ausentes.'),
+          h(LineChart4,{data:ucData,h:300})
+        ),
+        h(SH,{t:'Detalhamento por Organismo de Alerta'}),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          ORGS.filter(function(o){return o.priority;}).map(function(org){
+            var data2=buildChartData(uc,[org]);
+            return h('div',{key:org.key,style:{background:C.card,
+              border:'1px solid '+org.color+'44',borderRadius:12,
+              padding:'14px 14px 8px',position:'relative',overflow:'hidden'}},
+              h('div',{style:{position:'absolute',top:0,left:0,width:'100%',height:2,background:org.color}}),
+              h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:12,fontWeight:700,
+                color:org.color,marginBottom:10}},org.label+' — UTIC'),
+              h(RCont,{width:'100%',height:200},
+                h(ComposedChart,{data:data2,margin:{top:4,right:8,left:-24,bottom:0}},
+                  h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+                  h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+                    axisLine:false,tickLine:false}),
+                  h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+                    axisLine:false,tickLine:false}),
+                  h(RCTip,{content:makeTip('‰')}),
+                  h(Area,{type:'monotone',dataKey:org.key,name:org.label,
+                    stroke:org.color,strokeWidth:2,
+                    fill:org.color,fillOpacity:0.08,
+                    dot:{r:3.5,fill:org.color,strokeWidth:0},
+                    activeDot:{r:5},connectNulls:false})
+                )
+              )
+            );
+          })
+        )
+      );
+      break;
+
+    case 'compare':
+      content=h('div',{className:'fi'},
+        h('div',{style:{fontSize:9,color:C.tm,marginBottom:14,padding:'6px 12px',
+          background:C.surf,borderRadius:6,border:'1px solid '+C.brdr}},
+          'Linha sólida = UTI A/B · Linha tracejada = UTIC · Quebra = mês sem pac-dia válido'),
+        ORGS.map(function(org){
+          return h('div',{key:org.key,style:{background:C.card,
+            border:'1px solid '+(org.priority?org.color+'44':C.brdr),
+            borderRadius:12,padding:'14px 14px 8px',marginBottom:12,
+            position:'relative',overflow:'hidden'}},
+            org.priority?h('div',{style:{position:'absolute',top:0,left:0,
+              width:'100%',height:2,background:org.color}}):null,
+            h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:10}},
+              h('span',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:12,fontWeight:700,
+                color:org.priority?org.color:C.ti}},org.label),
+              org.priority?h('span',{style:{fontSize:8,background:org.color+'22',
+                color:org.color,padding:'2px 7px',borderRadius:4,fontWeight:700,
+                letterSpacing:1}},org.key==='kpc'?'⚠ ALERTA CLÍNICO':'⚠ ALERTA EPIDEM.'):null
+            ),
+            h(DualComparison,{ab:ab,uc:uc,org:org,h:org.priority?220:180})
+          );
+        })
+      );
+      break;
+
+    case 'counts':
+      content=h('div',{className:'fi'},
+        h('div',{style:{fontSize:9,color:C.tm,marginBottom:14,
+          padding:'6px 12px',background:C.surf,borderRadius:6,border:'1px solid '+C.brdr}},
+          'Contagens absolutas (n de casos) por mês · barras empilhadas por organismo'),
+        h(SH,{t:'UTI A/B — Contagens Absolutas'}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:'14px 14px 8px',marginBottom:12}},
+          h(CountBarChart,{unitData:ab,h:200})
+        ),
+        h(SH,{t:'UTIC — Contagens Absolutas'}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:'14px 14px 8px',marginBottom:12}},
+          h(CountBarChart,{unitData:uc,h:200})
+        ),
+        h(SH,{t:'Tabela — Totais Anuais por Organismo e Unidade'}),
+        h('div',{style:{background:'#ffffff',border:'1px solid #d0d7de',borderRadius:8,boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
+          padding:16,overflowX:'auto'}},
+          h('table',{style:{borderCollapse:'collapse',width:'100%',fontSize:11}},
+            h('thead',{},h('tr',{},
+              ['Organismo','UTI A/B','UTI C','Total'].map(function(t,i){
+                return h('th',{key:i,style:{padding:'7px 12px',color:C.ts,fontWeight:600,
+                  borderBottom:'1px solid '+C.brdr,textAlign:i>0?'center':'left'}},t);
+              })
+            )),
+            h('tbody',{},ORGS.map(function(org,i){
+              var abTotal=(ab.counts&&ab.counts[org.key]||[]).reduce(function(s,v){return s+(v||0);},0);
+              var ucTotal=(uc.counts&&uc.counts[org.key]||[]).reduce(function(s,v){return s+(v||0);},0);
+              return h('tr',{key:org.key,style:{background:i%2===0?'transparent':C.hover+'44',
+                borderLeft:org.priority?'3px solid '+org.color:'3px solid transparent'}},
+                h('td',{style:{padding:'8px 12px',fontWeight:org.priority?700:400,
+                  color:org.priority?org.color:C.ti,fontFamily:"'IBM Plex Sans',sans-serif"}},
+                  org.label,
+                  org.priority?h('span',{style:{marginLeft:6,fontSize:8,
+                    background:org.color+'22',color:org.color,padding:'1px 6px',borderRadius:3,
+                    fontWeight:700}},'ALERTA'):null
+                ),
+                h('td',{style:{padding:'8px 12px',textAlign:'center',
+                  fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,color:org.color}},abTotal),
+                h('td',{style:{padding:'8px 12px',textAlign:'center',
+                  fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,color:org.color}},ucTotal),
+                h('td',{style:{padding:'8px 12px',textAlign:'center',
+                  fontFamily:"'IBM Plex Mono',monospace",fontSize:14,fontWeight:700,
+                  color:org.priority?org.color:C.ti}},abTotal+ucTotal)
+              );
+            }))
+          )
+        )
+      );
+      break;
+
+    default: content=null;
+  }
+
+  return h('div',{style:{background:C.bg,minHeight:'100vh'}},
+    topBar,
+    h('div',{style:{maxWidth:1140,margin:'0 auto',padding:'20px 24px 48px'}},
+      viewSel,
+      content,
+      h(MetodFooter)
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>

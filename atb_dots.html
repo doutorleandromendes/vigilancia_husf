@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCIH/HUSF — Consumo de Antimicrobianos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0f2f5;font-family:'IBM Plex Sans',sans-serif;color:#1a2744;min-height:100vh}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .fi{animation:fadeIn .18s ease-out}
+  button{cursor:pointer;transition:all .12s}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.min.js"></script>
+<script>
+'use strict';
+if(!window.React||!window.ReactDOM||!window.Recharts){
+  document.getElementById('root').innerHTML='<div style="color:#c62828;padding:40px;font-family:monospace">Erro: bibliotecas não carregadas.</div>';
+  throw new Error('lib fail');
+}
+var h=React.createElement,useState=React.useState,useEffect=React.useEffect;
+
+// ── Design tokens ─────────────────────────────────────────────────────────────
+var BG='#f0f2f5',WHITE='#ffffff',BRDR='#d0d7de',MUTED='#8898aa';
+var NAVY='#1a2744',SLATE='#4a5568',LIGHT='#6b7280';
+var GRID='#e2e6ea';
+
+// ATB escalation palette — green → deep red (therapeutic escalation)
+var ATB_META=[
+  {key:'cef',label:'Ceftriaxona',  color:'#2e7d32',bg:'#e8f5e9'},
+  {key:'pip',label:'Pip/Tazo',     color:'#1565c0',bg:'#e3f2fd'},
+  {key:'cbp',label:'Carbapenêmico',color:'#e65100',bg:'#fbe9e7'},
+  {key:'gpp',label:'Glicopeptídeo',color:'#c62828',bg:'#ffebee'},
+  {key:'pb', label:'Polimixina B', color:'#4527a0',bg:'#ede7f6'}
+];
+
+// Unit colors — high contrast set
+var UNIT_COLORS=['#1565c0','#c62828','#2e7d32','#6a1b9a','#00695c','#e65100'];
+
+var UNITS=[
+  {key:'utiab',label:'UTI A/B',   group:'uti'},
+  {key:'utic', label:'UTI C',     group:'uti'},
+  {key:'clin', label:'Cl. Médica',group:'enf'},
+  {key:'cir',  label:'Cl. Cirúrgica',group:'enf'},
+  {key:'apto', label:'Apartamentos',group:'enf'},
+  {key:'epm',  label:'EPM',       group:'enf'}
+];
+var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ── Raw 2025 data (fallback) ──────────────────────────────────────────────────
+var RAW_2025={
+  cef:{
+    utiab:[33.44,68.70,63.74,23.35,60.43,16.57,33.33,53.26,48.73,20.87,40.31,41.82],
+    utic: [3.30,13.51,41.32,42.06,41.15,78.95,3.76,42.11,42.25,44.12,21.43,7.30],
+    clin: [36.92,21.14,33.28,53.76,33.43,37.57,16.53,29.21,8.56,26.87,18.24,40.52],
+    cir:  [35.06,63.52,78.74,37.63,61.95,47.19,18.07,58.33,67.14,35.25,38.46,35.86],
+    apto: [81.08,115.38,161.05,105.26,56.03,88.98,36.29,116.38,18.52,26.32,65.96,67.80],
+    epm:  [126.98,49.48,54.12,78.31,96.61,108.03,21.86,53.91,57.40,80.73,114.75,140.81]
+  },
+  pip:{
+    utiab:[91.97,73.79,83.52,25.29,48.73,57.09,98.25,51.55,25.34,37.95,65.26,85.45],
+    utic: [39.60,112.61,49.59,70.09,115.23,63.91,150.38,14.04,21.13,73.53,89.29,113.14],
+    clin: [50.77,32.52,48.41,13.82,39.24,47.69,19.28,26.43,22.82,8.49,22.80,42.36],
+    cir:  [19.64,48.74,11.81,24.19,34.13,38.27,18.07,26.19,41.22,66.98,40.87,67.59],
+    apto: [5.41,57.69,33.71,39.47,30.17,16.95,36.29,25.86,0.00,49.34,0.00,25.42],
+    epm:  [47.62,5.21,95.36,39.16,13.05,0.00,32.79,2.70,37.53,2.60,0.00,14.32]
+  },
+  cbp:{
+    utiab:[140.47,127.23,59.34,50.58,103.31,114.18,100.00,163.23,76.02,91.08,153.55,83.64],
+    utic: [188.12,112.61,90.91,130.84,57.61,90.23,45.11,42.11,80.99,106.62,167.86,167.88],
+    clin: [12.31,37.40,42.36,39.94,23.26,21.68,11.02,19.47,4.28,55.16,80.55,60.77],
+    cir:  [11.22,118.17,87.93,53.76,89.76,86.73,8.43,45.24,4.71,81.08,115.38,129.66],
+    apto: [10.81,0.00,0.00,0.00,0.00,0.00,12.10,4.31,0.00,0.00,0.00,0.00],
+    epm:  [6.35,18.23,2.58,0.00,0.00,0.00,27.32,53.91,0.00,5.21,2.34,0.00]
+  },
+  gpp:{
+    utiab:[138.80,167.94,109.89,107.00,192.98,158.38,214.04,171.82,142.30,144.21,251.44,132.73],
+    utic: [240.92,166.67,140.50,205.61,111.11,105.26,135.34,101.75,161.97,73.53,132.14,302.92],
+    clin: [52.31,35.77,39.33,44.55,43.60,36.13,33.06,51.46,57.06,76.38,126.14,51.57],
+    cir:  [17.53,93.06,83.99,30.91,34.13,98.21,78.31,103.57,47.11,52.88,144.23,23.45],
+    apto: [0.00,69.23,0.00,39.47,30.17,8.47,28.23,8.62,9.26,0.00,13.19,42.37],
+    epm:  [28.57,10.42,0.00,6.02,7.83,0.00,79.23,40.43,37.53,5.21,7.03,0.00]
+  },
+  pb:{
+    utiab:[60.2,33.08,4.4,11.67,31.19,40.52,0.00,44.67,50.68,28.46,65.26,7.27],
+    utic: [56.11,45.05,37.19,18.69,20.58,18.8,15.04,7.02,116.2,18.38,35.71,58.39],
+    clin: [0.00,0.00,0.00,0.00,13.08,1.45,0.00,0.00,0.00,0.00,0.00,3.68],
+    cir:  [0.7,17.73,0.00,0.00,5.06,6.38,0.00,0.00,22.38,1.18,49.28,17.93],
+    apto: [10.81,0.00,0.00,0.00,0.00,0.00,0.00,4.31,0.00,0.00,0.00,0.00],
+    epm:  [6.35,13.02,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00]
+  }
+};
+
+var RAW=RAW_2025;
+
+var RAW_2026={
+  cef:{utiab:[53.86],utic:[29.20],clin:[9.29],cir:[18.25],apto:[44.12],epm:[83.33]},
+  pip:{utiab:[30.52],utic:[76.64],clin:[26.02],cir:[22.16],apto:[0.00], epm:[17.54]},
+  cbp:{utiab:[91.56],utic:[105.84],clin:[27.88],cir:[69.10],apto:[0.00],epm:[0.00]},
+  gpp:{utiab:[150.81],utic:[197.08],clin:[20.45],cir:[69.10],apto:[22.06],epm:[0.00]},
+  pb: {utiab:[39.50],utic:[47.45], clin:[0.00], cir:[0.00], apto:[0.00], epm:[0.00]}
+};
+
+function flattenDots(dots){
+  var MORD=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  var out={};
+  Object.keys(dots).forEach(function(atk){
+    out[atk]={};
+    Object.keys(dots[atk]).forEach(function(uk){
+      var arr=dots[atk][uk].filter(function(d){return !d.c;})
+        .sort(function(a,b){
+          return MORD.indexOf(a.p.split('/')[0])-MORD.indexOf(b.p.split('/')[0]);
+        });
+      out[atk][uk]=arr.map(function(d){return d.v;});
+    });
+  });
+  return out;
+}
+
+// ── Recharts ──────────────────────────────────────────────────────────────────
+var RC=Recharts;
+var BarChart=RC.BarChart,Bar=RC.Bar,ComposedChart=RC.ComposedChart;
+var LineChart=RC.LineChart,Line=RC.Line;
+var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
+var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer,Legend=RC.Legend;
+var Cell=RC.Cell,RefArea=RC.ReferenceArea,RefLine=RC.ReferenceLine;
+
+// ── 13-month window (last 12 + current, labelled mmm/aa) ──────────────────────
+var MONTH_ABBR=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+var RAW_BY_YEAR={'2025':RAW_2025,'2026':RAW_2026};
+
+function buildWindow(){
+  // Find last year with data and last filled month index
+  var lastYear=2026, lastMo=0;
+  var probe=RAW_2026.cef.utiab||[];
+  for(var i=probe.length-1;i>=0;i--){ if(probe[i]!=null&&probe[i]>0){lastMo=i;break;} }
+
+  var pts=[];
+  for(var back=12;back>=0;back--){
+    var tot=lastYear*12+lastMo-back;
+    var yr=Math.floor(tot/12), mo=tot%12;
+    var raw=RAW_BY_YEAR[String(yr)]||{};
+    pts.push({lbl:MONTH_ABBR[mo]+'/'+String(yr).slice(-2), yr:yr, mo:mo, raw:raw, prev:yr<lastYear});
+  }
+  return pts;
+}
+
+// Find the last prev-year label (for ReferenceArea)
+function lastPrevLabel(win){ var l=null; win.forEach(function(w){if(w.prev)l=w.lbl;}); return l; }
+
+function makeTip(){
+  return function T(p){
+    if(!p.active||!p.payload||!p.payload.length) return null;
+    var items=p.payload.filter(function(x){return x.value>0;})
+                       .sort(function(a,b){return b.value-a.value;});
+    if(!items.length) return null;
+    return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
+      padding:'10px 14px',fontSize:12,boxShadow:'0 2px 8px rgba(0,0,0,0.12)',minWidth:160}},
+      h('div',{style:{color:LIGHT,fontSize:10,marginBottom:6,fontWeight:500}},p.label),
+      items.map(function(it,i){
+        return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',
+          gap:14,marginBottom:2}},
+          h('span',{style:{color:SLATE,fontSize:11}},it.name),
+          h('span',{style:{color:it.color||NAVY,fontFamily:"'IBM Plex Mono',monospace",
+            fontSize:11,fontWeight:700}},it.value.toFixed(1))
+        );
+      })
+    );
+  };
+}
+
+// ── Chart: grouped bars + total trend line (single axis, ComposedChart) ────────
+function ChartByATB(props){
+  var atb=props.atb,unitKeys=props.unitKeys,ht=props.h||320;
+  var unitLabels=UNITS.filter(function(u){return unitKeys.indexOf(u.key)>=0;});
+  var win=buildWindow();
+  var pvLast=lastPrevLabel(win); // last prev-year label for shading
+
+  var data=win.map(function(w){
+    var row={m:w.lbl,_total:0,prev:w.prev};
+    unitKeys.forEach(function(uk){
+      var v=(w.raw[atb.key]&&w.raw[atb.key][uk]&&w.raw[atb.key][uk][w.mo])||0;
+      row[uk]=v; row._total+=v;
+    });
+    return row;
+  });
+
+  // 3-month moving average on total — single continuous line
+  var smoothed=data.map(function(d,i){
+    var pts=[data[i-1],data[i],data[i+1]].filter(Boolean);
+    var trend=parseFloat((pts.reduce(function(s,p){return s+p._total;},0)/pts.length).toFixed(1));
+    return Object.assign({},d,{_trend:trend});
+  });
+
+  var bars=unitLabels.map(function(u,idx){
+    return h(Bar,{key:u.key,dataKey:u.key,name:u.label,yAxisId:'left',
+      fill:UNIT_COLORS[idx],radius:[2,2,0,0],maxBarSize:18},
+      smoothed.map(function(d,i){
+        return h(Cell,{key:i,fill:UNIT_COLORS[idx],opacity:d.prev?0.28:0.85});
+      })
+    );
+  });
+
+  return h('div',{},
+    h(RCont,{width:'100%',height:ht},
+      h(ComposedChart,{data:smoothed,margin:{top:8,right:48,left:-20,bottom:0},barCategoryGap:'20%',barGap:2},
+        h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
+        // Shade prev-year zone
+        pvLast?h(RefArea,{x1:smoothed[0].m,x2:pvLast,yAxisId:'left',
+          fill:'#f0f2f5',fillOpacity:0.6,stroke:'none'}):null,
+        // Year-boundary dashed line
+        pvLast?h(RefLine,{x:pvLast,yAxisId:'left',stroke:'#9eaab8',
+          strokeDasharray:'4 3',strokeWidth:1.2,
+          label:{value:String(new Date().getFullYear()),fill:'#9eaab8',
+            fontSize:8,position:'insideTopRight'}}):null,
+        h(XAxis,{dataKey:'m',tick:{fill:LIGHT,fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{yAxisId:'left',tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{yAxisId:'right',orientation:'right',
+          tick:{fill:atb.color,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+          axisLine:false,tickLine:false,
+          tickFormatter:function(v){return v.toFixed(0);}}),
+        h(RCTip,{content:makeTip()}),
+        h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:8}}),
+        bars[0]||null, bars[1]||null, bars[2]||null,
+        bars[3]||null, bars[4]||null, bars[5]||null,
+        // Single continuous trend line across full window
+        h(Line,{yAxisId:'right',type:'monotone',dataKey:'_trend',name:'Total (tend.)',
+          stroke:atb.color,strokeWidth:2.5,dot:false,
+          connectNulls:true,legendType:'plainline',
+          activeDot:{r:4,fill:atb.color,stroke:WHITE,strokeWidth:2}})
+      )
+    ),
+    h('div',{style:{display:'flex',alignItems:'center',gap:12,justifyContent:'flex-end',
+      marginTop:4,fontSize:8,color:MUTED}},
+      h('span',{style:{display:'inline-block',width:16,height:8,background:'#e8eaed',border:'1px solid #d0d7de',borderRadius:2}}),
+      'Ano anterior (atenuado)',
+      h('span',{style:{display:'inline-block',width:24,height:2.5,background:atb.color,borderRadius:2,marginLeft:8}}),
+      'Total hospitalar (tend. · eixo direito)'
+    )
+  );
+}
+
+// ── Chart: stacked bars — all ATBs, aggregated units ─────────────────────────
+function ChartStacked(props){
+  var unitKeys=props.unitKeys,ht=props.h||320;
+  var win=buildWindow();
+  var pvLast=lastPrevLabel(win);
+  var data=win.map(function(w){
+    var row={m:w.lbl,prev:w.prev};
+    ATB_META.forEach(function(atb){
+      row[atb.key]=unitKeys.reduce(function(s,uk){
+        return s+((w.raw[atb.key]&&w.raw[atb.key][uk]&&w.raw[atb.key][uk][w.mo])||0);
+      },0);
+    });
+    return row;
+  });
+  return h(RCont,{width:'100%',height:ht},
+    h(BarChart,{data:data,margin:{top:8,right:8,left:-20,bottom:0},barCategoryGap:'22%'},
+      h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
+      pvLast?h(RefArea,{x1:data[0].m,x2:pvLast,fill:'#f0f2f5',fillOpacity:0.6,stroke:'none'}):null,
+      pvLast?h(RefLine,{x:pvLast,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2}):null,
+      h(XAxis,{dataKey:'m',tick:{fill:LIGHT,fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(RCTip,{content:makeTip()}),
+      h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:8}}),
+      ATB_META.map(function(atb){
+        return h(Bar,{key:atb.key,dataKey:atb.key,name:atb.label,
+          fill:atb.color,stackId:'s',maxBarSize:30},
+          data.map(function(d,i){
+            return h(Cell,{key:i,fill:atb.color,opacity:d.prev?0.28:0.85});
+          })
+        );
+      })
+    )
+  );
+}
+
+// ── Chart: single unit — stacked ATBs ────────────────────────────────────────
+function ChartUnit(props){
+  var uk=props.unitKey,ht=props.h||280;
+  var data=MESES.map(function(m,mi){
+    var row={m:m};
+    ATB_META.forEach(function(atb){row[atb.key]=(RAW[atb.key][uk]||[])[mi]||0;});
+    return row;
+  });
+  var means=ATB_META.map(function(atb){
+    return {key:atb.key,mean:data.reduce(function(s,d){return s+d[atb.key];},0)/12};
+  });
+  return h('div',{},
+    h(RCont,{width:'100%',height:ht},
+      h(BarChart,{data:data,margin:{top:8,right:8,left:-20,bottom:0},barCategoryGap:'22%'},
+        h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
+        h(XAxis,{dataKey:'m',tick:{fill:LIGHT,fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(RCTip,{content:makeTip()}),
+        h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:8}}),
+        ATB_META.map(function(atb){
+          return h(Bar,{key:atb.key,dataKey:atb.key,name:atb.label,
+            fill:atb.color,stackId:'s',maxBarSize:32});
+        })
+      )
+    ),
+    h('div',{style:{display:'flex',gap:6,marginTop:8,flexWrap:'wrap'}},
+      means.map(function(m){
+        var atb=ATB_META.find(function(a){return a.key===m.key;});
+        return h('div',{key:m.key,style:{background:atb.bg,border:'1px solid '+atb.color+'44',
+          borderRadius:5,padding:'4px 10px',display:'flex',gap:8,alignItems:'center'}},
+          h('span',{style:{fontSize:9,color:SLATE}},atb.label),
+          h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:12,
+            fontWeight:700,color:atb.color}},m.mean.toFixed(1))
+        );
+      })
+    )
+  );
+}
+
+// ── Heatmap ───────────────────────────────────────────────────────────────────
+function Heatmap(props){
+  var unitKeys=props.unitKeys;
+  var unitLabels=UNITS.filter(function(u){return unitKeys.indexOf(u.key)>=0;});
+  var win=buildWindow(); // 13-month window [{lbl,yr,mo,raw,prev}]
+
+  function cellBg(atb,val,maxVal){
+    if(val===0||val==null) return {bg:WHITE,c:MUTED};
+    var t=Math.min(val/maxVal,1);
+    var alpha=Math.round(t*180+30);
+    return {bg:atb.color+Math.max(40,alpha).toString(16).padStart(2,'0'),c:'#fff'};
+  }
+  return h('div',{style:{overflowX:'auto'}},
+    h('table',{style:{borderCollapse:'collapse',width:'100%',fontSize:9,minWidth:520}},
+      h('thead',{},h('tr',{},
+        h('th',{style:{padding:'4px 8px',color:MUTED,fontWeight:600,textAlign:'left',
+          width:110,background:'#f8f9fa',borderBottom:'1px solid '+BRDR}},'ATB'),
+        h('th',{style:{padding:'4px 8px',color:MUTED,fontWeight:600,textAlign:'left',
+          width:90,background:'#f8f9fa',borderBottom:'1px solid '+BRDR}},'Unidade'),
+        win.map(function(w,i){
+          return h('th',{key:i,style:{padding:'4px 5px',fontSize:8,
+            textAlign:'center',width:38,
+            color:w.prev?MUTED:MUTED,
+            background:w.prev?'#f5f6f8':'#f8f9fa',
+            borderBottom:'1px solid '+BRDR,
+            opacity:w.prev?0.55:1}},w.lbl);
+        }),
+        h('th',{style:{padding:'4px 8px',color:NAVY,fontWeight:700,textAlign:'center',
+          width:58,background:'#eef0f3',borderBottom:'1px solid '+BRDR,
+          borderLeft:'2px solid '+BRDR}},'Média')
+      )),
+      h('tbody',{},
+        ATB_META.map(function(atb){
+          // Max across all visible data for colour scaling
+          var allVals=[];
+          unitKeys.forEach(function(uk){
+            win.forEach(function(w){
+              var v=w.raw[atb.key]&&w.raw[atb.key][uk]?w.raw[atb.key][uk][w.mo]:null;
+              if(v!=null&&v>0) allVals.push(v);
+            });
+          });
+          var maxVal=allVals.length?Math.max.apply(null,allVals):1;
+
+          return unitLabels.map(function(u,ui){
+            var unitVals=win.map(function(w){
+              return w.raw[atb.key]&&w.raw[atb.key][u.key]?w.raw[atb.key][u.key][w.mo]:null;
+            }).filter(function(v){return v!=null&&v>0;});
+            var mean=unitVals.length?unitVals.reduce(function(a,b){return a+b;},0)/unitVals.length:0;
+
+            return h('tr',{key:atb.key+u.key,
+              style:{borderTop:ui===0?'2px solid '+BRDR:'1px solid '+BRDR+'44'}},
+              ui===0?h('td',{rowSpan:unitLabels.length,style:{padding:'4px 8px',
+                verticalAlign:'middle',borderRight:'1px solid '+BRDR,
+                fontWeight:700,color:atb.color,
+                fontFamily:"'IBM Plex Sans',sans-serif",fontSize:10,
+                background:atb.bg,width:110}},atb.label):null,
+              h('td',{style:{padding:'4px 8px',color:SLATE,
+                borderRight:'1px solid '+BRDR+'44',whiteSpace:'nowrap',width:90,
+                fontSize:9}},u.label),
+              // Fixed 13 window columns — empty cells for future months
+              win.map(function(w,wi){
+                var v=w.raw[atb.key]&&w.raw[atb.key][u.key]?w.raw[atb.key][u.key][w.mo]:null;
+                var hasData=v!=null&&v>0;
+                var r=cellBg(atb,v,maxVal);
+                return h('td',{key:wi,style:{
+                  padding:'3px 4px',textAlign:'center',
+                  background:hasData?r.bg:(w.prev?'#f5f6f8':WHITE),
+                  color:hasData?r.c:(w.prev?MUTED+'55':MUTED),
+                  fontFamily:"'IBM Plex Mono',monospace",fontSize:9,
+                  fontWeight:hasData?600:400,
+                  borderBottom:'1px solid '+BRDR+'22'}},
+                  hasData?v.toFixed(0):'—');
+              }),
+              // Média — always last, distinct left border
+              h('td',{style:{padding:'4px 6px',textAlign:'center',
+                fontFamily:"'IBM Plex Mono',monospace",fontSize:10,
+                fontWeight:700,color:mean>0?atb.color:MUTED,
+                background:mean>0?atb.bg:WHITE,
+                borderLeft:'2px solid '+BRDR}},
+                mean>0?mean.toFixed(1):'—')
+            );
+          });
+        }).reduce(function(a,b){return a.concat(b);})
+      )
+    )
+  );
+}
+
+// ── Pill button ───────────────────────────────────────────────────────────────
+function Pill(props){
+  var a=props.active,col=props.color||'#1565c0';
+  return h('button',{onClick:props.onClick,style:{padding:'5px 14px',
+    borderRadius:20,border:'1px solid '+(a?col:BRDR),
+    background:a?col:WHITE,
+    color:a?WHITE:SLATE,
+    fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,
+    fontWeight:a?600:400,
+    boxShadow:a?'0 1px 4px rgba(0,0,0,0.15)':'none'}},
+    props.label);
+}
+
+// ── Card wrapper ──────────────────────────────────────────────────────────────
+function Card(props){
+  return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+    padding:props.p||'16px 16px 10px',marginBottom:props.mb||0,
+    boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},props.children);
+}
+
+
+function MetodFooter(){
+  return h('div',{style:{marginTop:24,borderTop:'1px solid #d0d7de',paddingTop:14}},
+    h('div',{style:{fontSize:9,color:'#8898aa',fontWeight:600,letterSpacing:1,
+      textTransform:'uppercase',marginBottom:8}},'Notas metodológicas'),
+    h('div',{style:{background:'#fafbfc',border:'1px solid #d0d7de',borderRadius:6,
+      padding:'10px 14px',fontSize:9,color:'#8898aa',lineHeight:1.7}},
+      'DOT (Defined Daily Dose per 1000 patient-days). ',
+      h('span',{style:{fontWeight:500,color:'#4a5568'}},'Ceftriaxona, Pip/Tazo, Carbapenêmicos, Glicopeptídeos e Polimixina B'),
+      ' monitorados como antimicrobianos estratégicos conforme protocolo SCIH/HUSF. ',
+      'Denominador: pacientes-dia ajustado por unidade. ',
+      'Análise mensal por unidade e por classe terapêutica.'
+    )
+    ,
+    h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
+      display:'flex',justifyContent:'space-between',alignItems:'center',
+      flexWrap:'wrap',gap:8}},
+      h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+        h('span',{style:{fontWeight:600,color:'#4a5568'}},'Autoria · '),
+        'Sistema de interface desenvolvido por Dr. Leandro Mendes · ',
+        'Análises epidemiológicas e estatísticas realizadas por Dr. Leandro Mendes'
+      ),
+      h('div',{style:{fontSize:8,color:'#b0bec5',fontFamily:"'IBM Plex Mono',monospace"}},
+        'SCIH/CCIH · HUSF · Bragança Paulista')
+    )
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App(){
+  var vs=useState('byAtb'); var view=vs[0],setView=vs[1];
+  var as=useState('cbp');   var selATB=as[0],setSelATB=as[1];
+  var us=useState('utiab'); var selUnit=us[0],setSelUnit=us[1];
+  var ps=useState('2026');  var periodo=ps[0],setPeriodo=ps[1];
+
+  useEffect(function(){
+    // Apply 2026 fallback immediately based on current periodo default
+    var yearGuess = '2026'; // current operational year
+    if(yearGuess === '2026') RAW = RAW_2026;
+    fetch('./data_iras.json?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.dots){RAW=flattenDots(d.dots);}
+        if(d.periodo) setPeriodo(d.periodo);
+      }).catch(function(){});
+  },[]);
+
+  var utiKeys=['utiab','utic'];
+  var enfKeys=['clin','cir','apto','epm'];
+  var allKeys=['utiab','utic','clin','cir','apto','epm'];
+  var atbMeta=ATB_META.find(function(a){return a.key===selATB;})||ATB_META[0];
+  var unitMeta=UNITS.find(function(u){return u.key===selUnit;})||UNITS[0];
+
+  var topBar=h('div',{style:{background:WHITE,borderBottom:'1px solid '+BRDR,
+    padding:'12px 28px',position:'sticky',top:0,zIndex:20,
+    display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}},
+    h('div',{},
+      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:14,
+        fontWeight:600,color:NAVY}},'Consumo de Antimicrobianos — DOT/1000 pac-dia'),
+      h('div',{style:{fontSize:9,color:LIGHT,marginTop:1}},
+        'HUSF · SCIH/CCIH · '+periodo)
+    ),
+    h('a',{href:'./iras_mdr.html',style:{marginLeft:'auto',fontSize:9,color:SLATE,
+      textDecoration:'none',padding:'4px 10px',border:'1px solid '+BRDR,
+      borderRadius:6,background:WHITE}},'← Dashboard')
+  );
+
+  var viewSel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}},
+    h(Pill,{label:'Por ATB',       active:view==='byAtb',  onClick:function(){setView('byAtb');}}),
+    h(Pill,{label:'Por Unidade',   active:view==='byUnit', onClick:function(){setView('byUnit');}}),
+    h(Pill,{label:'UTIs',          active:view==='uti',    onClick:function(){setView('uti');}}),
+    h(Pill,{label:'Enfermarias',   active:view==='enf',    onClick:function(){setView('enf');}}),
+    h(Pill,{label:'Total',         active:view==='total',  onClick:function(){setView('total');}}),
+    h(Pill,{label:'Mapa de Calor', active:view==='heatmap',onClick:function(){setView('heatmap');},color:'#4527a0'})
+  );
+
+  var atbSel=view==='byAtb'?h('div',{style:{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}},
+    ATB_META.map(function(atb){
+      return h(Pill,{key:atb.key,label:atb.label,active:selATB===atb.key,
+        color:atb.color,onClick:function(){setSelATB(atb.key);}});
+    })
+  ):null;
+
+  var unitSel=view==='byUnit'?h('div',{style:{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}},
+    UNITS.map(function(u){
+      return h(Pill,{key:u.key,label:u.label,active:selUnit===u.key,
+        onClick:function(){setSelUnit(u.key);}});
+    })
+  ):null;
+
+  function secHead(title,sub){
+    return h('div',{style:{marginBottom:10}},
+      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:13,
+        fontWeight:600,color:NAVY}},title),
+      sub?h('div',{style:{fontSize:9,color:LIGHT,marginTop:2}},sub):null
+    );
+  }
+
+  var content;
+  switch(view){
+    case 'byAtb':
+      content=h('div',{className:'fi'},
+        h(Card,{},
+          secHead(atbMeta.label+' — DOT/1000 pac-dia por Unidade',
+            'Barras agrupadas · cada cor = uma unidade'),
+          h(ChartByATB,{atb:atbMeta,unitKeys:allKeys,h:340})
+        )
+      ); break;
+
+    case 'byUnit':
+      content=h('div',{className:'fi'},
+        h(Card,{},
+          secHead(unitMeta.label+' — Perfil de Consumo por Classe',
+            'Barras empilhadas · escalada terapêutica · médias anuais abaixo'),
+          h(ChartUnit,{unitKey:selUnit,h:300})
+        )
+      ); break;
+
+    case 'uti':
+      content=h('div',{className:'fi'},
+        h(Card,{mb:12},
+          secHead('Unidades de Terapia Intensiva — Consumo Total (UTI A/B + UTI C)',
+            'DOT/1000 pac-dia · barras empilhadas por classe'),
+          h(ChartStacked,{unitKeys:utiKeys,h:300})
+        ),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          ['utiab','utic'].map(function(uk){
+            var u=UNITS.find(function(x){return x.key===uk;});
+            return h(Card,{key:uk},
+              h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,
+                fontWeight:600,color:NAVY,marginBottom:10}},u.label+' — Perfil detalhado'),
+              h(ChartUnit,{unitKey:uk,h:200})
+            );
+          })
+        )
+      ); break;
+
+    case 'enf':
+      content=h('div',{className:'fi'},
+        h(Card,{mb:12},
+          secHead('Enfermarias — Consumo Total',
+            'Cl. Médica + Cl. Cirúrgica + Apartamentos + EPM · DOT/1000 pac-dia'),
+          h(ChartStacked,{unitKeys:enfKeys,h:280})
+        ),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          enfKeys.map(function(uk){
+            var u=UNITS.find(function(x){return x.key===uk;});
+            return h(Card,{key:uk},
+              h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,
+                fontWeight:600,color:NAVY,marginBottom:10}},u.label),
+              h(ChartUnit,{unitKey:uk,h:180})
+            );
+          })
+        )
+      ); break;
+
+    case 'total':
+      content=h('div',{className:'fi'},
+        h(Card,{mb:14},
+          secHead('Total Hospitalar — Consumo Consolidado',
+            'Todas as unidades · barras empilhadas por escalada terapêutica'),
+          h(ChartStacked,{unitKeys:allKeys,h:340})
+        ),
+        h(Card,{},
+          h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+            color:NAVY,marginBottom:12}},'Média Anual por Unidade (DOT/1000 pac-dia)'),
+          h('div',{style:{overflowX:'auto'}},
+            h('table',{style:{borderCollapse:'collapse',width:'100%',fontSize:10,minWidth:500}},
+              h('thead',{},h('tr',{},
+                h('th',{style:{padding:'6px 10px',textAlign:'left',color:SLATE,fontWeight:600,
+                  borderBottom:'1px solid '+BRDR,background:'#f8f9fa'}},'Classe'),
+                UNITS.map(function(u){
+                  return h('th',{key:u.key,style:{padding:'6px 8px',textAlign:'center',
+                    color:SLATE,fontWeight:600,borderBottom:'1px solid '+BRDR,
+                    fontSize:9,background:'#f8f9fa'}},u.label);
+                }),
+                h('th',{style:{padding:'6px 8px',textAlign:'center',color:SLATE,fontWeight:700,
+                  borderBottom:'1px solid '+BRDR,background:'#f8f9fa'}},'Total')
+              )),
+              h('tbody',{},ATB_META.map(function(atb,i){
+                var means=UNITS.map(function(u){
+                  return (RAW[atb.key][u.key]||[]).reduce(function(a,b){return a+b;},0)/12;
+                });
+                var total=means.reduce(function(a,b){return a+b;},0);
+                return h('tr',{key:atb.key,style:{background:i%2===0?WHITE:'#fafbfc'}},
+                  h('td',{style:{padding:'7px 10px',fontWeight:600,color:atb.color,
+                    borderBottom:'1px solid '+BRDR+'33'}},atb.label),
+                  means.map(function(m,j){
+                    return h('td',{key:j,style:{padding:'7px 8px',textAlign:'center',
+                      fontFamily:"'IBM Plex Mono',monospace",fontSize:10,
+                      color:m>80?atb.color:SLATE,fontWeight:m>80?700:400,
+                      borderBottom:'1px solid '+BRDR+'33'}},m.toFixed(1));
+                  }),
+                  h('td',{style:{padding:'7px 8px',textAlign:'center',
+                    fontFamily:"'IBM Plex Mono',monospace",fontSize:11,fontWeight:700,
+                    color:atb.color,borderBottom:'1px solid '+BRDR+'33'}},total.toFixed(1))
+                );
+              }))
+            )
+          )
+        )
+      ); break;
+
+    case 'heatmap':
+      content=h('div',{className:'fi'},
+        h(Card,{},
+          secHead('Mapa de Calor — Intensidade de Uso por ATB, Unidade e Mês',
+            'Intensidade relativa dentro de cada classe · números = DOT/1000 pac-dia · — = zero'),
+          h(Heatmap,{unitKeys:allKeys})
+        )
+      ); break;
+
+    default: content=null;
+  }
+
+  return h('div',{style:{background:BG,minHeight:'100vh'}},
+    topBar,
+    h('div',{style:{maxWidth:1200,margin:'0 auto',padding:'20px 24px 48px'}},
+      viewSel, atbSel, unitSel, content, h(MetodFooter)
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
