@@ -45,7 +45,7 @@ var BarChart=RC.BarChart,Bar=RC.Bar,ComposedChart=RC.ComposedChart;
 var LineChart=RC.LineChart,Line=RC.Line;
 var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
 var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer;
-var RefLine=RC.ReferenceLine,Cell=RC.Cell,Legend=RC.Legend;
+var RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea,Cell=RC.Cell,Legend=RC.Legend;
 
 // ── Fallback data ─────────────────────────────────────────────────────────────
 var FB={
@@ -54,14 +54,21 @@ var FB={
   clinicaMedica:{taxaIH:[{p:'2016',v:2.75},{p:'2017',v:2.49},{p:'2018',v:0.81},{p:'2019',v:0.76},{p:'2020',v:0.82},{p:'2021',v:1.15},{p:'2022',v:1.18},{p:'2023',v:1.63},{p:'2024',v:1.57},{p:'jan/25',v:0.92},{p:'fev/25',v:1.63},{p:'mar/25',v:1.06},{p:'abr/25',v:1.54},{p:'mai/25',v:1.31},{p:'jun/25',v:1.44},{p:'jul/25',v:0.69},{p:'ago/25',v:1.11},{p:'set/25',v:1.27},{p:'out/25',v:1.55},{p:'nov/25',v:1.02},{p:'dez/25',v:1.81},{p:'jan/26',v:1.20,c:1}],inf:{ac:2,itu:0,pneu:6,sc:null,total:8,pd:664}},
   clinicaCirurgica:{taxaIH:[{p:'2016',v:6.51},{p:'2017',v:4.38},{p:'2018',v:1.23},{p:'2019',v:0.84},{p:'2020',v:0.91},{p:'2021',v:1.15},{p:'2022',v:1.61},{p:'2023',v:3.13},{p:'2024',v:3.00},{p:'jan/25',v:3.12},{p:'fev/25',v:3.45},{p:'mar/25',v:3.77},{p:'abr/25',v:4.15},{p:'mai/25',v:2.79},{p:'jun/25',v:3.14},{p:'jul/25',v:3.49},{p:'ago/25',v:3.21},{p:'set/25',v:3.12},{p:'out/25',v:2.75},{p:'nov/25',v:3.00},{p:'dez/25',v:2.15},{p:'jan/26',v:2.68,c:1}],inf:{ac:4,itu:2,pneu:8,sc:6,total:20,pd:746}},
   epm:{taxaIH:[{p:'2016',v:2.40},{p:'2017',v:1.80},{p:'2018',v:0.52},{p:'2019',v:0.55},{p:'2020',v:0.66},{p:'2021',v:0.83},{p:'2022',v:0.78},{p:'2023',v:1.20},{p:'2024',v:0.82},{p:'jan/25',v:1.59},{p:'fev/25',v:1.38},{p:'mar/25',v:0.76},{p:'abr/25',v:0.46},{p:'mai/25',v:1.01},{p:'jun/25',v:1.17},{p:'jul/25',v:1.55},{p:'ago/25',v:0.99},{p:'set/25',v:0.92},{p:'out/25',v:1.25},{p:'nov/25',v:0.50},{p:'dez/25',v:0.55},{p:'jan/26',v:0.65,c:1}],inf:{ac:0,itu:0,pneu:2,sc:2,total:4,pd:619}},
+  diarreia:{
+    cm:   [{p:'jun/25',v:8.55},{p:'jul/25',v:11.83},{p:'ago/25',v:26.21},{p:'set/25',v:15.56},{p:'out/25',v:33.80},{p:'nov/25',v:7.19},{p:'dez/25',v:4.42},{p:'jan/26',v:2.40},{p:'fev/26',v:0.00}],
+    cc:   [{p:'jun/25',v:0.00},{p:'jul/25',v:0.00},{p:'ago/25',v:1.65},{p:'set/25',v:0.00},{p:'out/25',v:1.58},{p:'nov/25',v:5.31},{p:'dez/25',v:0.00},{p:'jan/26',v:1.96},{p:'fev/26',v:6.54}],
+    epm:  [{p:'jun/25',v:0.00},{p:'jul/25',v:5.71},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:10.07},{p:'nov/25',v:0.00},{p:'dez/25',v:0.00},{p:'jan/26',v:7.33},{p:'fev/26',v:0.00}],
+    utiab:[{p:'jun/25',v:30.93},{p:'jul/25',v:21.05},{p:'ago/25',v:7.94},{p:'set/25',v:13.12},{p:'out/25',v:7.32},{p:'nov/25',v:16.08},{p:'dez/25',v:8.38},{p:'jan/26',v:11.63},{p:'fev/26',v:13.79}],
+    utic: [{p:'jun/25',v:0.00},{p:'jul/25',v:0.00},{p:'ago/25',v:10.58},{p:'set/25',v:0.00},{p:'out/25',v:14.08},{p:'nov/25',v:5.43},{p:'dez/25',v:15.63},{p:'jan/26',v:0.00},{p:'fev/26',v:26.32}]
+  },
   hd:{
     ilav:[{p:'2016',v:24.4},{p:'2017',v:27.8},{p:'2018',v:12.6},{p:'2019',v:10.4},{p:'2020',v:5.4},{p:'2021',v:5.71},{p:'2022',v:6.8},{p:'2023',v:3.15},{p:'2024',v:3.36},{p:'jan/25',v:2.86},{p:'fev/25',v:1.85},{p:'mar/25',v:1.49},{p:'abr/25',v:5.20},{p:'mai/25',v:7.78},{p:'jun/25',v:0.46},{p:'jul/25',v:1.59},{p:'ago/25',v:0.00},{p:'set/25',v:1.67},{p:'out/25',v:0.00},{p:'nov/25',v:0.74},{p:'dez/25',v:1.75},{p:'jan/26',v:2.45,c:1}],
     bact:[{p:'2016',v:12.5},{p:'2017',v:6.7},{p:'2018',v:5.9},{p:'2019',v:5.6},{p:'2020',v:5.1},{p:'2021',v:8.68},{p:'2022',v:6.79},{p:'2023',v:8.3},{p:'2024',v:24.32},{p:'jan/25',v:10.44},{p:'fev/25',v:7.90},{p:'mar/25',v:1.99},{p:'abr/25',v:11.99},{p:'mai/25',v:3.22},{p:'jun/25',v:10.33},{p:'jul/25',v:10.53},{p:'ago/25',v:1.11},{p:'set/25',v:7.41},{p:'out/25',v:14.86},{p:'nov/25',v:13.73},{p:'dez/25',v:9.86},{p:'jan/26',v:11.53,c:1}],
     vanco:[{p:'2016',v:8.8},{p:'2017',v:7.5},{p:'2018',v:8.5},{p:'2019',v:5.9},{p:'2020',v:4.5},{p:'2021',v:7.15},{p:'2022',v:7.79},{p:'2023',v:8.02},{p:'2024',v:10.22},{p:'jan/25',v:10.59},{p:'fev/25',v:5.98},{p:'mar/25',v:6.84},{p:'abr/25',v:10.79},{p:'mai/25',v:10.37},{p:'jun/25',v:6.67},{p:'jul/25',v:7.44},{p:'ago/25',v:2.07},{p:'set/25',v:6.53},{p:'out/25',v:4.58},{p:'nov/25',v:5.83},{p:'dez/25',v:5.42},{p:'jan/26',v:5.88,c:1}],
-    ilavTemp:[{p:'jan/25',v:1.85},{p:'fev/25',v:1.85},{p:'mar/25',v:0.00},{p:'abr/25',v:4.76},{p:'mai/25',v:5.56},{p:'jun/25',v:0.00},{p:'jul/25',v:1.15},{p:'ago/25',v:0.00},{p:'set/25',v:1.67},{p:'out/25',v:0.00},{p:'nov/25',v:0.00},{p:'dez/25',v:1.75},{p:'jan/26',v:2.08,c:1}],
-    ilavPerm:[{p:'jan/25',v:1.01},{p:'fev/25',v:0.00},{p:'mar/25',v:1.49},{p:'abr/25',v:0.44},{p:'mai/25',v:2.22},{p:'jun/25',v:0.46},{p:'jul/25',v:0.44},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:0.00},{p:'nov/25',v:0.74},{p:'dez/25',v:0.00},{p:'jan/26',v:0.37,c:1}],
-    bactTemp:[{p:'jan/25',v:7.41},{p:'fev/25',v:7.41},{p:'mar/25',v:0.00},{p:'abr/25',v:11.11},{p:'mai/25',v:2.78},{p:'jun/25',v:9.88},{p:'jul/25',v:9.20},{p:'ago/25',v:1.11},{p:'set/25',v:6.67},{p:'out/25',v:13.73},{p:'nov/25',v:13.73},{p:'dez/25',v:8.77},{p:'jan/26',v:10.42,c:1}],
-    bactPerm:[{p:'jan/25',v:3.03},{p:'fev/25',v:0.50},{p:'mar/25',v:1.99},{p:'abr/25',v:0.88},{p:'mai/25',v:0.44},{p:'jun/25',v:0.46},{p:'jul/25',v:1.33},{p:'ago/25',v:0.00},{p:'set/25',v:0.74},{p:'out/25',v:1.14},{p:'nov/25',v:0.00},{p:'dez/25',v:1.09},{p:'jan/26',v:1.11,c:1}],
+    ilavTemp:[{p:'jan/25',v:1.85},{p:'fev/25',v:1.85},{p:'mar/25',v:0.00},{p:'abr/25',v:4.76},{p:'mai/25',v:5.56},{p:'jun/25',v:0.00},{p:'jul/25',v:1.15},{p:'ago/25',v:0.00},{p:'set/25',v:1.67},{p:'out/25',v:0.00},{p:'nov/25',v:0.00},{p:'dez/25',v:1.75},{p:'jan/26',v:2.08}],
+    ilavPerm:[{p:'jan/25',v:1.01},{p:'fev/25',v:0.00},{p:'mar/25',v:1.49},{p:'abr/25',v:0.44},{p:'mai/25',v:2.22},{p:'jun/25',v:0.46},{p:'jul/25',v:0.44},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:0.00},{p:'nov/25',v:0.74},{p:'dez/25',v:0.00},{p:'jan/26',v:0.37}],
+    bactTemp:[{p:'jan/25',v:7.41},{p:'fev/25',v:7.41},{p:'mar/25',v:0.00},{p:'abr/25',v:11.11},{p:'mai/25',v:2.78},{p:'jun/25',v:9.88},{p:'jul/25',v:9.20},{p:'ago/25',v:1.11},{p:'set/25',v:6.67},{p:'out/25',v:13.73},{p:'nov/25',v:13.73},{p:'dez/25',v:8.77},{p:'jan/26',v:10.42}],
+    bactPerm:[{p:'jan/25',v:3.03},{p:'fev/25',v:0.50},{p:'mar/25',v:1.99},{p:'abr/25',v:0.88},{p:'mai/25',v:0.44},{p:'jun/25',v:0.46},{p:'jul/25',v:1.33},{p:'ago/25',v:0.00},{p:'set/25',v:0.74},{p:'out/25',v:1.14},{p:'nov/25',v:0.00},{p:'dez/25',v:1.09},{p:'jan/26',v:1.11}],
     audit:{ok:10,nc:4,pct:29}
   },
   utiAB:{
@@ -393,34 +400,148 @@ function HdSection(props){
   );
 }
 
+function DiarreiaSection(props){
+  var D=props.D;
+  var dd=D.diarreia||{};
+
+  var DUNITS=[
+    {key:'utiab',label:'UTI A/B',    color:RED},
+    {key:'utic', label:'UTI C',      color:PURPLE},
+    {key:'cm',   label:'Cl. Médica', color:BLUE},
+    {key:'cc',   label:'Cl. Cirúrgica',color:GREEN},
+    {key:'epm',  label:'EPM / Apto', color:AMBER},
+  ];
+
+  // Build timeline from the cm series (longest/most complete)
+  var ref=dd.cm||[];
+  if(!ref.length) return h('div',{className:'fi'},h('div',{style:{color:MUTED,padding:24,fontSize:12}},'Sem dados de diarreia disponíveis.'));
+
+  var lastLbl=(ref[ref.length-1]||{}).p||'';
+  var currYr=(lastLbl.split('/')[1])||'';
+
+  var allLabels=ref.map(function(pt){return pt.p;});
+
+  var chartData=allLabels.map(function(lbl){
+    var ptYr=(lbl.split('/')[1])||'';
+    var prev=ptYr!==currYr;
+    var row={m:lbl,prev:prev};
+    DUNITS.forEach(function(u){
+      var series=dd[u.key]||[];
+      var pt=series.find(function(s){return s.p===lbl;})||{};
+      var v=pt.v!=null?pt.v:null;
+      row[u.key]=v;
+      row[u.key+'_prev']=prev?v:null;
+      row[u.key+'_curr']=!prev?v:null;
+      // Share boundary point so lines connect across year boundary
+      var prevPt=allLabels.indexOf(lbl)>0&&allLabels[allLabels.indexOf(lbl)-1];
+      if(!prev&&prevPt&&(prevPt.split('/')[1])!==currYr) row[u.key+'_prev']=v;
+    });
+    return row;
+  });
+
+  var pvFirst=null,pvLast=null;
+  chartData.forEach(function(d){if(d.prev){if(!pvFirst)pvFirst=d.m;pvLast=d.m;}});
+
+  // KPI strip — latest value per unit
+  var kpis=DUNITS.map(function(u){
+    var series=dd[u.key]||[];
+    var curr=null,currLbl='—';
+    for(var i=series.length-1;i>=0;i--){
+      if(series[i].v!=null){curr=series[i].v;currLbl=series[i].p;break;}
+    }
+    var prev=null;
+    var ci=series.findIndex(function(s){return s.v===curr&&s.p===currLbl;});
+    for(var j=ci-1;j>=0;j--){
+      if(series[j].v!=null){prev=series[j].v;break;}
+    }
+    var trend=curr===null?'—':prev===null?'→':curr>prev?'↑':curr<prev?'↓':'→';
+    return {u:u,curr:curr,currLbl:currLbl,trend:trend};
+  });
+
+  function makeTipDiarr(){
+    return function T(p){
+      if(!p.active||!p.payload||!p.payload.length) return null;
+      var items=p.payload.filter(function(x){return x.value!=null&&x.value>0;})
+        .sort(function(a,b){return b.value-a.value;});
+      if(!items.length) return null;
+      return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
+        padding:'10px 14px',fontSize:12,boxShadow:'0 2px 8px rgba(0,0,0,0.12)',minWidth:180}},
+        h('div',{style:{color:LIGHT,fontSize:10,marginBottom:6}},'Diarreia /1000 pac-dia · '+p.label),
+        items.map(function(it,i){
+          return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',gap:14,marginBottom:2}},
+            h('span',{style:{color:SLATE,fontSize:11}},it.name),
+            h('span',{style:{color:it.color,fontFamily:"'IBM Plex Mono',monospace",fontSize:11,fontWeight:700}},
+              it.value.toFixed(2))
+          );
+        })
+      );
+    };
+  }
+
+  return h('div',{className:'fi'},
+    // KPI strip
+    h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}},
+      kpis.map(function(k,i){
+        var ok=k.curr==null||k.curr<20;
+        return h('div',{key:i,style:{background:WHITE,border:'1px solid '+(ok?BRDR:k.u.color+'55'),
+          borderRadius:8,padding:'10px 14px',flex:'1',minWidth:120,
+          boxShadow:ok?'0 1px 3px rgba(0,0,0,0.06)':'0 2px 8px '+k.u.color+'22',
+          position:'relative',overflow:'hidden'}},
+          h('div',{style:{position:'absolute',top:0,left:0,width:'100%',height:3,background:k.u.color}}),
+          h('div',{style:{fontSize:9,color:SLATE,marginBottom:4,marginTop:2}},k.u.label),
+          h('div',{style:{display:'flex',alignItems:'baseline',gap:6}},
+            k.curr!=null
+              ?h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:26,fontWeight:700,
+                  color:ok?NAVY:k.u.color,lineHeight:1}},k.curr.toFixed(1))
+              :h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:26,color:MUTED}},'—'),
+            k.trend!=='—'?h('span',{style:{fontSize:14,fontWeight:700,
+              color:k.trend==='↑'?RED:k.trend==='↓'?GREEN:MUTED}},k.trend):null
+          ),
+          h('div',{style:{fontSize:8,color:MUTED,marginTop:4}},k.currLbl+' · /1000 pac-dia')
+        );
+      })
+    ),
+    // Line chart
+    h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+      padding:'16px 16px 10px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)',marginBottom:12}},
+      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+        color:NAVY,marginBottom:4}},'Densidade de Incidência de Diarreia Hospitalar (/1000 pac-dia)'),
+      h('div',{style:{fontSize:8,color:MUTED,marginBottom:12}},
+        'Vigilância iniciada em jun/2025 · diarreia instalada ≥48h após admissão em paciente previamente sem diarreia'),
+      h(RCont,{width:'100%',height:300},
+        h(ComposedChart,{data:chartData,margin:{top:8,right:12,left:-20,bottom:0}},
+          h(CartGrid,{strokeDasharray:'2 4',stroke:GRID,vertical:false}),
+          pvFirst?h(RefArea,{x1:pvFirst,x2:pvLast,fill:'#f0f2f5',fillOpacity:0.7,stroke:'none'}):null,
+          pvLast?h(RefLine,{x:pvLast,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2,
+            label:{value:'2026',fill:'#9eaab8',fontSize:8,position:'insideTopRight'}}):null,
+          h(XAxis,{dataKey:'m',tick:{fill:LIGHT,fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+          h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,allowDecimals:true}),
+          h(RCTip,{content:makeTipDiarr()}),
+          h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:6}}),
+          DUNITS.map(function(u){
+            return [
+              h(Line,{key:u.key+'_p',type:'monotone',dataKey:u.key+'_prev',
+                stroke:u.color,strokeWidth:1.5,strokeOpacity:0.25,
+                dot:false,connectNulls:true,legendType:'none',name:undefined}),
+              h(Line,{key:u.key+'_c',type:'monotone',dataKey:u.key+'_curr',
+                stroke:u.color,strokeWidth:2,strokeOpacity:1,
+                dot:{r:3,fill:u.color,stroke:WHITE,strokeWidth:1.5},
+                connectNulls:true,legendType:'plainline',name:u.label,
+                activeDot:{r:5,fill:u.color,stroke:WHITE,strokeWidth:2}})
+            ];
+          }).reduce(function(a,b){return a.concat(b);})
+        )
+      )
+    )
+  );
+}
+
 function ClinicaSection(props){
   var D=props.D,which=props.which;
   var labels={clinicaMedica:'Clínica Médica',clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos'};
-  var cd=D[which],hasSC=which!=='clinicaMedica';
-  var rows=[{l:'Inf. Acesso Central',v:cd.inf.ac},{l:'Inf. Urinária',v:cd.inf.itu},{l:'Pneumonias',v:cd.inf.pneu}];
-  if(hasSC) rows.push({l:'Inf. Sítio Cirúrgico',v:cd.inf.sc});
-  rows.push({l:'Total',v:cd.inf.total,b:true});
-  rows.push({l:'Pacientes-dia',v:cd.inf.pd,m:true});
-  rows.push({l:'Taxa IH',v:(cd.inf.total/cd.inf.pd*100).toFixed(2)+'%',b:true,col:TEAL});
-  return h('div',{className:'fi',style:{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:12}},
-    h(BarS,{title:'Taxa IH — '+labels[which],data:cd.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8,h:260}),
-    h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,padding:18,
-      boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
-      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:12,fontWeight:600,
-        color:NAVY,marginBottom:14}},'Infecções — '+D.periodo),
-      h('div',{style:{display:'flex',flexDirection:'column',gap:4}},
-        rows.map(function(r,i){
-          return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',
-            alignItems:'center',padding:'7px 10px',borderRadius:6,
-            background:r.b?BG:'transparent',
-            borderBottom:!r.b?'1px solid '+BRDR+'66':'none'}},
-            h('span',{style:{fontSize:11,color:r.b?NAVY:r.m?MUTED:SLATE,fontWeight:r.b?600:400}},r.l),
-            h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:15,fontWeight:r.b?700:500,
-              color:r.col||(r.b?NAVY:r.m?MUTED:SLATE)}},r.v)
-          );
-        })
-      )
-    )
+  var cd=D[which];
+  return h('div',{className:'fi'},
+    h(BarS,{title:'Taxa IH — '+labels[which],data:cd.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8,h:280})
   );
 }
 
@@ -556,12 +677,14 @@ var NAV=[
   {id:'hd',l:'Hemodiálise',g:'Unidades Críticas',ic:'◈'},
   {id:'clinicaMedica',l:'Clínica Médica',g:'Enfermarias',ic:'▤'},
   {id:'clinicaCirurgica',l:'Clínica Cirúrgica',g:'Enfermarias',ic:'▤'},
-  {id:'epm',l:'EPM / Apartamentos',g:'Enfermarias',ic:'▤'}
+  {id:'epm',l:'EPM / Apartamentos',g:'Enfermarias',ic:'▤'},
+  {id:'diarreia',l:'Diarreia Hospitalar',g:'Vigilâncias Especiais',ic:'◎'}
 ];
 var TITLES={overview:'Visão Geral — IrAS & MDR',mdrInst:'Multirresistentes — Institucional',
   abio:'Antibiograma Institucional',utiAB:'UTI A/B',utic:'UTI C',
   utiNeo:'UTI Neonatal',hd:'Hemodiálise / Nefrologia',clinicaMedica:'Clínica Médica',
-  clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos'};
+  clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos',
+  diarreia:'Diarreia Hospitalar'};
 var groups=NAV.reduce(function(acc,n){if(n.g&&acc.indexOf(n.g)===-1)acc.push(n.g);return acc;},[]);
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -589,6 +712,19 @@ function App(){
             }
           });
         }
+        // Diarreia: merge JSON (apenas mês corrente) com histórico do FB
+        if(d.diarreia){
+          var DIARR_KEYS=['cm','cc','epm','utiab','utic'];
+          DIARR_KEYS.forEach(function(k){
+            var jv=d.diarreia[k], fbv=FB.diarreia&&FB.diarreia[k];
+            if(!Array.isArray(jv)||!Array.isArray(fbv)) return;
+            var onlyCurr=jv.length>0&&jv.every(function(x){return x.c;});
+            if(onlyCurr){
+              var hist=fbv.filter(function(x){return !x.c;});
+              d.diarreia[k]=hist.concat(jv);
+            }
+          });
+        }
         setD(d);
       })
       .catch(function(){});
@@ -613,6 +749,7 @@ function App(){
       case 'clinicaMedica':    return h(ClinicaSection,{D:D,which:'clinicaMedica'});
       case 'clinicaCirurgica': return h(ClinicaSection,{D:D,which:'clinicaCirurgica'});
       case 'epm':              return h(ClinicaSection,{D:D,which:'epm'});
+      case 'diarreia':         return h(DiarreiaSection,{D:D});
       default: return null;
     }
   }
