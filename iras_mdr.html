@@ -800,31 +800,47 @@ function App(){
           Object.keys(LIM_MAP).forEach(function(key){
             var arr=d[unit][key];
             if(!Array.isArray(arr)||!arr.length) return;
-            // Find last non-c point (most recent historical = where limiares apply)
-            var lastHistIdx=-1;
-            for(var i=arr.length-1;i>=0;i--){ if(!arr[i].c){lastHistIdx=i;break;} }
-            if(lastHistIdx<0) return;
             var m=LIM_MAP[key];
-            var pt=Object.assign({},arr[lastHistIdx]);
-            if(m.max&&lim[m.max]!=null) pt.lMax=lim[m.max];
-            if(m.min&&lim[m.min]!=null) pt.lMin=lim[m.min];
             arr=arr.slice();
-            arr[lastHistIdx]=pt;
+            // Inject into every point that lacks lMin/lMax (both historical and current)
+            arr=arr.map(function(pt){
+              if((m.max&&lim[m.max]!=null&&pt.lMax==null)||(m.min&&lim[m.min]!=null&&pt.lMin==null)){
+                // Only inject into the last historical point and the c:1 point
+                return pt; // handled below
+              }
+              return pt;
+            });
+            // Find last non-c point and the c:1 point
+            var lastHistIdx=-1;
+            var currIdx=-1;
+            for(var i=arr.length-1;i>=0;i--){
+              if(arr[i].c&&currIdx<0) currIdx=i;
+              else if(!arr[i].c&&lastHistIdx<0) lastHistIdx=i;
+              if(lastHistIdx>=0&&currIdx>=0) break;
+            }
+            [lastHistIdx,currIdx].forEach(function(idx){
+              if(idx<0) return;
+              var pt=Object.assign({},arr[idx]);
+              if(m.max&&lim[m.max]!=null) pt.lMax=lim[m.max];
+              if(m.min&&lim[m.min]!=null) pt.lMin=lim[m.min];
+              arr[idx]=pt;
+            });
             d[unit][key]=arr;
           });
         });
         // Neo ipcsMax
         if(d.utiNeo&&d.utiNeo.limiares&&d.utiNeo.ipcs){
           var neoLim=d.utiNeo.limiares.ipcsMax;
-          var neoArr=d.utiNeo.ipcs;
-          var lastHistIdx=-1;
-          for(var i=neoArr.length-1;i>=0;i--){ if(!neoArr[i].c){lastHistIdx=i;break;} }
-          if(lastHistIdx>=0&&neoLim!=null){
-            var pt=Object.assign({},neoArr[lastHistIdx]);
-            pt.lMax=neoLim;
-            neoArr=neoArr.slice(); neoArr[lastHistIdx]=pt;
-            d.utiNeo.ipcs=neoArr;
+          var neoArr=d.utiNeo.ipcs.slice();
+          for(var i=neoArr.length-1;i>=0;i--){
+            if(neoLim!=null){
+              var pt=Object.assign({},neoArr[i]);
+              pt.lMax=neoLim;
+              neoArr[i]=pt;
+            }
+            if(!neoArr[i].c) break; // only inject into c:1 and last historical
           }
+          d.utiNeo.ipcs=neoArr;
         }
 
         // ── auditSeries: merge FB historical + JSON ────────────────────────────
@@ -957,6 +973,33 @@ function App(){
         })
       ),
       h('div',{style:{padding:'10px 16px',borderTop:'1px solid #0f1e38'}},
+        h('div',{style:{fontSize:8,color:'#5a7a9a',marginBottom:10,fontWeight:600,
+          letterSpacing:.5,textTransform:'uppercase'}},
+          'Outros Dashboards'),
+        h('a',{href:'https://doutorleandromendes.github.io/vigilancia_husf/mdr_mensal.html',
+          target:'_blank',rel:'noopener',
+          style:{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',
+            marginBottom:5,borderRadius:6,textDecoration:'none',
+            background:'rgba(197,40,40,.10)',border:'1px solid rgba(197,40,40,.25)',
+            color:'#ef9a9a',fontSize:10,fontWeight:500,transition:'background .15s'},
+          onMouseEnter:function(e){e.currentTarget.style.background='rgba(197,40,40,.20)';},
+          onMouseLeave:function(e){e.currentTarget.style.background='rgba(197,40,40,.10)';}},
+          h('span',{style:{fontSize:11}},'⬟'),
+          h('span',{},'Resistência Bacteriana'),
+          h('span',{style:{marginLeft:'auto',fontSize:9,opacity:.6}},'↗')
+        ),
+        h('a',{href:'https://doutorleandromendes.github.io/vigilancia_husf/atb_dots.html',
+          target:'_blank',rel:'noopener',
+          style:{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',
+            marginBottom:10,borderRadius:6,textDecoration:'none',
+            background:'rgba(21,101,192,.10)',border:'1px solid rgba(21,101,192,.25)',
+            color:'#90caf9',fontSize:10,fontWeight:500,transition:'background .15s'},
+          onMouseEnter:function(e){e.currentTarget.style.background='rgba(21,101,192,.20)';},
+          onMouseLeave:function(e){e.currentTarget.style.background='rgba(21,101,192,.10)';}},
+          h('span',{style:{fontSize:11}},'◈'),
+          h('span',{},'Uso de ATBs'),
+          h('span',{style:{marginLeft:'auto',fontSize:9,opacity:.6}},'↗')
+        ),
         h('div',{style:{fontSize:8,color:'#5a7a9a',lineHeight:1.8}},
           h('div',{},'Metodologia NHSN'),
           h('div',{},'Clopper-Pearson · Poisson/Bin-Neg')
