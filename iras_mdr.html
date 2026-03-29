@@ -707,7 +707,8 @@ function App(){
             if(!Array.isArray(jv)||!Array.isArray(fbv)) return;
             var onlyCurr=jv.length>0&&jv.every(function(x){return x.c;});
             if(onlyCurr){
-              var hist=fbv.filter(function(x){return !x.c;});
+              var currLabel=jv[0].p;
+              var hist=fbv.filter(function(x){return !x.c&&x.p!==currLabel;});
               d.hd[k]=hist.concat(jv);
             }
           });
@@ -720,7 +721,8 @@ function App(){
             if(!Array.isArray(jv)||!Array.isArray(fbv)) return;
             var onlyCurr=jv.length>0&&jv.every(function(x){return x.c;});
             if(onlyCurr){
-              var hist=fbv.filter(function(x){return !x.c;});
+              var currLabel=jv[0].p;
+              var hist=fbv.filter(function(x){return !x.c&&x.p!==currLabel;});
               d.diarreia[k]=hist.concat(jv);
             }
           });
