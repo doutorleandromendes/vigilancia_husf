@@ -462,7 +462,8 @@ function GlobalView(){
           }))
         )
       )
-    )
+    ),
+    h(MetodFooter,{})
   );
 }
 
@@ -491,7 +492,8 @@ function LimpasView(){
     h(Card,{},
       h(SH,{title:'S\u00e9rie Mensal Completa',sub:'Jan/24\u2013Dez/25 · CVE Plan. 1',color:P.limpa}),
       h(MesTable,{data:LIMPAS,benchmark:2})
-    )
+    ),
+    h(MetodFooter,{})
   );
 }
 
@@ -522,7 +524,8 @@ function CesarView(){
     h(Card,{},
       h(SH,{title:'S\u00e9rie Mensal Completa',sub:'Jan/24\u2013Dez/25',color:'#1565c0'}),
       h(MesTable,{data:CESAR,benchmark:3})
-    )
+    ),
+    h(MetodFooter,{})
   );
 }
 
@@ -534,59 +537,33 @@ function EquipesView(){
   var selSeries=EQ_SERIES[selEq]||null;
   var selData=EQUIPES.find(function(e){return e.eq===selEq;})||null;
 
-  // Two-bar chart: 2024 ghost, 2025 colored
-  var barData=sorted.map(function(d){return {eq:d.eq,t24:d.taxa24,t25:d.taxa25};});
-  function eqColor(t){return t>5?P.alerta:(t>2?P.isc:(t>0?'#2e7d32':'#c8d6df'));}
+  // 3-year bar data
+  var barData=sorted.map(function(d){
+    var t26=d.cl26>0?parseFloat((d.isc26/d.cl26*100).toFixed(2)):null;
+    return {eq:d.eq,t24:d.taxa24,t25:d.taxa25,t26:t26};
+  });
 
-  // Trend arrow
+  function eqColor(t){return t>5?P.alerta:(t>2?P.isc:(t>0?'#2e7d32':'#c8d6df'));}
+  function eqColor26(t){
+    if(t===null||t===undefined) return '#e0e5ea'; // sem dado ainda
+    return eqColor(t);
+  }
+
   function trendArrow(d){
-    var diff=d.taxa25-d.taxa24;
+    var t26=d.cl26>0?d.isc26/d.cl26*100:null;
+    var base=t26!==null?d.taxa25:d.taxa24;
+    var curr=t26!==null?t26:d.taxa25;
+    var diff=curr-base;
     if(Math.abs(diff)<0.2) return {sym:'\u2014',c:C.tm};
     return diff>0?{sym:'\u25b2',c:P.alerta}:{sym:'\u25bc',c:'#2e7d32'};
   }
 
   return h('div',{className:'fi'},
-    // Main overview: grouped bar 2024 vs 2025 with 2026 placeholder
-    h(Card,{style:{marginBottom:14}},
-      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}},
-        h('div',{},
-          h(SH,{title:'Taxa de ISC por Especialidade (%)',
-            sub:'Cirurgias Limpas · CVE Plan. 1',color:P.isc}),
-        ),
-        // Legend
-        h('div',{style:{display:'flex',gap:12,alignItems:'center',paddingTop:2}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:5,fontSize:10,color:C.ts}},
-            h('div',{style:{width:10,height:10,borderRadius:2,background:'#9eaab8'}}), '2024'),
-          h('div',{style:{display:'flex',alignItems:'center',gap:5,fontSize:10,color:C.ts}},
-            h('div',{style:{width:10,height:10,borderRadius:2,background:P.isc}}), '2025'),
-          h('div',{style:{display:'flex',alignItems:'center',gap:5,fontSize:10,color:'#9ca3af'}},
-            h('div',{style:{width:10,height:10,borderRadius:2,border:'1px dashed #9ca3af'}}), '2026 (em andamento)')
-        )
-      ),
-      h(RCont,{width:'100%',height:290},
-        h(BarChart,{data:barData,layout:'vertical',margin:{top:4,right:56,left:80,bottom:4},barCategoryGap:'20%'},
-          h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',horizontal:false}),
-          h(RefLine,{x:2,stroke:'#9eaab8',strokeDasharray:'5 3',strokeWidth:1.4,
-            label:{value:'2%',position:'insideTopRight',fill:'#9eaab8',fontSize:9}}),
-          h(XAxis,{type:'number',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},
-            axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%'}}),
-          h(YAxis,{type:'category',dataKey:'eq',width:78,
-            tick:{fill:'#4a5568',fontSize:10,fontFamily:"'IBM Plex Sans',sans-serif"},
-            axisLine:false,tickLine:false}),
-          h(RCTip,{content:makeTip('%')}),
-          // 2024 ghost bars
-          h(Bar,{dataKey:'t24',name:'2024',fill:'#c5cfe0',maxBarSize:9,radius:[0,3,3,0]}),
-          // 2025 colored bars
-          h(Bar,{dataKey:'t25',name:'2025',maxBarSize:9,radius:[0,3,3,0]},
-            barData.map(function(d,i){return h(Cell,{key:i,fill:eqColor(d.t25)});}))
-        )
-      )
-    ),
 
-    // Detail: table left + series right
-    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+    // ── Comparativo Anual + S\u00e9rie Mensal (lado a lado) ───────────────
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:14}},
       h(Card,{},
-        h(SH,{title:'Comparativo Anual',sub:'Clique para série mensal',color:'#1565c0'}),
+        h(SH,{title:'Comparativo Anual',sub:'Somente cirurgias limpas (Classe I) \u00b7 n\u00e3o inclui cesarianas \u00b7 clique para s\u00e9rie',color:'#1565c0'}),
         h('div',{style:{overflowX:'auto'}},
           h('table',{},
             h('thead',{},h('tr',{},
@@ -594,10 +571,12 @@ function EquipesView(){
               h('th',{style:{textAlign:'right'}},'2024 %'),
               h('th',{style:{textAlign:'right'}},'2025 %'),
               h('th',{style:{textAlign:'right'}},'2026 %'),
-              h('th',{style:{textAlign:'center'}},'Tendência')
+              h('th',{style:{textAlign:'center'}},'Tend\u00eancia')
             )),
             h('tbody',{},sorted.map(function(d){
+              var t26=d.cl26>0?parseFloat((d.isc26/d.cl26*100).toFixed(2)):null;
               var c25=eqColor(d.taxa25);
+              var c26=eqColor26(t26);
               var tr=trendArrow(d);
               var sel=d.eq===selEq;
               var hasSeries=!!EQ_SERIES[d.eq];
@@ -608,27 +587,26 @@ function EquipesView(){
                   d.eq+(hasSeries?' \u2197':'')),
                 h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.tm}},d.taxa24.toFixed(2)+'%'),
                 h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:12,fontWeight:700,color:c25}},d.taxa25.toFixed(2)+'%'),
-                h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:'#9ca3af'}},
-                d.cl26>0?h('span',{style:{color:eqColor(d.cl26>0?d.isc26/d.cl26*100:0),fontWeight:700}},
-                  d.cl26>0?(d.isc26/d.cl26*100).toFixed(2)+'%':'—'):'—'),
+                h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:12,fontWeight:t26!==null?700:400,color:c26}},
+                  t26!==null?t26.toFixed(2)+'%':'\u2014'),
                 h('td',{style:{textAlign:'center',fontSize:12,fontWeight:700,color:tr.c}},tr.sym)
               );
             }))
           )
         ),
         h('div',{style:{fontSize:10,color:C.tm,marginTop:8}},
-          '2026 YTD: Jan+Fev via CVE Plan. 1 · atualiza mensalmente via JSON \u00b7 \u2197 clique para s\u00e9rie')
+          '2026 YTD: Jan+Fev via CVE Plan. 1 \u00b7 atualiza mensalmente via JSON \u00b7 \u2197 clique para s\u00e9rie')
       ),
 
       h(Card,{},
-        h(SH,{title:'Série Mensal — '+selEq,
-          sub:selData?'2024: '+selData.taxa24.toFixed(2)+'%  ·  2025: '+selData.taxa25.toFixed(2)+'%':'',
+        h(SH,{title:'S\u00e9rie Mensal \u2014 '+selEq,
+          sub:selData?'2024: '+selData.taxa24.toFixed(2)+'%  \u00b7  2025: '+selData.taxa25.toFixed(2)+'%':'',
           color:P.taxa}),
         selSeries
           ?h(EqLine,{data:selSeries,h:200,lineColor:P.taxa})
           :h('div',{style:{height:200,display:'flex',alignItems:'center',
               justifyContent:'center',color:C.tm,fontSize:12}},
-              'Série não disponível para esta especialidade'),
+              'S\u00e9rie n\u00e3o dispon\u00edvel para esta especialidade'),
         selData?h('div',{style:{display:'flex',gap:24,marginTop:10,paddingTop:10,
           borderTop:'1px solid '+C.brdr}},
           [{l:'ISC 2024',v:selData.isc24,c:C.ts},{l:'Proc. 2024',v:selData.cl24,c:C.ts},
@@ -641,6 +619,93 @@ function EquipesView(){
           })
         ):null
       )
+    ),
+
+    // ── Gr\u00e1fico de barras horizontais — 3 anos (abaixo) ──────────────
+    h(Card,{},
+      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}},
+        h(SH,{title:'Taxa de ISC por Especialidade (%)',
+          sub:'Somente cirurgias limpas (Classe I) \u00b7 CVE Plan. 1 \u00b7 n\u00e3o inclui cesarianas',color:P.isc}),
+        h('div',{style:{display:'flex',gap:10,alignItems:'center',paddingTop:2,flexWrap:'wrap'}},
+          [{l:'2024',bg:'#c5cfe0'},{l:'2025',bg:'#9eaab8'}].map(function(x){
+            return h('div',{key:x.l,style:{display:'flex',alignItems:'center',gap:4,fontSize:10,color:C.ts}},
+              h('div',{style:{width:10,height:10,borderRadius:2,background:x.bg}}),x.l);
+          }),
+          h('div',{style:{display:'flex',alignItems:'center',gap:4,fontSize:10,color:C.ts}},
+            h('div',{style:{width:10,height:10,borderRadius:2,background:P.isc}}),
+            '2026 (YTD)')
+        )
+      ),
+      h(RCont,{width:'100%',height:320},
+        h(BarChart,{data:barData,layout:'vertical',margin:{top:4,right:56,left:80,bottom:4},barCategoryGap:'18%'},
+          h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',horizontal:false}),
+          h(RefLine,{x:2,stroke:'#9eaab8',strokeDasharray:'5 3',strokeWidth:1.4,
+            label:{value:'2%',position:'insideTopRight',fill:'#9eaab8',fontSize:9}}),
+          h(XAxis,{type:'number',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},
+            axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%'}}),
+          h(YAxis,{type:'category',dataKey:'eq',width:78,
+            tick:{fill:'#4a5568',fontSize:10,fontFamily:"'IBM Plex Sans',sans-serif"},
+            axisLine:false,tickLine:false}),
+          h(RCTip,{content:makeTip('%')}),
+          // 2024 — light gray ghost
+          h(Bar,{dataKey:'t24',name:'2024',fill:'#c5cfe0',maxBarSize:8,radius:[0,3,3,0]}),
+          // 2025 — medium gray ghost
+          h(Bar,{dataKey:'t25',name:'2025',maxBarSize:8,radius:[0,3,3,0]},
+            barData.map(function(d,i){return h(Cell,{key:i,fill:'#9eaab8'});})),
+          // 2026 — colored by risk (null = very pale)
+          h(Bar,{dataKey:'t26',name:'2026 (YTD)',maxBarSize:8,radius:[0,3,3,0]},
+            barData.map(function(d,i){return h(Cell,{key:i,fill:eqColor26(d.t26)});}))
+        )
+      ),
+      h('div',{style:{display:'flex',gap:14,paddingTop:2}},
+        [{l:'\u22642% (meta)',c:'#2e7d32'},{l:'2\u20133% (aten\u00e7\u00e3o)',c:P.isc},{l:'>3% (alerta)',c:P.alerta},{l:'sem dado 2026',c:'#e0e5ea'}]
+        .map(function(x){
+          return h('div',{key:x.l,style:{display:'flex',alignItems:'center',gap:5,fontSize:10,color:C.ts}},
+            h('div',{style:{width:10,height:10,borderRadius:2,background:x.c}}),x.l);
+        })
+      )
+    )
+  );
+}
+
+
+// ── Methodology footer ────────────────────────────────────────────────────────
+function MetodFooter(){
+  var items=[
+    {icon:'◈', label:'Canal endêmico — Cirurgias Limpas e Cesarianas',
+     text:'Média ± 1 desvio-padrão calculado sobre a série histórica de 2024 e 2025 (limpas) ou apenas 2024 (cesarianas, dada quebra metodológica em 2025). Atualizado anualmente com o fechamento do ano anterior.'},
+    {icon:'⦿', label:'Status epidemiológico (ISC)',
+     text:'Endêmico = dentro do canal ±1DP. Possível atividade supraendêmica = acima do limite superior do canal. Supraendêmico / alerta de surto = acima de 1,5× o limite superior do canal por 1 ou mais competências consecutivas.'},
+    {icon:'◦', label:'Vigilância Negativa Global (Censo ISC)',
+     text:'Prevalência diária de ISC ativo, expressa como % de pacientes-dia com ISC+ em todos os setores. Metodologia de censo diário iniciada em Julho de 2025 pelo SCIH/HUSF.'},
+    {icon:'✶', label:'Indicadores CVE-SP',
+     text:'Cirurgias limpas (Plan. 1) e Cesarianas (Plan. 1B) seguem as definições e fórmulas do Centro de Vigilância Epidemiológica "Prof. Alexandre Vranjac" — CVE-SP / ANVISA.'}
+  ];
+  return h('div',{style:{marginTop:24,borderTop:'1px solid #d0d7de',paddingTop:14}},
+    h('div',{style:{fontSize:9,color:'#8898aa',fontWeight:600,letterSpacing:1,
+      textTransform:'uppercase',marginBottom:10}},'Notas metodológicas'),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+      items.map(function(it,i){
+        return h('div',{key:i,style:{background:'#fafbfc',border:'1px solid #d0d7de',
+          borderRadius:6,padding:'10px 12px',display:'flex',gap:10,alignItems:'flex-start'}},
+          h('span',{style:{fontSize:12,color:'#b0bec5',flexShrink:0,marginTop:1}},it.icon),
+          h('div',{},
+            h('div',{style:{fontSize:9,fontWeight:600,color:'#4a5568',marginBottom:3}},it.label),
+            h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},it.text)
+          )
+        );
+      })
+    ),
+    h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
+      display:'flex',justifyContent:'space-between',alignItems:'center',
+      flexWrap:'wrap',gap:8}},
+      h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+        h('span',{style:{fontWeight:600,color:'#4a5568'}},'Autoria · '),
+        'Sistema de interface desenvolvido por Dr. Leandro Mendes · ',
+        'Análises epidemiológicas e estatísticas realizadas por Dr. Leandro Mendes'
+      ),
+      h('div',{style:{fontSize:8,color:'#b0bec5',fontFamily:"'IBM Plex Mono',monospace"}},
+        'SCIH/CCIH · HUSF · Bragança Paulista')
     )
   );
 }
@@ -650,17 +715,17 @@ var VIEWS=[
   {id:'global',  label:'Visão Global',      sub:'Censo ISC · Jul/25 em diante'},
   {id:'limpas',  label:'Cir. Limpas',       sub:'Classe I · Altemeier'},
   {id:'cesar',   label:'Cesarianas',        sub:'Indicador ANVISA'},
-  {id:'equipes', label:'Por Especialidade', sub:'NEUCI, CCARD…'},
+  {id:'equipes', label:'Por Especialidade', sub:'Cir. limpas · NEUCI, CCARD…'},
 ];
 var ICONS={global:'GL',limpas:'CL',cesar:'CS',equipes:'ESP'};
 
 // ── JSON merge helper (same pattern as iras_mdr.html) ────────────────────────
 function mergeJsonSeries(fbArr, jsArr){
-  // Append JSON points that don't exist in FB (by label p=m)
+  // Append JSON points that don't exist in FB (by label p=m, case-insensitive)
   if(!Array.isArray(jsArr)||!jsArr.length) return fbArr;
   var fbLabels={};
-  fbArr.forEach(function(pt){fbLabels[pt.m||pt.p]=true;});
-  var toAdd=jsArr.filter(function(pt){return !fbLabels[pt.p];});
+  fbArr.forEach(function(pt){fbLabels[(pt.m||pt.p).toLowerCase()]=true;});
+  var toAdd=jsArr.filter(function(pt){return !fbLabels[pt.p.toLowerCase()];});
   toAdd=toAdd.map(function(pt){
     // Normalise: JSON uses {p,isc,cl,taxa,proc,pd,c} → FB uses {m,...}
     var r=Object.assign({},pt,{m:pt.p,prev:false});
