@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCIH/HUSF — Infecção de Sítio Cirúrgico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f2f5;font-family:'IBM Plex Sans',sans-serif;color:#1a2744;min-height:100vh;
+  background-image:radial-gradient(circle,rgba(75,156,245,0.035) 1px,transparent 1px);background-size:26px 26px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadeIn .18s ease-out}
+button{cursor:pointer;transition:all .12s}
+table{border-collapse:collapse;width:100%}
+th,td{padding:7px 12px;text-align:left;border-bottom:1px solid #e8ecf0;font-size:12px}
+th{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;background:#f8fafc;border-bottom:2px solid #e2e6ea}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfc}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.min.js"></script>
+<script>
+'use strict';
+if(!window.React||!window.ReactDOM||!window.Recharts){
+  document.getElementById('root').innerHTML='<div style="color:#f87171;padding:40px;font-family:monospace">Erro: biblioteca não carregada.</div>';
+  throw new Error('lib fail');
+}
+var h=React.createElement,useState=React.useState,useEffect=React.useEffect;
+var RC=Recharts;
+var ComposedChart=RC.ComposedChart,BarChart=RC.BarChart,Bar=RC.Bar;
+var Line=RC.Line,XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
+var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer,Legend=RC.Legend;
+var RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea,Cell=RC.Cell;
+
+var C={surf:'#ffffff',brdr:'#d0d7de',glow:'#b0bec5',ti:'#1a2744',ts:'#4a5568',tm:'#8898aa'};
+var P={isc:'#e65100',taxa:'#1565c0',limpa:'#2e7d32',alerta:'#c62828',canal:'#5c6bc0'};
+
+// ── Activity status ────────────────────────────────────────────────────────────
+// 3-level classification used across all views
+function actStatus(taxa, lMin, lMax){
+  if(lMax==null) return null;
+  if(taxa > lMax * 1.5) return {label:'Atividade supraendêmica — alerta de surto', color:'#c62828', bg:'#ffebee'};
+  if(taxa > lMax)       return {label:'Possível atividade supraendêmica',           color:'#e65100', bg:'#fff3e0'};
+  if(taxa > lMin)       return {label:'Atividade endêmica',                         color:'#2e7d32', bg:'#f1f8e9'};
+  return                       {label:'Atividade endêmica',                         color:'#2e7d32', bg:'#f1f8e9'};
+}
+
+function ActivityBadge(p){
+  var s=actStatus(p.taxa, p.lMin, p.lMax);
+  if(!s) return null;
+  return h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,
+    background:s.bg,border:'1px solid '+s.color+'44',borderRadius:20,
+    padding:'3px 10px',fontSize:9,fontWeight:700,color:s.color,letterSpacing:.3}},
+    h('div',{style:{width:6,height:6,borderRadius:'50%',background:s.color,flexShrink:0}}),
+    s.label
+  );
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+function makeTip(unit){
+  return function T(p){
+    if(!p.active||!p.payload||!p.payload.length) return null;
+    var items=p.payload.filter(function(x){
+      return x.value!=null&&x.dataKey!=='lMin'&&x.dataKey!=='lMax'&&x.value>0;
+    }).sort(function(a,b){return b.value-a.value;});
+    if(!items.length) return null;
+    var raw=p.payload[0]&&p.payload[0].payload;
+    return h('div',{style:{background:C.surf,border:'1px solid '+C.glow,borderRadius:8,
+      padding:'10px 14px',fontSize:12,minWidth:170,boxShadow:'0 4px 12px rgba(0,0,0,.10)'}},
+      h('div',{style:{color:C.ts,fontSize:10,marginBottom:6,fontWeight:600}},p.label),
+      items.map(function(it,i){
+        return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',gap:14,marginBottom:2}},
+          h('span',{style:{color:it.color||C.ts,fontSize:11}},it.name),
+          h('span',{style:{color:it.color||C.ti,fontFamily:"'IBM Plex Mono',monospace",fontSize:11,fontWeight:700}},
+            typeof it.value==='number'?it.value.toFixed(2)+unit:it.value)
+        );
+      }),
+      raw&&raw.lMax!=null?h('div',{style:{borderTop:'1px solid #e8ecf0',marginTop:6,paddingTop:5,
+        fontSize:9,color:C.tm}},
+        'Canal endêmico (\u00b11DP): '+raw.lMin.toFixed(2)+'\u2013'+raw.lMax.toFixed(2)+unit):null
+    );
+  };
+}
+
+// ── Data — FB (fallback, full historical series) ──────────────────────────────
+// 2024 and 2025 are now "previous" years (prev:true). 2026 = current (prev:false).
+// JSON data_iras.json["isc"] extends the series with monthly 2026 points (c:1 = latest).
+var LIM_MIN=0.30, LIM_MAX=1.06;  // Cirurgias Limpas — ±1DP (2024+2025)
+var CES_MIN=0.57, CES_MAX=4.98;  // Cesarianas — ±1DP (2024 apenas)
+var GLB_MIN=16.30, GLB_MAX=20.40; // Censo ISC — Jul/25–Mar/26 (9 meses)
+
+// FB_LIMPAS: Jan/24–Dez/25 — all prev:true; JSON adds 2026 prev:false points
+var FB_LIMPAS=[
+  {m:'Jan/24',proc:504,isc:2,taxa:0.40,prev:true},
+  {m:'Fev/24',proc:713,isc:3,taxa:0.42,prev:true},
+  {m:'Mar/24',proc:668,isc:5,taxa:0.75,prev:true},
+  {m:'Abr/24',proc:619,isc:1,taxa:0.16,prev:true},
+  {m:'Mai/24',proc:580,isc:5,taxa:0.86,prev:true},
+  {m:'Jun/24',proc:576,isc:2,taxa:0.35,prev:true},
+  {m:'Jul/24',proc:547,isc:5,taxa:0.91,prev:true},
+  {m:'Ago/24',proc:589,isc:8,taxa:1.36,prev:true},
+  {m:'Set/24',proc:558,isc:4,taxa:0.72,prev:true},
+  {m:'Out/24',proc:587,isc:1,taxa:0.17,prev:true},
+  {m:'Nov/24',proc:524,isc:4,taxa:0.76,prev:true},
+  {m:'Dez/24',proc:466,isc:2,taxa:0.43,prev:true},
+  {m:'Jan/25',proc:581,isc:6,taxa:1.03,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Fev/25',proc:577,isc:7,taxa:1.21,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Mar/25',proc:556,isc:6,taxa:1.08,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Abr/25',proc:644,isc:5,taxa:0.78,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Mai/25',proc:611,isc:8,taxa:1.31,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Jun/25',proc:603,isc:4,taxa:0.66,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Jul/25',proc:681,isc:2,taxa:0.29,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Ago/25',proc:614,isc:2,taxa:0.33,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Set/25',proc:644,isc:6,taxa:0.93,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Out/25',proc:610,isc:0,taxa:0.00,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Nov/25',proc:540,isc:6,taxa:1.11,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+  {m:'Dez/25',proc:536,isc:2,taxa:0.37,lMin:LIM_MIN,lMax:LIM_MAX,prev:true},
+];
+
+// FB_CESAR: Jan/24–Dez/25 — all prev:true; JSON adds 2026 points
+var FB_CESAR=[
+  {m:'Jan/24',proc:135,isc:6, taxa:4.44, prev:true},
+  {m:'Fev/24',proc:113,isc:3, taxa:2.65, prev:true},
+  {m:'Mar/24',proc:127,isc:5, taxa:3.94, prev:true},
+  {m:'Abr/24',proc:115,isc:1, taxa:0.87, prev:true},
+  {m:'Mai/24',proc:131,isc:1, taxa:0.76, prev:true},
+  {m:'Jun/24',proc:133,isc:1, taxa:0.75, prev:true},
+  {m:'Jul/24',proc:94, isc:3, taxa:3.19, prev:true},
+  {m:'Ago/24',proc:99, isc:0, taxa:0.00, prev:true},
+  {m:'Set/24',proc:98, isc:0, taxa:0.00, prev:true},
+  {m:'Out/24',proc:120,isc:5, taxa:4.17, prev:true},
+  {m:'Nov/24',proc:116,isc:8, taxa:6.90, prev:true},
+  {m:'Dez/24',proc:89, isc:5, taxa:5.62, prev:true},
+  {m:'Jan/25',proc:104,isc:15,taxa:14.42,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Fev/25',proc:128,isc:13,taxa:10.16,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Mar/25',proc:128,isc:14,taxa:10.94,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Abr/25',proc:122,isc:24,taxa:19.67,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Mai/25',proc:114,isc:6, taxa:5.26, lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Jun/25',proc:109,isc:12,taxa:11.01,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Jul/25',proc:104,isc:14,taxa:13.46,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Ago/25',proc:127,isc:6, taxa:4.72, lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Set/25',proc:117,isc:14,taxa:11.97,lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Out/25',proc:95, isc:8, taxa:8.42, lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Nov/25',proc:104,isc:10,taxa:9.62, lMin:CES_MIN,lMax:CES_MAX,prev:true},
+  {m:'Dez/25',proc:111,isc:11,taxa:9.91, lMin:CES_MIN,lMax:CES_MAX,prev:true},
+];
+
+// FB_GLOBAL: Censo ISC — Jul/25–Mar/26; JSON adds latest month as c:1
+var FB_GLOBAL=[
+  {m:'Jul/25',isc:583,pd:3443,taxa:16.93,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Ago/25',isc:577,pd:3445,taxa:16.75,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Set/25',isc:627,pd:3668,taxa:17.10,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Out/25',isc:576,pd:3524,taxa:16.35,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Nov/25',isc:525,pd:3041,taxa:17.26,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Dez/25',isc:585,pd:2988,taxa:19.58,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Jan/26',isc:593,pd:2905,taxa:20.41,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Fev/26',isc:491,pd:2529,taxa:19.41,lMin:GLB_MIN,lMax:GLB_MAX},
+  {m:'Mar/26',isc:510,pd:2984,taxa:17.09,lMin:GLB_MIN,lMax:GLB_MAX},
+];
+
+// Mutable copies — extended by JSON merge
+var LIMPAS=FB_LIMPAS.slice();
+var CESAR=FB_CESAR.slice();
+var GLOBAL=FB_GLOBAL.slice();
+
+// EQUIPES: isc24/cl24 = 2024 annual, isc25/cl25 = 2025 annual (fixed)
+// isc26/cl26 = 2026 YTD accumulating — seeded with Jan+Feb from CVE 2026
+var EQUIPES=[
+  {eq:'Neurocirurg.',isc24:30,cl24:380,taxa24:7.89,isc25:38,cl25:406,taxa25:9.36,isc26:2,cl26:74},
+  {eq:'Cardíaca',    isc24:2, cl24:147,taxa24:1.36,isc25:7, cl25:178,taxa25:3.93,isc26:0,cl26:29},
+  {eq:'Vascular',    isc24:2, cl24:212,taxa24:0.94,isc25:3, cl25:301,taxa25:1.00,isc26:0,cl26:45},
+  {eq:'Ortopedia',   isc24:2, cl24:1261,taxa24:0.16,isc25:2,cl25:1232,taxa25:0.16,isc26:0,cl26:184},
+  {eq:'Ginecologia', isc24:3, cl24:2471,taxa24:0.12,isc25:0,cl25:2361,taxa25:0.00,isc26:0,cl26:378},
+  {eq:'Cx Geral',    isc24:1, cl24:1088,taxa24:0.09,isc25:1,cl25:1146,taxa25:0.09,isc26:0,cl26:144},
+  {eq:'Urologia',    isc24:2, cl24:775, taxa24:0.26,isc25:3,cl25:978, taxa25:0.31,isc26:0,cl26:189},
+  {eq:'Plástica',    isc24:0, cl24:367, taxa24:0.00,isc25:0,cl25:392, taxa25:0.00,isc26:0,cl26:70},
+  {eq:'Ci.Ped.',     isc24:0, cl24:180, taxa24:0.00,isc25:0,cl25:193, taxa25:0.00,isc26:0,cl26:37},
+  {eq:'Torácica',    isc24:0, cl24:11,  taxa24:0.00,isc25:0,cl25:6,   taxa25:0.00,isc26:0,cl26:6},
+];
+
+var EQ_SERIES={
+  'Neurocirurg.':[
+    {m:'Jan/24',isc:1, proc:9, taxa:11.11,prev:true},{m:'Fev/24',isc:3, proc:30,taxa:10.00,prev:true},
+    {m:'Mar/24',isc:3, proc:30,taxa:10.00,prev:true},{m:'Abr/24',isc:1, proc:39,taxa:2.56, prev:true},
+    {m:'Mai/24',isc:3, proc:38,taxa:7.89, prev:true},{m:'Jun/24',isc:1, proc:34,taxa:2.94, prev:true},
+    {m:'Jul/24',isc:5, proc:42,taxa:11.90,prev:true},{m:'Ago/24',isc:3, proc:31,taxa:9.68, prev:true},
+    {m:'Set/24',isc:4, proc:39,taxa:10.26,prev:true},{m:'Out/24',isc:1, proc:26,taxa:3.85, prev:true},
+    {m:'Nov/24',isc:3, proc:23,taxa:13.04,prev:true},{m:'Dez/24',isc:2, proc:39,taxa:5.13, prev:true},
+    {m:'Jan/25',isc:3, proc:27,taxa:11.11,prev:true},{m:'Fev/25',isc:6,proc:22,taxa:27.27,prev:true},
+    {m:'Mar/25',isc:4, proc:24,taxa:16.67,prev:true},{m:'Abr/25',isc:2,proc:21,taxa:9.52, prev:true},
+    {m:'Mai/25',isc:7, proc:31,taxa:22.58,prev:true},{m:'Jun/25',isc:4,proc:37,taxa:10.81,prev:true},
+    {m:'Jul/25',isc:1, proc:49,taxa:2.04, prev:true},{m:'Ago/25',isc:1,proc:43,taxa:2.33, prev:true},
+    {m:'Set/25',isc:5, proc:42,taxa:11.90,prev:true},{m:'Out/25',isc:0,proc:43,taxa:0.00, prev:true},
+    {m:'Nov/25',isc:4, proc:36,taxa:11.11,prev:true},{m:'Dez/25',isc:1,proc:31,taxa:3.23, prev:true},
+    // 2026 — seeded from CVE 2026; JSON extends with c:1 for latest month
+    {m:'Jan/26',isc:1, proc:40,taxa:2.50, prev:false},{m:'Fev/26',isc:1,proc:34,taxa:2.94, prev:false},
+  ],
+  'Cardíaca':[
+    {m:'Jan/24',isc:0,proc:19,taxa:0.00, prev:true},{m:'Fev/24',isc:0,proc:15,taxa:0.00, prev:true},
+    {m:'Mar/24',isc:0,proc:18,taxa:0.00, prev:true},{m:'Abr/24',isc:0,proc:11,taxa:0.00, prev:true},
+    {m:'Mai/24',isc:0,proc:10,taxa:0.00, prev:true},{m:'Jun/24',isc:0,proc:7, taxa:0.00, prev:true},
+    {m:'Jul/24',isc:0,proc:13,taxa:0.00, prev:true},{m:'Ago/24',isc:2,proc:7, taxa:28.57,prev:true},
+    {m:'Set/24',isc:0,proc:9, taxa:0.00, prev:true},{m:'Out/24',isc:0,proc:12,taxa:0.00, prev:true},
+    {m:'Nov/24',isc:0,proc:13,taxa:0.00, prev:true},{m:'Dez/24',isc:0,proc:3, taxa:0.00, prev:true},
+    {m:'Jan/25',isc:1,proc:14,taxa:7.14, prev:true},{m:'Fev/25',isc:0,proc:13,taxa:0.00,prev:true},
+    {m:'Mar/25',isc:0,proc:13,taxa:0.00, prev:true},{m:'Abr/25',isc:1,proc:13,taxa:7.69,prev:true},
+    {m:'Mai/25',isc:0,proc:14,taxa:0.00, prev:true},{m:'Jun/25',isc:0,proc:15,taxa:0.00,prev:true},
+    {m:'Jul/25',isc:1,proc:19,taxa:5.26, prev:true},{m:'Ago/25',isc:1,proc:17,taxa:5.88,prev:true},
+    {m:'Set/25',isc:0,proc:18,taxa:0.00, prev:true},{m:'Out/25',isc:0,proc:13,taxa:0.00,prev:true},
+    {m:'Nov/25',isc:2,proc:13,taxa:15.38,prev:true},{m:'Dez/25',isc:2,proc:16,taxa:12.50,prev:true},
+    // 2026 — CVE 2026 Jan/Feb: CCARD had 0 ISC in both months
+    {m:'Jan/26',isc:0,proc:18,taxa:0.00, prev:false},{m:'Fev/26',isc:0,proc:11,taxa:0.00, prev:false},
+  ],
+  'Vascular':[
+    {m:'Jan/24',isc:0,proc:11,taxa:0.00,prev:true},{m:'Fev/24',isc:0,proc:20,taxa:0.00,prev:true},
+    {m:'Mar/24',isc:0,proc:20,taxa:0.00,prev:true},{m:'Abr/24',isc:0,proc:17,taxa:0.00,prev:true},
+    {m:'Mai/24',isc:0,proc:16,taxa:0.00,prev:true},{m:'Jun/24',isc:1,proc:13,taxa:7.69,prev:true},
+    {m:'Jul/24',isc:0,proc:21,taxa:0.00,prev:true},{m:'Ago/24',isc:0,proc:18,taxa:0.00,prev:true},
+    {m:'Set/24',isc:0,proc:16,taxa:0.00,prev:true},{m:'Out/24',isc:0,proc:16,taxa:0.00,prev:true},
+    {m:'Nov/24',isc:1,proc:25,taxa:4.00,prev:true},{m:'Dez/24',isc:0,proc:19,taxa:0.00,prev:true},
+    {m:'Jan/25',isc:0,proc:28,taxa:0.00,prev:true},{m:'Fev/25',isc:1,proc:33,taxa:3.03,prev:true},
+    {m:'Mar/25',isc:1,proc:31,taxa:3.23,prev:true},{m:'Abr/25',isc:0,proc:25,taxa:0.00,prev:true},
+    {m:'Mai/25',isc:0,proc:29,taxa:0.00,prev:true},{m:'Jun/25',isc:0,proc:22,taxa:0.00,prev:true},
+    {m:'Jul/25',isc:0,proc:29,taxa:0.00,prev:true},{m:'Ago/25',isc:0,proc:27,taxa:0.00,prev:true},
+    {m:'Set/25',isc:1,proc:25,taxa:4.00,prev:true},{m:'Out/25',isc:0,proc:22,taxa:0.00,prev:true},
+    {m:'Nov/25',isc:0,proc:8, taxa:0.00,prev:true},{m:'Dez/25',isc:1,proc:22,taxa:4.55,prev:true},
+    {m:'Jan/26',isc:0,proc:22,taxa:0.00,prev:false},{m:'Fev/26',isc:0,proc:23,taxa:0.00,prev:false},
+  ],
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function enrich13(data){
+  var pts=data.filter(function(d){return d.taxa!=null;}).slice(-13);
+  return pts.map(function(d,i){
+    var r=Object.assign({},d);
+    r.taxa_prev=d.prev?d.taxa:null;
+    r.taxa_curr=!d.prev?d.taxa:null;
+    if(!d.prev&&i>0&&pts[i-1]&&pts[i-1].prev){r.taxa_prev=d.taxa;}
+    return r;
+  });
+}
+
+// ── Shared UI ─────────────────────────────────────────────────────────────────
+function Card(p){
+  return h('div',{style:Object.assign({background:C.surf,borderRadius:10,
+    border:'1px solid '+C.brdr,boxShadow:'0 1px 3px rgba(0,0,0,.06)',
+    padding:'16px 18px'},p.style||{})},p.children);
+}
+function SH(p){
+  return h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:14}},
+    h('div',{style:{width:3,height:16,borderRadius:2,background:p.color||'#1565c0',flexShrink:0}}),
+    h('span',{style:{fontSize:13,fontWeight:600,color:C.ti}},p.title),
+    p.sub?h('span',{style:{fontSize:10,color:C.tm,marginLeft:4}},p.sub):null
+  );
+}
+function Kpi(p){
+  return h('div',{style:{background:C.surf,borderRadius:10,padding:'14px 16px',flex:1,minWidth:140,
+    border:'2px solid '+(p.alert?p.color:C.brdr),position:'relative',overflow:'hidden',
+    boxShadow:p.alert?('0 2px 8px '+p.color+'33'):'0 1px 3px rgba(0,0,0,.06)'}},
+    h('div',{style:{position:'absolute',top:0,left:0,right:0,height:3,background:p.color}}),
+    h('div',{style:{fontSize:9,fontWeight:700,color:p.color,marginBottom:8,marginTop:2,
+      textTransform:'uppercase',letterSpacing:.5}},p.label),
+    h('div',{style:{display:'flex',alignItems:'baseline',gap:4,marginBottom:5}},
+      h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:30,fontWeight:700,
+        lineHeight:1,color:p.alert?p.color:C.ti}},p.value),
+      p.unit?h('span',{style:{fontSize:11,color:C.tm}},p.unit):null
+    ),
+    typeof p.sub==='string'
+      ?h('div',{style:{fontSize:10,color:C.tm}},p.sub)
+      :(p.sub||null),
+    p.alert?h('div',{style:{position:'absolute',top:10,right:10,background:p.color,
+      color:'#fff',fontSize:8,fontWeight:700,padding:'2px 6px',borderRadius:3}},'\u25b2 ALERTA'):null
+  );
+}
+
+// ── Time-series composed chart ────────────────────────────────────────────────
+// Canal = two dashed RefLines; bars rendered last (front)
+function TaxaChart(p){
+  var data=enrich13(p.data);
+  var lc=p.lineColor||P.taxa;
+  var bm=p.benchmark||null;
+  var ht=p.h||280;
+  var pvFirst=null,pvLast=null;
+  data.forEach(function(d){if(d.prev){if(!pvFirst)pvFirst=d.m;pvLast=d.m;}});
+  var sample=data.find(function(d){return d.lMin!=null;});
+  var cMin=sample?sample.lMin:null, cMax=sample?sample.lMax:null;
+
+  return h(RCont,{width:'100%',height:ht},
+    h(ComposedChart,{data:data,margin:{top:8,right:32,left:0,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+      pvFirst?h(RefArea,{x1:pvFirst,x2:pvLast,yAxisId:'r',fill:'#f0f2f5',fillOpacity:.7,stroke:'none'}):null,
+      pvLast?h(RefLine,{x:pvLast,yAxisId:'r',stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2}):null,
+      bm?h(RefLine,{yAxisId:'l',y:bm,stroke:'#9eaab8',strokeDasharray:'5 3',strokeWidth:1.2,
+        label:{value:'meta '+bm+'%',position:'insideTopRight',fill:'#9eaab8',
+          fontSize:9,fontFamily:"'IBM Plex Mono',monospace"}}):null,
+      cMax!=null?h(RefLine,{yAxisId:'l',y:cMax,stroke:P.canal,strokeDasharray:'6 3',strokeWidth:1.4,
+        label:{value:'\u00b11DP',position:'insideTopRight',fill:P.canal,
+          fontSize:8,fontFamily:"'IBM Plex Mono',monospace"}}):null,
+      cMin!=null?h(RefLine,{yAxisId:'l',y:cMin,stroke:P.canal,strokeDasharray:'6 3',strokeWidth:1.0}):null,
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{yAxisId:'r',orientation:'right',allowDecimals:false,
+        tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{yAxisId:'l',orientation:'left',
+        tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+        axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%'}}),
+      h(RCTip,{content:makeTip('%')}),
+      // Line first
+      h(Line,{yAxisId:'l',type:'monotone',dataKey:'taxa_prev',stroke:lc,strokeWidth:1.5,
+        strokeOpacity:.25,dot:false,connectNulls:true,legendType:'none',name:undefined}),
+      h(Line,{yAxisId:'l',type:'monotone',dataKey:'taxa_curr',name:'Taxa (%)',stroke:lc,
+        strokeWidth:2.5,strokeOpacity:1,connectNulls:true,legendType:'plainline',
+        dot:{r:4,fill:lc,stroke:'#fff',strokeWidth:2},
+        activeDot:{r:6,fill:lc,stroke:'#fff',strokeWidth:2}}),
+      // Bars last (on top)
+      h(Bar,{yAxisId:'r',dataKey:'isc',name:'ISC (n)',fill:P.isc,maxBarSize:22,radius:[2,2,0,0]},
+        data.map(function(d,i){return h(Cell,{key:i,fill:P.isc,opacity:d.prev?.22:.80});})),
+      h(Legend,{iconSize:8,wrapperStyle:{fontSize:10,color:C.ts,paddingTop:8}})
+    )
+  );
+}
+
+// Equipe series line (single axis, 24 months)
+function EqLine(p){
+  var data=enrich13(p.data);
+  var lc=p.lineColor||P.taxa;
+  var pvFirst=null,pvLast=null;
+  data.forEach(function(d){if(d.prev){if(!pvFirst)pvFirst=d.m;pvLast=d.m;}});
+  return h(RCont,{width:'100%',height:p.h||200},
+    h(ComposedChart,{data:data,margin:{top:8,right:20,left:-14,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+      pvFirst?h(RefArea,{x1:pvFirst,x2:pvLast,fill:'#f0f2f5',fillOpacity:.7,stroke:'none'}):null,
+      pvLast?h(RefLine,{x:pvLast,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2}):null,
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%'}}),
+      h(RCTip,{content:makeTip('%')}),
+      h(Line,{type:'monotone',dataKey:'taxa_prev',stroke:lc,strokeWidth:1.5,
+        strokeOpacity:.25,dot:false,connectNulls:true,legendType:'none',name:undefined}),
+      h(Line,{type:'monotone',dataKey:'taxa_curr',name:'Taxa (%)',stroke:lc,
+        strokeWidth:2.5,strokeOpacity:1,connectNulls:true,legendType:'none',
+        dot:{r:4,fill:lc,stroke:'#fff',strokeWidth:2},
+        activeDot:{r:6,fill:lc,stroke:'#fff',strokeWidth:2}})
+    )
+  );
+}
+
+// Monthly table (generic)
+function MesTable(p){
+  var rows=p.data.slice().reverse();
+  var bm=p.benchmark||2;
+  return h('div',{style:{overflowX:'auto'}},
+    h('table',{},
+      h('thead',{},h('tr',{},
+        h('th',{},'Mês'),h('th',{style:{textAlign:'right'}},'Procedimentos'),
+        h('th',{style:{textAlign:'right'}},'ISC (n)'),h('th',{style:{textAlign:'right'}},'Taxa (%)'),
+        h('th',{style:{textAlign:'right'}},'\u2193 \u00b11DP'),h('th',{style:{textAlign:'right'}},'\u2191 \u00b11DP'),
+        h('th',{style:{textAlign:'center'}},'Atividade')
+      )),
+      h('tbody',{},rows.map(function(d){
+        if(d.pending) return h('tr',{key:d.m,style:{opacity:.45}},
+          h('td',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.tm}},d.m),
+          h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.tm}},d.proc),
+          h('td',{colSpan:5,style:{textAlign:'center',fontSize:10,color:C.tm,fontStyle:'italic'}},'aguardando dado')
+        );
+        var st=actStatus(d.taxa, d.lMin, d.lMax);
+        var hi=d.lMax!=null?d.taxa>d.lMax:d.taxa>bm;
+        return h('tr',{key:d.m},
+          h('td',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:11,
+            color:d.prev?C.tm:C.ti,fontWeight:d.prev?400:600}},d.m),
+          h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.ts}},d.proc),
+          h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,
+            color:d.isc>0?P.isc:C.tm,fontWeight:d.isc>0?700:400}},d.isc),
+          h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:12,
+            fontWeight:700,color:hi?P.alerta:'#2e7d32'}},d.taxa.toFixed(2)+'%'),
+          h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.tm}},d.lMin!=null?d.lMin.toFixed(2)+'%':'—'),
+          h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:P.canal}},d.lMax!=null?d.lMax.toFixed(2)+'%':'—'),
+          h('td',{style:{textAlign:'center'}},
+            st?h('span',{style:{fontSize:9,fontWeight:700,color:st.color}},st.label):null)
+        );
+      }))
+    )
+  );
+}
+
+// ── Views ─────────────────────────────────────────────────────────────────────
+function GlobalView(){
+  var curr=GLOBAL[GLOBAL.length-1];
+  var mean=GLOBAL.reduce(function(a,d){return a+d.taxa;},0)/GLOBAL.length;
+  var st=actStatus(curr.taxa, GLB_MIN, GLB_MAX);
+  // Chart data: no prev/curr split (all 2025+2026)
+  var chartData=GLOBAL.map(function(d){
+    return Object.assign({},d,{taxa_curr:d.taxa,isc:d.isc});
+  });
+  return h('div',{className:'fi'},
+    h('div',{style:{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap'}},
+      h(Kpi,{label:'Meses em vigil\u00e2ncia',value:GLOBAL.length,color:'#1565c0',
+        sub:'Jul/2025 \u2013 Mar/2026 · Censo ISC'}),
+      h(Kpi,{label:'M\u00e9dia de preval\u00eancia',value:mean.toFixed(1),unit:'%',color:P.taxa,
+        sub:'% de pac-dia com ISC+ ativo'}),
+      h(Kpi,{label:'Taxa — '+curr.m,value:curr.taxa.toFixed(1),unit:'%',
+        color:st?st.color:P.taxa,alert:curr.taxa>GLB_MAX,
+        sub:h(ActivityBadge,{taxa:curr.taxa,lMin:GLB_MIN,lMax:GLB_MAX})})
+    ),
+    h(Card,{style:{marginBottom:14}},
+      h(SH,{title:'Prevale\u0302ncia de ISC — Censo de Vigil\u00e2ncia Negativa (%)',
+        sub:'% de pacientes-dia com ISC+ ativo · todas as unidades · tracejado = m\u00e9dia \u00b11DP',color:P.taxa}),
+      h(RCont,{width:'100%',height:290},
+        h(ComposedChart,{data:chartData,margin:{top:8,right:32,left:0,bottom:0}},
+          h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false,opacity:1}),
+          h(RefLine,{yAxisId:'l',y:GLB_MAX,stroke:P.canal,strokeDasharray:'6 3',strokeWidth:1.4,
+            label:{value:'\u00b11DP',position:'insideTopRight',fill:P.canal,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"}}),
+          h(RefLine,{yAxisId:'l',y:GLB_MIN,stroke:P.canal,strokeDasharray:'6 3',strokeWidth:1.0}),
+          h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+          h(YAxis,{yAxisId:'r',orientation:'right',allowDecimals:false,
+            tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+          h(YAxis,{yAxisId:'l',orientation:'left',
+            tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},
+            axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%'}}),
+          h(RCTip,{content:makeTip('%')}),
+          h(Line,{yAxisId:'l',type:'monotone',dataKey:'taxa_curr',name:'Prevalência (%)',stroke:P.taxa,
+            strokeWidth:2.5,connectNulls:true,legendType:'plainline',
+            dot:{r:4,fill:P.taxa,stroke:'#fff',strokeWidth:2},
+            activeDot:{r:6,fill:P.taxa,stroke:'#fff',strokeWidth:2}}),
+          h(Bar,{yAxisId:'r',dataKey:'isc',name:'ISC-dia (n)',fill:P.isc,maxBarSize:22,radius:[2,2,0,0]},
+            chartData.map(function(d,i){return h(Cell,{key:i,fill:P.isc,opacity:.75});})),
+          h(Legend,{iconSize:8,wrapperStyle:{fontSize:10,color:C.ts,paddingTop:8}})
+        )
+      )
+    ),
+    h(Card,{},
+      h(SH,{title:'Série Mensal — Censo ISC',color:P.taxa}),
+      h('div',{style:{overflowX:'auto'}},
+        h('table',{},
+          h('thead',{},h('tr',{},
+            h('th',{},'Mês'),h('th',{style:{textAlign:'right'}},'ISC-dia (n)'),
+            h('th',{style:{textAlign:'right'}},'Pac-dia total'),
+            h('th',{style:{textAlign:'right'}},'Prevalência (%)'),
+            h('th',{style:{textAlign:'right'}},'\u2193 \u00b11DP'),h('th',{style:{textAlign:'right'}},'\u2191 \u00b11DP'),
+            h('th',{style:{textAlign:'center'}},'Atividade')
+          )),
+          h('tbody',{},GLOBAL.slice().reverse().map(function(d){
+            var st=actStatus(d.taxa,GLB_MIN,GLB_MAX);
+            return h('tr',{key:d.m},
+              h('td',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:11,fontWeight:600,color:C.ti}},d.m),
+              h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:P.isc,fontWeight:700}},d.isc),
+              h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.ts}},d.pd),
+              h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:12,
+                fontWeight:700,color:d.taxa>GLB_MAX?P.alerta:P.taxa}},d.taxa.toFixed(1)+'%'),
+              h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.tm}},GLB_MIN.toFixed(1)+'%'),
+              h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:P.canal}},GLB_MAX.toFixed(1)+'%'),
+              h('td',{style:{textAlign:'center'}},
+                st?h('span',{style:{fontSize:9,fontWeight:700,color:st.color}},st.label):null)
+            );
+          }))
+        )
+      )
+    ),
+    h(MetodFooter,{})
+  );
+}
+
+function LimpasView(){
+  var data26=LIMPAS.filter(function(d){return !d.prev;});
+  var dataRef=data26.length?data26:LIMPAS.filter(function(d){return d.m&&d.m.indexOf('/25')>-1;});
+  var currValid=LIMPAS.slice().reverse().find(function(d){return d.taxa!=null&&!d.prev;})||LIMPAS[LIMPAS.length-1];
+  var tP=dataRef.reduce(function(a,d){return a+(d.proc||0);},0);
+  var tI=dataRef.reduce(function(a,d){return a+(d.isc||0);},0);
+  var txa=tP>0?(tI/tP*100).toFixed(2):'0.00';
+  var yrLabel=data26.length?'2026 (YTD)':'2025';
+  var st=actStatus(currValid.taxa,LIM_MIN,LIM_MAX);
+  return h('div',{className:'fi'},
+    h('div',{style:{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap'}},
+      h(Kpi,{label:'Cirurgias Limpas '+yrLabel,value:tP.toLocaleString('pt-BR'),color:'#2e7d32',sub:'Classe I · CVE Plan. 1'}),
+      h(Kpi,{label:'ISC em limpas '+yrLabel,value:tI,color:P.isc,sub:txa+'% taxa acumulada'}),
+      h(Kpi,{label:'Taxa — '+currValid.m,value:currValid.taxa.toFixed(2),unit:'%',
+        color:st?st.color:'#2e7d32',alert:currValid.taxa>LIM_MAX,
+        sub:h(ActivityBadge,{taxa:currValid.taxa,lMin:LIM_MIN,lMax:LIM_MAX})})
+    ),
+    h(Card,{style:{marginBottom:14}},
+      h(SH,{title:'Taxa de ISC — Cirurgias Limpas (%)',
+        sub:'Barras = n ISC · Linha = taxa % · Tracejado = canal \u00b11DP (0,30\u20131,06%)',color:P.limpa}),
+      h(TaxaChart,{data:LIMPAS,h:290,lineColor:P.limpa,benchmark:2})
+    ),
+    h(Card,{},
+      h(SH,{title:'S\u00e9rie Mensal Completa',sub:'Jan/24\u2013Dez/25 · CVE Plan. 1',color:P.limpa}),
+      h(MesTable,{data:LIMPAS,benchmark:2})
+    ),
+    h(MetodFooter,{})
+  );
+}
+
+function CesarView(){
+  var data26=CESAR.filter(function(d){return !d.prev;});
+  var dataRef=data26.length?data26:CESAR.filter(function(d){return d.m&&d.m.indexOf('/25')>-1;});
+  var curr=CESAR.slice().reverse().find(function(d){return d.taxa!=null&&!d.prev;})||CESAR[CESAR.length-1];
+  var tP=dataRef.reduce(function(a,d){return a+(d.proc||0);},0);
+  var tI=dataRef.reduce(function(a,d){return a+(d.isc||0);},0);
+  var txa=tP>0?(tI/tP*100).toFixed(2):'—';
+  var mesesAlerta=dataRef.filter(function(d){return d.taxa!=null&&d.taxa>CES_MAX;}).length;
+  var yrLabel=data26.length?'2026 (YTD Jan\u2013Fev)':'2025';
+  var st=curr?actStatus(curr.taxa,CES_MIN,CES_MAX):null;
+  return h('div',{className:'fi'},
+    h('div',{style:{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap'}},
+      h(Kpi,{label:'Cesarianas '+yrLabel,value:tP,color:'#1565c0',sub:'CVE Plan. 1B'}),
+      h(Kpi,{label:'ISC pós-cesar. '+yrLabel,value:tI,color:P.alerta,alert:mesesAlerta>0,
+        sub:'Taxa acumulada: '+txa+'% — '+mesesAlerta+' meses acima do canal'}),
+      curr?h(Kpi,{label:'Taxa — '+curr.m,value:curr.taxa.toFixed(2),unit:'%',
+        color:st?st.color:'#1565c0',alert:curr.taxa>CES_MAX,
+        sub:h(ActivityBadge,{taxa:curr.taxa,lMin:CES_MIN,lMax:CES_MAX})}):null
+    ),
+    h(Card,{style:{marginBottom:14}},
+      h(SH,{title:'Taxa de ISC P\u00f3s-Cesariana (%)',
+        sub:'Barras = n ISC · Canal \u00b11DP = 0,57\u20134,98% (baseline 2024)',color:'#1565c0'}),
+      h(TaxaChart,{data:CESAR,h:290,lineColor:'#1565c0',benchmark:3})
+    ),
+    h(Card,{},
+      h(SH,{title:'S\u00e9rie Mensal Completa',sub:'Jan/24\u2013Dez/25',color:'#1565c0'}),
+      h(MesTable,{data:CESAR,benchmark:3})
+    ),
+    h(MetodFooter,{})
+  );
+}
+
+function EquipesView(){
+  // Sort by 2025 taxa desc
+  var sorted=[].concat(EQUIPES).sort(function(a,b){return b.taxa25-a.taxa25;});
+  var st=useState(sorted[0].eq);
+  var selEq=st[0],setSelEq=st[1];
+  var selSeries=EQ_SERIES[selEq]||null;
+  var selData=EQUIPES.find(function(e){return e.eq===selEq;})||null;
+
+  // 3-year bar data
+  var barData=sorted.map(function(d){
+    var t26=d.cl26>0?parseFloat((d.isc26/d.cl26*100).toFixed(2)):null;
+    return {eq:d.eq,t24:d.taxa24,t25:d.taxa25,t26:t26};
+  });
+
+  function eqColor(t){return t>5?P.alerta:(t>2?P.isc:(t>0?'#2e7d32':'#c8d6df'));}
+  function eqColor26(t){
+    if(t===null||t===undefined) return '#e0e5ea'; // sem dado ainda
+    return eqColor(t);
+  }
+
+  function trendArrow(d){
+    var t26=d.cl26>0?d.isc26/d.cl26*100:null;
+    var base=t26!==null?d.taxa25:d.taxa24;
+    var curr=t26!==null?t26:d.taxa25;
+    var diff=curr-base;
+    if(Math.abs(diff)<0.2) return {sym:'\u2014',c:C.tm};
+    return diff>0?{sym:'\u25b2',c:P.alerta}:{sym:'\u25bc',c:'#2e7d32'};
+  }
+
+  return h('div',{className:'fi'},
+
+    // ── Comparativo Anual + S\u00e9rie Mensal (lado a lado) ───────────────
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:14}},
+      h(Card,{},
+        h(SH,{title:'Comparativo Anual',sub:'Somente cirurgias limpas (Classe I) \u00b7 n\u00e3o inclui cesarianas \u00b7 clique para s\u00e9rie',color:'#1565c0'}),
+        h('div',{style:{overflowX:'auto'}},
+          h('table',{},
+            h('thead',{},h('tr',{},
+              h('th',{},'Especialidade'),
+              h('th',{style:{textAlign:'right'}},'2024 %'),
+              h('th',{style:{textAlign:'right'}},'2025 %'),
+              h('th',{style:{textAlign:'right'}},'2026 %'),
+              h('th',{style:{textAlign:'center'}},'Tend\u00eancia')
+            )),
+            h('tbody',{},sorted.map(function(d){
+              var t26=d.cl26>0?parseFloat((d.isc26/d.cl26*100).toFixed(2)):null;
+              var c25=eqColor(d.taxa25);
+              var c26=eqColor26(t26);
+              var tr=trendArrow(d);
+              var sel=d.eq===selEq;
+              var hasSeries=!!EQ_SERIES[d.eq];
+              return h('tr',{key:d.eq,
+                style:{background:sel?'#f0f6ff':'transparent',cursor:hasSeries?'pointer':'default'},
+                onClick:function(){if(hasSeries)setSelEq(d.eq);}},
+                h('td',{style:{fontWeight:sel?700:500,fontSize:12,color:C.ti}},
+                  d.eq+(hasSeries?' \u2197':'')),
+                h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:11,color:C.tm}},d.taxa24.toFixed(2)+'%'),
+                h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:12,fontWeight:700,color:c25}},d.taxa25.toFixed(2)+'%'),
+                h('td',{style:{textAlign:'right',fontFamily:"'IBM Plex Mono',monospace",fontSize:12,fontWeight:t26!==null?700:400,color:c26}},
+                  t26!==null?t26.toFixed(2)+'%':'\u2014'),
+                h('td',{style:{textAlign:'center',fontSize:12,fontWeight:700,color:tr.c}},tr.sym)
+              );
+            }))
+          )
+        ),
+        h('div',{style:{fontSize:10,color:C.tm,marginTop:8}},
+          '2026 YTD: Jan+Fev via CVE Plan. 1 \u00b7 atualiza mensalmente via JSON \u00b7 \u2197 clique para s\u00e9rie')
+      ),
+
+      h(Card,{},
+        h(SH,{title:'S\u00e9rie Mensal \u2014 '+selEq,
+          sub:selData?'2024: '+selData.taxa24.toFixed(2)+'%  \u00b7  2025: '+selData.taxa25.toFixed(2)+'%':'',
+          color:P.taxa}),
+        selSeries
+          ?h(EqLine,{data:selSeries,h:200,lineColor:P.taxa})
+          :h('div',{style:{height:200,display:'flex',alignItems:'center',
+              justifyContent:'center',color:C.tm,fontSize:12}},
+              'S\u00e9rie n\u00e3o dispon\u00edvel para esta especialidade'),
+        selData?h('div',{style:{display:'flex',gap:24,marginTop:10,paddingTop:10,
+          borderTop:'1px solid '+C.brdr}},
+          [{l:'ISC 2024',v:selData.isc24,c:C.ts},{l:'Proc. 2024',v:selData.cl24,c:C.ts},
+           {l:'ISC 2025',v:selData.isc25,c:selData.isc25>0?P.isc:C.ts},{l:'Proc. 2025',v:selData.cl25,c:C.ts}]
+          .map(function(x){
+            return h('div',{key:x.l},
+              h('div',{style:{fontSize:9,color:C.tm,marginBottom:2}},x.l),
+              h('div',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:14,fontWeight:700,color:x.c}},x.v)
+            );
+          })
+        ):null
+      )
+    ),
+
+    // ── Gr\u00e1fico de barras horizontais — 3 anos (abaixo) ──────────────
+    h(Card,{},
+      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}},
+        h(SH,{title:'Taxa de ISC por Especialidade (%)',
+          sub:'Somente cirurgias limpas (Classe I) \u00b7 CVE Plan. 1 \u00b7 n\u00e3o inclui cesarianas',color:P.isc}),
+        h('div',{style:{display:'flex',gap:10,alignItems:'center',paddingTop:2,flexWrap:'wrap'}},
+          [{l:'2024',bg:'#c5cfe0'},{l:'2025',bg:'#9eaab8'}].map(function(x){
+            return h('div',{key:x.l,style:{display:'flex',alignItems:'center',gap:4,fontSize:10,color:C.ts}},
+              h('div',{style:{width:10,height:10,borderRadius:2,background:x.bg}}),x.l);
+          }),
+          h('div',{style:{display:'flex',alignItems:'center',gap:4,fontSize:10,color:C.ts}},
+            h('div',{style:{width:10,height:10,borderRadius:2,background:P.isc}}),
+            '2026 (YTD)')
+        )
+      ),
+      h(RCont,{width:'100%',height:320},
+        h(BarChart,{data:barData,layout:'vertical',margin:{top:4,right:56,left:80,bottom:4},barCategoryGap:'18%'},
+          h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',horizontal:false}),
+          h(RefLine,{x:2,stroke:'#9eaab8',strokeDasharray:'5 3',strokeWidth:1.4,
+            label:{value:'2%',position:'insideTopRight',fill:'#9eaab8',fontSize:9}}),
+          h(XAxis,{type:'number',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},
+            axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%'}}),
+          h(YAxis,{type:'category',dataKey:'eq',width:78,
+            tick:{fill:'#4a5568',fontSize:10,fontFamily:"'IBM Plex Sans',sans-serif"},
+            axisLine:false,tickLine:false}),
+          h(RCTip,{content:makeTip('%')}),
+          // 2024 — light gray ghost
+          h(Bar,{dataKey:'t24',name:'2024',fill:'#c5cfe0',maxBarSize:8,radius:[0,3,3,0]}),
+          // 2025 — medium gray ghost
+          h(Bar,{dataKey:'t25',name:'2025',maxBarSize:8,radius:[0,3,3,0]},
+            barData.map(function(d,i){return h(Cell,{key:i,fill:'#9eaab8'});})),
+          // 2026 — colored by risk (null = very pale)
+          h(Bar,{dataKey:'t26',name:'2026 (YTD)',maxBarSize:8,radius:[0,3,3,0]},
+            barData.map(function(d,i){return h(Cell,{key:i,fill:eqColor26(d.t26)});}))
+        )
+      ),
+      h('div',{style:{display:'flex',gap:14,paddingTop:2}},
+        [{l:'\u22642% (meta)',c:'#2e7d32'},{l:'2\u20133% (aten\u00e7\u00e3o)',c:P.isc},{l:'>3% (alerta)',c:P.alerta},{l:'sem dado 2026',c:'#e0e5ea'}]
+        .map(function(x){
+          return h('div',{key:x.l,style:{display:'flex',alignItems:'center',gap:5,fontSize:10,color:C.ts}},
+            h('div',{style:{width:10,height:10,borderRadius:2,background:x.c}}),x.l);
+        })
+      )
+    )
+  );
+}
+
+
+// ── Methodology footer ────────────────────────────────────────────────────────
+function MetodFooter(){
+  var items=[
+    {icon:'◈', label:'Canal endêmico — Cirurgias Limpas e Cesarianas',
+     text:'Média ± 1 desvio-padrão calculado sobre a série histórica de 2024 e 2025 (limpas) ou apenas 2024 (cesarianas, dada quebra metodológica em 2025). Atualizado anualmente com o fechamento do ano anterior.'},
+    {icon:'⦿', label:'Status epidemiológico (ISC)',
+     text:'Endêmico = dentro do canal ±1DP. Possível atividade supraendêmica = acima do limite superior do canal. Supraendêmico / alerta de surto = acima de 1,5× o limite superior do canal por 1 ou mais competências consecutivas.'},
+    {icon:'◦', label:'Vigilância Negativa Global (Censo ISC)',
+     text:'Prevalência diária de ISC ativo, expressa como % de pacientes-dia com ISC+ em todos os setores. Metodologia de censo diário iniciada em Julho de 2025 pelo SCIH/HUSF.'},
+    {icon:'✶', label:'Indicadores CVE-SP',
+     text:'Cirurgias limpas (Plan. 1) e Cesarianas (Plan. 1B) seguem as definições e fórmulas do Centro de Vigilância Epidemiológica "Prof. Alexandre Vranjac" — CVE-SP / ANVISA.'}
+  ];
+  return h('div',{style:{marginTop:24,borderTop:'1px solid #d0d7de',paddingTop:14}},
+    h('div',{style:{fontSize:9,color:'#8898aa',fontWeight:600,letterSpacing:1,
+      textTransform:'uppercase',marginBottom:10}},'Notas metodológicas'),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+      items.map(function(it,i){
+        return h('div',{key:i,style:{background:'#fafbfc',border:'1px solid #d0d7de',
+          borderRadius:6,padding:'10px 12px',display:'flex',gap:10,alignItems:'flex-start'}},
+          h('span',{style:{fontSize:12,color:'#b0bec5',flexShrink:0,marginTop:1}},it.icon),
+          h('div',{},
+            h('div',{style:{fontSize:9,fontWeight:600,color:'#4a5568',marginBottom:3}},it.label),
+            h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},it.text)
+          )
+        );
+      })
+    ),
+    h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
+      display:'flex',justifyContent:'space-between',alignItems:'center',
+      flexWrap:'wrap',gap:8}},
+      h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+        h('span',{style:{fontWeight:600,color:'#4a5568'}},'Autoria · '),
+        'Sistema de interface desenvolvido por Dr. Leandro Mendes · ',
+        'Análises epidemiológicas e estatísticas realizadas por Dr. Leandro Mendes'
+      ),
+      h('div',{style:{fontSize:8,color:'#b0bec5',fontFamily:"'IBM Plex Mono',monospace"}},
+        'SCIH/CCIH · HUSF · Bragança Paulista')
+    )
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+var VIEWS=[
+  {id:'global',  label:'Visão Global',      sub:'Censo ISC · Jul/25 em diante'},
+  {id:'limpas',  label:'Cir. Limpas',       sub:'Classe I · Altemeier'},
+  {id:'cesar',   label:'Cesarianas',        sub:'Indicador ANVISA'},
+  {id:'equipes', label:'Por Especialidade', sub:'Cir. limpas · NEUCI, CCARD…'},
+];
+var ICONS={global:'GL',limpas:'CL',cesar:'CS',equipes:'ESP'};
+
+// ── JSON merge helper (same pattern as iras_mdr.html) ────────────────────────
+function mergeJsonSeries(fbArr, jsArr){
+  // Append JSON points that don't exist in FB (by label p=m, case-insensitive)
+  if(!Array.isArray(jsArr)||!jsArr.length) return fbArr;
+  var fbLabels={};
+  fbArr.forEach(function(pt){fbLabels[(pt.m||pt.p).toLowerCase()]=true;});
+  var toAdd=jsArr.filter(function(pt){return !fbLabels[pt.p.toLowerCase()];});
+  toAdd=toAdd.map(function(pt){
+    // Normalise: JSON uses {p,isc,cl,taxa,proc,pd,c} → FB uses {m,...}
+    var r=Object.assign({},pt,{m:pt.p,prev:false});
+    delete r.p;
+    return r;
+  });
+  return fbArr.concat(toAdd);
+}
+
+function App(){
+  var sv=useState('global'); var view=sv[0],setView=sv[1];
+  var sl=useState(false);    var loaded=sl[0],setLoaded=sl[1];
+
+  useEffect(function(){
+    fetch('./data_iras.json?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var isc=d.isc||{};
+        // Extend mutable series from JSON isc section
+        if(Array.isArray(isc.limpas)&&isc.limpas.length){
+          var ext=mergeJsonSeries(LIMPAS,isc.limpas);
+          LIMPAS.length=0; ext.forEach(function(x){LIMPAS.push(x);});
+        }
+        if(Array.isArray(isc.cesar)&&isc.cesar.length){
+          var ext2=mergeJsonSeries(CESAR,isc.cesar);
+          CESAR.length=0; ext2.forEach(function(x){CESAR.push(x);});
+        }
+        if(Array.isArray(isc.global)&&isc.global.length){
+          var ext3=mergeJsonSeries(GLOBAL,isc.global);
+          GLOBAL.length=0; ext3.forEach(function(x){GLOBAL.push(x);});
+        }
+        // Extend EQ_SERIES from JSON isc.equipes
+        if(isc.equipes&&typeof isc.equipes==='object'){
+          Object.keys(isc.equipes).forEach(function(spec){
+            var jsArr=isc.equipes[spec];
+            if(!Array.isArray(jsArr)) return;
+            var labelMap={'NEUCI':'Neurocirurg.','CCARD':'Cardíaca','CIVAS':'Vascular',
+              'ORTOP':'Ortopedia','GINEC':'Ginecologia','CGERA':'Cx Geral',
+              'UROCI':'Urologia','PLAST':'Plástica','CIRPE':'Ci.Ped.','TORAX':'Torácica'};
+            var label=labelMap[spec]||spec;
+            if(!EQ_SERIES[label]) EQ_SERIES[label]=[];
+            var ext4=mergeJsonSeries(EQ_SERIES[label],jsArr);
+            EQ_SERIES[label]=ext4;
+          });
+        }
+        // Update EQUIPES 2026 accumulator from JSON isc.equipes26acum
+        if(isc.equipes26acum&&typeof isc.equipes26acum==='object'){
+          EQUIPES.forEach(function(eq){
+            var labelToSpec={'Neurocirurg.':'NEUCI','Cardíaca':'CCARD','Vascular':'CIVAS',
+              'Ortopedia':'ORTOP','Ginecologia':'GINEC','Cx Geral':'CGERA',
+              'Urologia':'UROCI','Plástica':'PLAST','Ci.Ped.':'CIRPE','Torácica':'TORAX'};
+            var spec=labelToSpec[eq.eq];
+            var a=spec&&isc.equipes26acum[spec];
+            if(a){eq.isc26=a.isc||0;eq.cl26=a.cl||0;}
+          });
+        }
+        setLoaded(true);
+      })
+      .catch(function(){setLoaded(true);}); // silent — FB serves as fallback
+  },[]);
+
+  var curr=VIEWS.find(function(v){return v.id===view;})||VIEWS[0];
+  return h('div',{style:{display:'flex',minHeight:'100vh'}},
+    h('div',{style:{width:192,background:'#1a2744',display:'flex',flexDirection:'column',
+      position:'sticky',top:0,height:'100vh',overflowY:'auto',flexShrink:0}},
+      h('div',{style:{padding:'20px 16px 14px',borderBottom:'1px solid rgba(255,255,255,.07)'}},
+        h('div',{style:{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.38)',letterSpacing:2,marginBottom:5}},'CCIH \u00b7 HUSF'),
+        h('div',{style:{fontSize:14,fontWeight:700,color:'#ffffff',lineHeight:1.3}},
+          'Infec\u00e7\u00e3o de',h('br'),'S\u00edtio Cir\u00fargico'),
+        h('div',{style:{fontSize:9,color:'rgba(255,255,255,.28)',marginTop:3,
+          fontFamily:"'IBM Plex Mono',monospace"}},'ISC \u00b7 2024\u20132026')
+      ),
+      h('div',{style:{padding:'12px 8px',flex:1}},
+        VIEWS.map(function(v){
+          var active=view===v.id;
+          return h('button',{key:v.id,onClick:function(){setView(v.id);},
+            style:{display:'flex',alignItems:'center',gap:10,width:'100%',
+              padding:'10px 10px',borderRadius:7,border:'none',textAlign:'left',marginBottom:2,
+              background:active?'rgba(255,255,255,.11)':'transparent',
+              borderLeft:active?'3px solid #4fc3f7':'3px solid transparent',
+              transition:'background .12s,border-color .12s'}},
+            h('div',{style:{width:28,height:28,borderRadius:6,flexShrink:0,
+              background:active?'rgba(79,195,247,.18)':'rgba(255,255,255,.07)',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              fontSize:9,fontWeight:700,color:active?'#4fc3f7':'rgba(255,255,255,.5)',
+              fontFamily:"'IBM Plex Mono',monospace"}},ICONS[v.id]),
+            h('div',{},
+              h('div',{style:{fontSize:11,fontWeight:active?700:500,
+                color:active?'#ffffff':'rgba(255,255,255,.58)',lineHeight:1.2}},v.label),
+              h('div',{style:{fontSize:9,color:'rgba(255,255,255,.28)',marginTop:1}},v.sub)
+            )
+          );
+        })
+      ),
+      h('div',{style:{padding:'12px 14px',borderTop:'1px solid rgba(255,255,255,.06)'}},
+        h('div',{style:{fontSize:9,color:'rgba(255,255,255,.18)',lineHeight:1.9}},
+          'SCIH / HUSF',h('br'),'Bragan\u00e7a Paulista, SP',h('br'),'\u00a9 CCIH 2026')
+      )
+    ),
+    h('div',{style:{flex:1,overflowY:'auto',padding:'24px 24px 48px'}},
+      h('div',{style:{marginBottom:20}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:'#8898aa',letterSpacing:2,marginBottom:4}},
+          'CCIH / HUSF \u00b7 VIGIL\u00c2NCIA EPIDEMIOL\u00d3GICA'),
+        h('h1',{style:{fontSize:22,fontWeight:700,color:'#1a2744'}},curr.label),
+        h('div',{style:{fontSize:11,color:'#8898aa',marginTop:2}},
+          curr.id==='global'?'Jul/2025 \u2013 Mar/2026 \u00b7 Fonte: Censo ISC HUSF':
+          curr.id==='equipes'?'Jan/2024 \u2013 Dez/2025 + 2026 YTD \u00b7 Fonte: CVE Plan. 1':
+          'Jan/2024 \u2013 Dez/2025 + 2026 \u00b7 Fonte: CVE Plan. 1'+(curr.id==='cesar'?' / 1B':'')
+        )
+      ),
+      view==='global' ?h(GlobalView,{}):
+      view==='limpas' ?h(LimpasView,{}):
+      view==='cesar'  ?h(CesarView,{}):
+                       h(EquipesView,{})
+    )
+  );
+}
+ReactDOM.render(h(App,{}),document.getElementById('root'));
+</script>
+</body>
+</html>

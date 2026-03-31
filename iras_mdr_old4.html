@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCIH/CCIH — HUSF · IrAS & Determinantes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0f2f5;font-family:'IBM Plex Sans',sans-serif;color:#1a2744;overflow:hidden}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .fi{animation:fadeIn .18s ease-out}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .pulse{animation:pulse 2.2s ease-in-out infinite}
+  button{cursor:pointer}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.min.js"></script>
+<script>
+'use strict';
+if(!window.React||!window.ReactDOM||!window.Recharts){
+  document.getElementById('root').innerHTML='<div style="color:#c62828;padding:40px;font-family:monospace">Erro: biblioteca não carregada.</div>';
+  throw new Error('lib fail');
+}
+var h=React.createElement,useState=React.useState,useEffect=React.useEffect;
+
+// ── Design tokens ─────────────────────────────────────────────────────────────
+var BG='#f0f2f5', WHITE='#ffffff', BRDR='#d0d7de', MUTED='#8898aa';
+var NAVY='#1a2744', SLATE='#4a5568', LIGHT='#6b7280';
+var BLUE='#1565c0', RED='#c62828', GREEN='#2e7d32', AMBER='#e65100', PURPLE='#4527a0', TEAL='#00695c';
+var HIST='#9eaab8', CURR=BLUE;
+var GRID='#e2e6ea';
+
+// ── Recharts ──────────────────────────────────────────────────────────────────
+var RC=Recharts;
+var BarChart=RC.BarChart,Bar=RC.Bar,ComposedChart=RC.ComposedChart;
+var LineChart=RC.LineChart,Line=RC.Line;
+var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
+var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer;
+var RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea,Cell=RC.Cell,Legend=RC.Legend;
+
+// ── Fallback data ─────────────────────────────────────────────────────────────
+var FB={
+  periodo:'Janeiro 2026',
+  global:{taxaIH:[{p:'2016',v:12.44},{p:'2017',v:7.47},{p:'2018',v:2.57},{p:'2019',v:2.12},{p:'2020',v:2.40},{p:'2021',v:2.81},{p:'2022',v:1.80},{p:'2023',v:1.03},{p:'2024',v:1.10},{p:'jan/25',v:0.90},{p:'fev/25',v:1.05},{p:'mar/25',v:0.70},{p:'abr/25',v:0.88},{p:'mai/25',v:1.15},{p:'jun/25',v:1.32},{p:'jul/25',v:1.22},{p:'ago/25',v:1.15},{p:'set/25',v:1.16},{p:'out/25',v:1.27},{p:'nov/25',v:0.81},{p:'dez/25',v:0.90},{p:'jan/26',v:0.86}]},
+  clinicaMedica:{taxaIH:[{p:'2016',v:2.75},{p:'2017',v:2.49},{p:'2018',v:0.81},{p:'2019',v:0.76},{p:'2020',v:0.82},{p:'2021',v:1.15},{p:'2022',v:1.18},{p:'2023',v:1.63},{p:'2024',v:1.57},{p:'jan/25',v:0.92},{p:'fev/25',v:1.63},{p:'mar/25',v:1.06},{p:'abr/25',v:1.54},{p:'mai/25',v:1.31},{p:'jun/25',v:1.44},{p:'jul/25',v:0.69},{p:'ago/25',v:1.11},{p:'set/25',v:1.27},{p:'out/25',v:1.55},{p:'nov/25',v:1.02},{p:'dez/25',v:1.81},{p:'jan/26',v:1.20}],inf:{ac:2,itu:0,pneu:6,sc:null,total:8,pd:664}},
+  clinicaCirurgica:{taxaIH:[{p:'2016',v:6.51},{p:'2017',v:4.38},{p:'2018',v:1.23},{p:'2019',v:0.84},{p:'2020',v:0.91},{p:'2021',v:1.15},{p:'2022',v:1.61},{p:'2023',v:3.13},{p:'2024',v:3.00},{p:'jan/25',v:3.12},{p:'fev/25',v:3.45},{p:'mar/25',v:3.77},{p:'abr/25',v:4.15},{p:'mai/25',v:2.79},{p:'jun/25',v:3.14},{p:'jul/25',v:3.49},{p:'ago/25',v:3.21},{p:'set/25',v:3.12},{p:'out/25',v:2.75},{p:'nov/25',v:3.00},{p:'dez/25',v:2.15},{p:'jan/26',v:2.68}],inf:{ac:4,itu:2,pneu:8,sc:6,total:20,pd:746}},
+  epm:{taxaIH:[{p:'2016',v:2.40},{p:'2017',v:1.80},{p:'2018',v:0.52},{p:'2019',v:0.55},{p:'2020',v:0.66},{p:'2021',v:0.83},{p:'2022',v:0.78},{p:'2023',v:1.20},{p:'2024',v:0.82},{p:'jan/25',v:1.59},{p:'fev/25',v:1.38},{p:'mar/25',v:0.76},{p:'abr/25',v:0.46},{p:'mai/25',v:1.01},{p:'jun/25',v:1.17},{p:'jul/25',v:1.55},{p:'ago/25',v:0.99},{p:'set/25',v:0.92},{p:'out/25',v:1.25},{p:'nov/25',v:0.50},{p:'dez/25',v:0.55},{p:'jan/26',v:0.65}],inf:{ac:0,itu:0,pneu:2,sc:2,total:4,pd:619}},
+  diarreia:{
+    cm:   [{p:'jun/25',v:8.55},{p:'jul/25',v:11.83},{p:'ago/25',v:26.21},{p:'set/25',v:15.56},{p:'out/25',v:33.80},{p:'nov/25',v:7.19},{p:'dez/25',v:4.42},{p:'jan/26',v:2.40},{p:'fev/26',v:0.00}],
+    cc:   [{p:'jun/25',v:0.00},{p:'jul/25',v:0.00},{p:'ago/25',v:1.65},{p:'set/25',v:0.00},{p:'out/25',v:1.58},{p:'nov/25',v:5.31},{p:'dez/25',v:0.00},{p:'jan/26',v:1.96},{p:'fev/26',v:6.54}],
+    epm:  [{p:'jun/25',v:0.00},{p:'jul/25',v:5.71},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:10.07},{p:'nov/25',v:0.00},{p:'dez/25',v:0.00},{p:'jan/26',v:7.33},{p:'fev/26',v:0.00}],
+    utiab:[{p:'jun/25',v:30.93},{p:'jul/25',v:21.05},{p:'ago/25',v:7.94},{p:'set/25',v:13.12},{p:'out/25',v:7.32},{p:'nov/25',v:16.08},{p:'dez/25',v:8.38},{p:'jan/26',v:11.63},{p:'fev/26',v:13.79}],
+    utic: [{p:'jun/25',v:0.00},{p:'jul/25',v:0.00},{p:'ago/25',v:10.58},{p:'set/25',v:0.00},{p:'out/25',v:14.08},{p:'nov/25',v:5.43},{p:'dez/25',v:15.63},{p:'jan/26',v:0.00},{p:'fev/26',v:26.32}]
+  },
+  hd:{
+    ilav:[{p:'2016',v:24.4},{p:'2017',v:27.8},{p:'2018',v:12.6},{p:'2019',v:10.4},{p:'2020',v:5.4},{p:'2021',v:5.71},{p:'2022',v:6.8},{p:'2023',v:3.15},{p:'2024',v:3.36},{p:'jan/25',v:2.86},{p:'fev/25',v:1.85},{p:'mar/25',v:1.49},{p:'abr/25',v:5.20},{p:'mai/25',v:7.78},{p:'jun/25',v:0.46},{p:'jul/25',v:1.59},{p:'ago/25',v:0.00},{p:'set/25',v:1.67},{p:'out/25',v:0.00},{p:'nov/25',v:0.74},{p:'dez/25',v:1.75},{p:'jan/26',v:2.45}],
+    bact:[{p:'2016',v:12.5},{p:'2017',v:6.7},{p:'2018',v:5.9},{p:'2019',v:5.6},{p:'2020',v:5.1},{p:'2021',v:8.68},{p:'2022',v:6.79},{p:'2023',v:8.3},{p:'2024',v:24.32},{p:'jan/25',v:10.44},{p:'fev/25',v:7.90},{p:'mar/25',v:1.99},{p:'abr/25',v:11.99},{p:'mai/25',v:3.22},{p:'jun/25',v:10.33},{p:'jul/25',v:10.53},{p:'ago/25',v:1.11},{p:'set/25',v:7.41},{p:'out/25',v:14.86},{p:'nov/25',v:13.73},{p:'dez/25',v:9.86},{p:'jan/26',v:11.53}],
+    vanco:[{p:'2016',v:8.8},{p:'2017',v:7.5},{p:'2018',v:8.5},{p:'2019',v:5.9},{p:'2020',v:4.5},{p:'2021',v:7.15},{p:'2022',v:7.79},{p:'2023',v:8.02},{p:'2024',v:10.22},{p:'jan/25',v:10.59},{p:'fev/25',v:5.98},{p:'mar/25',v:6.84},{p:'abr/25',v:10.79},{p:'mai/25',v:10.37},{p:'jun/25',v:6.67},{p:'jul/25',v:7.44},{p:'ago/25',v:2.07},{p:'set/25',v:6.53},{p:'out/25',v:4.58},{p:'nov/25',v:5.83},{p:'dez/25',v:5.42},{p:'jan/26',v:5.88}],
+    ilavTemp:[{p:'jan/25',v:1.85},{p:'fev/25',v:1.85},{p:'mar/25',v:0.00},{p:'abr/25',v:4.76},{p:'mai/25',v:5.56},{p:'jun/25',v:0.00},{p:'jul/25',v:1.15},{p:'ago/25',v:0.00},{p:'set/25',v:1.67},{p:'out/25',v:0.00},{p:'nov/25',v:0.00},{p:'dez/25',v:1.75},{p:'jan/26',v:2.08}],
+    ilavPerm:[{p:'jan/25',v:1.01},{p:'fev/25',v:0.00},{p:'mar/25',v:1.49},{p:'abr/25',v:0.44},{p:'mai/25',v:2.22},{p:'jun/25',v:0.46},{p:'jul/25',v:0.44},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:0.00},{p:'nov/25',v:0.74},{p:'dez/25',v:0.00},{p:'jan/26',v:0.37}],
+    bactTemp:[{p:'jan/25',v:7.41},{p:'fev/25',v:7.41},{p:'mar/25',v:0.00},{p:'abr/25',v:11.11},{p:'mai/25',v:2.78},{p:'jun/25',v:9.88},{p:'jul/25',v:9.20},{p:'ago/25',v:1.11},{p:'set/25',v:6.67},{p:'out/25',v:13.73},{p:'nov/25',v:13.73},{p:'dez/25',v:8.77},{p:'jan/26',v:10.42}],
+    bactPerm:[{p:'jan/25',v:3.03},{p:'fev/25',v:0.50},{p:'mar/25',v:1.99},{p:'abr/25',v:0.88},{p:'mai/25',v:0.44},{p:'jun/25',v:0.46},{p:'jul/25',v:1.33},{p:'ago/25',v:0.00},{p:'set/25',v:0.74},{p:'out/25',v:1.14},{p:'nov/25',v:0.00},{p:'dez/25',v:1.09},{p:'jan/26',v:1.11}],
+    audit:{ok:10,nc:4,pct:29}
+  },
+  utiAB:{
+    svd:[{p:'2015',v:87.70},{p:'2016',v:86.50},{p:'2017',v:82.59},{p:'2018',v:74.77},{p:'2019',v:72.38},{p:'2020',v:78.40},{p:'2021',v:82.87},{p:'2022',v:78.69},{p:'2023',v:77.65},{p:'2024',v:75.80},{p:'jan/25',v:78.09,lMin:66.69,lMax:84.85},{p:'fev/25',v:73.96,lMin:69.88,lMax:78.71},{p:'mar/25',v:72.65,lMin:58.83,lMax:85.11},{p:'abr/25',v:65.19,lMin:63.97,lMax:84.88},{p:'mai/25',v:76.04,lMin:66.75,lMax:83.32},{p:'jun/25',v:74.57,lMin:66.56,lMax:78.61},{p:'jul/25',v:72.85,lMin:71.26,lMax:78.81},{p:'ago/25',v:80.47,lMin:68.96,lMax:78.03},{p:'set/25',v:67.64,lMin:70.74,lMax:78.02},{p:'out/25',v:68.44,lMin:69.00,lMax:76.36},{p:'nov/25',v:74.28,lMin:65.00,lMax:70.00},{p:'dez/25',v:68.55,lMin:70.00,lMax:80.00},{p:'jan/26',v:75.0}],
+    cvc:[{p:'2015',v:67.0},{p:'2016',v:84.3},{p:'2017',v:85.9},{p:'2018',v:74.5},{p:'2019',v:72.1},{p:'2020',v:75.3},{p:'2021',v:80.2},{p:'2022',v:74.2},{p:'2023',v:77.7},{p:'2024',v:76.7},{p:'jan/25',v:77.42,lMin:76.37,lMax:81.40},{p:'fev/25',v:76.41,lMin:70.66,lMax:74.67},{p:'mar/25',v:59.30,lMin:67.37,lMax:73.46},{p:'abr/25',v:64.79,lMin:64.08,lMax:70.75},{p:'mai/25',v:71.13,lMin:68.53,lMax:73.92},{p:'jun/25',v:70.00,lMin:71.77,lMax:74.90},{p:'jul/25',v:74.22,lMin:72.74,lMax:76.09},{p:'ago/25',v:70.12,lMin:72.80,lMax:76.60},{p:'set/25',v:71.15,lMin:69.49,lMax:73.84},{p:'out/25',v:69.20,lMin:71.95,lMax:75.41},{p:'nov/25',v:71.79,lMin:66.00,lMax:70.00},{p:'dez/25',v:65.64,lMin:62.00,lMax:73.00},{p:'jan/26',v:65.0}],
+    tot:[{p:'2015',v:45.0},{p:'2016',v:57.5},{p:'2017',v:59.9},{p:'2018',v:51.4},{p:'2019',v:51.36},{p:'2020',v:59.87},{p:'2021',v:62.44},{p:'2022',v:56.52},{p:'2023',v:58.14},{p:'2024',v:64.93},{p:'jan/25',v:69.90},{p:'fev/25',v:50.86},{p:'mar/25',v:43.11},{p:'abr/25',v:42.86},{p:'mai/25',v:45.09},{p:'jun/25',v:53.91},{p:'jul/25',v:59.57},{p:'ago/25',v:52.54},{p:'set/25',v:55.75},{p:'out/25',v:63.88},{p:'nov/25',v:49.33},{p:'dez/25',v:51.27},{p:'jan/26',v:57.0}],
+    pav:[{p:'2015',v:26.19},{p:'2016',v:13.57},{p:'2017',v:11.56},{p:'2018',v:24.06},{p:'2019',v:24.18},{p:'2020',v:9.70},{p:'2021',v:12.71},{p:'2022',v:14.71},{p:'2023',v:16.83},{p:'2024',v:12.95},{p:'jan/25',v:9.57,lMin:4.40,lMax:18.80},{p:'fev/25',v:19.32,lMin:6.80,lMax:15.66},{p:'mar/25',v:10.15,lMin:12.26,lMax:24.89},{p:'abr/25',v:9.39,lMin:8.19,lMax:25.49},{p:'mai/25',v:16.74,lMin:7.76,lMax:17.68},{p:'jun/25',v:4.03,lMin:7.61,lMax:23.51},{p:'jul/25',v:16.39,lMin:7.54,lMax:15.36},{p:'ago/25',v:22.30,lMin:10.29,lMax:25.39},{p:'set/25',v:20.98,lMin:8.59,lMax:15.77},{p:'out/25',v:29.76,lMin:12.23,lMax:20.10},{p:'nov/25',v:7.78,lMin:10.00,lMax:16.00},{p:'dez/25',v:17.73},{p:'jan/26',v:0.0}],
+    itu:[{p:'2015',v:6.5},{p:'2016',v:5.5},{p:'2017',v:4.4},{p:'2018',v:5.0},{p:'2019',v:6.1},{p:'2020',v:1.5},{p:'2021',v:1.7},{p:'2022',v:1.1},{p:'2023',v:1.2},{p:'2024',v:0.4},{p:'jan/25',v:0.00},{p:'fev/25',v:0.00},{p:'mar/25',v:3.01},{p:'abr/25',v:0.00},{p:'mai/25',v:0.00},{p:'jun/25',v:0.00},{p:'jul/25',v:2.68},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:0.00},{p:'nov/25',v:0.00},{p:'dez/25',v:0.00},{p:'jan/26',v:0.0}],
+    ipcs:[{p:'2015',v:3.33},{p:'2016',v:2.3},{p:'2017',v:2.9},{p:'2018',v:5.5},{p:'2019',v:7.34},{p:'2020',v:5.95},{p:'2021',v:7.53},{p:'2022',v:12.8},{p:'2023',v:9.75},{p:'2024',v:7.24},{p:'jan/25',v:8.64,lMin:2.97,lMax:15.46},{p:'fev/25',v:12.86,lMin:7.20,lMax:11.10},{p:'mar/25',v:7.38,lMin:3.21,lMax:13.08},{p:'abr/25',v:3.11,lMin:3.32,lMax:10.65},{p:'mai/25',v:18.57,lMin:2.63,lMax:7.83},{p:'jun/25',v:15.53,lMin:4.31,lMax:11.53},{p:'jul/25',v:13.16,lMin:6.25,lMax:10.22},{p:'ago/25',v:13.93,lMin:5.16,lMax:11.25},{p:'set/25',v:10.96,lMin:6.45,lMax:11.29},{p:'out/25',v:8.24,lMin:4.18,lMax:19.10},{p:'nov/25',v:10.70,lMin:5.00,lMax:12.00},{p:'dez/25',v:5.54},{p:'jan/26',v:0.0}],
+    dddPip:[{p:'2015',v:168.45},{p:'2016',v:254.00},{p:'2017',v:270.11},{p:'2018',v:131.10},{p:'2019',v:83.60},{p:'2020',v:134.97},{p:'2021',v:150.20},{p:'2022',v:129.81},{p:'2023',v:119.99},{p:'2024',v:82.34},{p:'jan/25',v:66.91,lMin:104.14,lMax:143.31},{p:'fev/25',v:94.48,lMin:95.22,lMax:129.12},{p:'mar/25',v:49.32,lMin:60.41,lMax:122.37},{p:'abr/25',v:66.31,lMin:68.09,lMax:118.17},{p:'mai/25',v:52.31,lMin:79.42,lMax:120.29},{p:'jun/25',v:55.53,lMin:89.43,lMax:116.88},{p:'jul/25',v:113.06,lMin:100.09,lMax:122.65},{p:'ago/25',v:29.58,lMin:87.54,lMax:115.04},{p:'set/25',v:21.51,lMin:91.33,lMax:115.97},{p:'out/25',v:44.88,lMin:88.65,lMax:117.52},{p:'nov/25',v:64.56,lMin:80.00,lMax:100.00},{p:'dez/25',v:75.37,lMin:90.00,lMax:120.00},{p:'jan/26',v:22.0}],
+    dddCarba:[{p:'2015',v:270.0},{p:'2016',v:370.0},{p:'2017',v:347.6},{p:'2018',v:188.0},{p:'2019',v:107.8},{p:'2020',v:181.7},{p:'2021',v:150.8},{p:'2022',v:129.8},{p:'2023',v:157.8},{p:'2024',v:158.3},{p:'jan/25',v:135.41,lMin:130.32,lMax:175.79},{p:'fev/25',v:122.95,lMin:112.37,lMax:145.61},{p:'mar/25',v:69.90,lMin:83.26,lMax:134.70},{p:'abr/25',v:95.64,lMin:87.28,lMax:134.57},{p:'mai/25',v:91.55,lMin:87.26,lMax:130.90},{p:'jun/25',v:122.30,lMin:107.14,lMax:139.16},{p:'jul/25',v:69.95,lMin:139.67,lMax:160.08},{p:'ago/25',v:190.03,lMin:91.71,lMax:132.35},{p:'set/25',v:99.96,lMin:97.18,lMax:139.83},{p:'out/25',v:129.42,lMin:121.41,lMax:148.66},{p:'nov/25',v:194.76,lMin:100.00,lMax:150.00},{p:'dez/25',v:154.68,lMin:120.00,lMax:160.00},{p:'jan/26',v:130.0}],
+    dddGlico:[{p:'2015',v:109.0},{p:'2016',v:115.0},{p:'2017',v:149.8},{p:'2018',v:127.9},{p:'2019',v:136.6},{p:'2020',v:132.4},{p:'2021',v:119.7},{p:'2022',v:83.4},{p:'2023',v:90.8},{p:'2024',v:98.0},{p:'jan/25',v:101.55,lMin:94.54,lMax:121.08},{p:'fev/25',v:77.90,lMin:87.43,lMax:115.15},{p:'mar/25',v:59.56,lMin:75.80,lMax:114.90},{p:'abr/25',v:113.22,lMin:83.30,lMax:112.44},{p:'mai/25',v:98.59,lMin:81.97,lMax:113.71},{p:'jun/25',v:81.69,lMin:90.17,lMax:117.34},{p:'jul/25',v:110.62,lMin:75.18,lMax:109.45},{p:'ago/25',v:107.64,lMin:94.30,lMax:137.92},{p:'set/25',v:98.49,lMin:81.16,lMax:117.03},{p:'out/25',v:81.74,lMin:100.21,lMax:131.41},{p:'nov/25',v:158.55,lMin:90.00,lMax:120.00},{p:'dez/25',v:119.30,lMin:100.00,lMax:140.00},{p:'jan/26',v:100.0}],
+    dddPoli:[{p:'2015',v:14.50},{p:'2016',v:28.40},{p:'2017',v:77.60},{p:'2018',v:51.60},{p:'2019',v:58.28},{p:'2020',v:40.82},{p:'2021',v:53.81},{p:'2022',v:47.20},{p:'2023',v:25.87},{p:'2024',v:55.49},{p:'jan/25',v:73.62,lMin:40.89,lMax:58.81},{p:'fev/25',v:38.69,lMin:30.43,lMax:54.65},{p:'mar/25',v:16.64,lMin:19.20,lMax:51.33},{p:'abr/25',v:23.44,lMin:28.23,lMax:52.53},{p:'mai/25',v:25.61,lMin:26.52,lMax:51.34},{p:'jun/25',v:36.15,lMin:36.95,lMax:55.00},{p:'jul/25',v:37.08,lMin:18.29,lMax:47.86},{p:'ago/25',v:34.93,lMin:51.86,lMax:72.77},{p:'set/25',v:94.10,lMin:29.77,lMax:51.12},{p:'out/25',v:29.37,lMin:51.74,lMax:73.03},{p:'nov/25',v:62.01,lMin:44.00,lMax:58.00},{p:'dez/25',v:21.18,lMin:50.00,lMax:70.00},{p:'jan/26',v:30.0}],
+    mdr:[{p:'2019',e:5,k:10,a:6},{p:'2020',e:5,k:10,a:6},{p:'2021',e:5,k:11,a:8},{p:'2022',e:8,k:10,a:5},{p:'2023',e:19,k:3,a:8},{p:'2024',e:22,k:6,a:11},{p:'2025',e:5,k:9,a:5}],
+    mdrMax:{e:34,k:17,a:28},
+    hm:[{p:'2015',v:14.00},{p:'2016',v:36.00},{p:'2017',v:30.10},{p:'2018',v:34.12},{p:'2019',v:54.45},{p:'2020',v:70.90},{p:'2021',v:26.20},{p:'2022',v:50.70},{p:'2023',v:32.00},{p:'2024',v:28.60},{p:'jan/25',v:49.39},{p:'fev/25',v:44.52},{p:'mar/25',v:32.10},{p:'abr/25',v:36.57},{p:'mai/25',v:40.33},{p:'jun/25',v:34.51},{p:'jul/25',v:38.56},{p:'ago/25',v:17.68},{p:'set/25',v:44.54},{p:'out/25',v:45.34},{p:'nov/25',v:26.22},{p:'dez/25',v:52.16},{p:'jan/26',v:0.0}],
+    audit:{ok:16,nc:0,pct:0},
+    auditSeries:[{p:'jan/26',ok:16,nc:0,pct:0}]
+  },
+  utic:{
+    svd:[{p:'2015',v:67.0},{p:'2016',v:84.3},{p:'2017',v:85.9},{p:'2018',v:74.5},{p:'2019',v:72.1},{p:'2020',v:75.3},{p:'2021',v:80.2},{p:'2022',v:74.2},{p:'2023',v:77.7},{p:'2024',v:77.92},{p:'jan/25',v:73.27},{p:'fev/25',v:71.17},{p:'mar/25',v:85.25},{p:'abr/25',v:81.31},{p:'mai/25',v:82.47},{p:'jun/25',v:85.20},{p:'jul/25',v:78.49},{p:'ago/25',v:73.57},{p:'set/25',v:67.96},{p:'out/25',v:86.67},{p:'nov/25',v:85.71},{p:'dez/25',v:71.83},{p:'jan/26',v:76.0}],
+    cvc:[{p:'2015',v:67.0},{p:'2016',v:84.3},{p:'2017',v:85.9},{p:'2018',v:74.5},{p:'2019',v:72.1},{p:'2020',v:75.3},{p:'2021',v:80.2},{p:'2022',v:74.2},{p:'2023',v:77.7},{p:'2024',v:75.5},{p:'jan/25',v:72.61},{p:'fev/25',v:68.47},{p:'mar/25',v:72.13},{p:'abr/25',v:78.04},{p:'mai/25',v:83.27},{p:'jun/25',v:76.40},{p:'jul/25',v:75.27},{p:'ago/25',v:72.86},{p:'set/25',v:72.89},{p:'out/25',v:85.56},{p:'nov/25',v:88.21},{p:'dez/25',v:71.48},{p:'jan/26',v:72.0}],
+    tot:[{p:'2015',v:45.0},{p:'2016',v:57.5},{p:'2017',v:59.9},{p:'2018',v:51.4},{p:'2019',v:51.36},{p:'2020',v:59.87},{p:'2021',v:62.44},{p:'2022',v:56.52},{p:'2023',v:58.14},{p:'2024',v:62.59},{p:'jan/25',v:76.90},{p:'fev/25',v:53.15},{p:'mar/25',v:68.03},{p:'abr/25',v:57.48},{p:'mai/25',v:52.99},{p:'jun/25',v:52.40},{p:'jul/25',v:72.04},{p:'ago/25',v:74.29},{p:'set/25',v:79.58},{p:'out/25',v:77.04},{p:'nov/25',v:76.07},{p:'dez/25',v:55.99},{p:'jan/26',v:60.0}],
+    pav:[{p:'2021',v:12.71},{p:'2022',v:14.71},{p:'2023',v:16.83},{p:'2024',v:11.36},{p:'jan/25',v:12.88,lMin:10.74,lMax:23.26},{p:'fev/25',v:0.00,lMin:12.82,lMax:18.77},{p:'mar/25',v:12.05,lMin:1.60,lMax:24.07},{p:'abr/25',v:24.39,lMin:12.14,lMax:18.44},{p:'mai/25',v:22.56,lMin:11.52,lMax:18.68},{p:'jun/25',v:30.53,lMin:9.21,lMax:16.07},{p:'jul/25',v:24.88,lMin:11.35,lMax:16.54},{p:'ago/25',v:9.62,lMin:6.97,lMax:17.30},{p:'set/25',v:22.12,lMin:8.69,lMax:16.20},{p:'out/25',v:9.62,lMin:7.44,lMax:19.87},{p:'nov/25',v:9.39,lMin:3.19,lMax:24.81},{p:'dez/25',v:0.00,lMin:4.46,lMax:23.96},{p:'jan/26',v:0.0}],
+    itu:[{p:'2021',v:1.7},{p:'2022',v:1.1},{p:'2023',v:1.2},{p:'2024',v:0.4},{p:'jan/25',v:0.00},{p:'fev/25',v:0.00},{p:'mar/25',v:0.00},{p:'abr/25',v:0.00},{p:'mai/25',v:0.00},{p:'jun/25',v:0.00},{p:'jul/25',v:0.00},{p:'ago/25',v:0.00},{p:'set/25',v:0.00},{p:'out/25',v:4.27},{p:'nov/25',v:0.00},{p:'dez/25',v:0.00},{p:'jan/26',v:0.0}],
+    ipcs:[{p:'2021',v:7.53},{p:'2022',v:12.8},{p:'2023',v:9.75},{p:'2024',v:4.92},{p:'jan/25',v:9.09,lMin:2.09,lMax:11.22},{p:'fev/25',v:0.00,lMin:3.25,lMax:12.13},{p:'mar/25',v:34.09,lMin:2.51,lMax:24.08},{p:'abr/25',v:17.96,lMin:3.00,lMax:7.97},{p:'mai/25',v:9.57,lMin:1.54,lMax:16.93},{p:'jun/25',v:0.00,lMin:3.64,lMax:10.36},{p:'jul/25',v:14.29,lMin:1.61,lMax:7.60},{p:'ago/25',v:4.90,lMin:1.35,lMax:11.09},{p:'set/25',v:19.32,lMin:3.20,lMax:9.59},{p:'out/25',v:4.33,lMin:2.99,lMax:10.63},{p:'nov/25',v:4.05,lMin:1.86,lMax:8.61},{p:'dez/25',v:14.78,lMin:3.59,lMax:18.92},{p:'jan/26',v:0.0}],
+    dddPip:[{p:'2021',v:150.20},{p:'2022',v:129.81},{p:'2023',v:119.99},{p:'2024',v:82.34},{p:'jan/25',v:29.23},{p:'fev/25',v:87.52},{p:'mar/25',v:22.25},{p:'abr/25',v:54.74},{p:'mai/25',v:48.38},{p:'jun/25',v:61.71},{p:'jul/25',v:128.01},{p:'ago/25',v:4.08},{p:'set/25',v:18.11},{p:'out/25',v:67.72},{p:'nov/25',v:78.57},{p:'dez/25',v:80.48},{p:'jan/26',v:65.0}],
+    dddCarba:[{p:'2021',v:150.8},{p:'2022',v:129.8},{p:'2023',v:157.8},{p:'2024',v:158.3},{p:'jan/25',v:215.62},{p:'fev/25',v:159.16},{p:'mar/25',v:104.51},{p:'abr/25',v:175.23},{p:'mai/25',v:254.98},{p:'jun/25',v:110.00},{p:'jul/25',v:47.19},{p:'ago/25',v:26.79},{p:'set/25',v:101.53},{p:'out/25',v:144.44},{p:'nov/25',v:214.29},{p:'dez/25',v:231.22},{p:'jan/26',v:128.0}],
+    dddGlico:[{p:'2021',v:119.7},{p:'2022',v:83.4},{p:'2023',v:90.8},{p:'2024',v:98.0},{p:'jan/25',v:148.51},{p:'fev/25',v:74.32},{p:'mar/25',v:77.87},{p:'abr/25',v:165.89},{p:'mai/25',v:80.68},{p:'jun/25',v:52.00},{p:'jul/25',v:53.76},{p:'ago/25',v:62.50},{p:'set/25',v:103.87},{p:'out/25',v:54.63},{p:'nov/25',v:125.89},{p:'dez/25',v:172.54},{p:'jan/26',v:110.0}],
+    dddPoli:[{p:'2021',v:53.81},{p:'2022',v:47.20},{p:'2023',v:25.87},{p:'2024',v:55.50},{p:'jan/25',v:68.21},{p:'fev/25',v:57.06},{p:'mar/25',v:40.98},{p:'abr/25',v:21.81},{p:'mai/25',v:14.61},{p:'jun/25',v:16.00},{p:'jul/25',v:19.12},{p:'ago/25',v:5.95},{p:'set/25',v:147.89},{p:'out/25',v:23.46},{p:'nov/25',v:39.29},{p:'dez/25',v:45.77},{p:'jan/26',v:70.0}],
+    mdr:[{p:'2021',e:18.8,k:6.3,a:6.3},{p:'2022',e:7.6,k:3.9,a:8.8},{p:'2023',e:5.8,k:1.9,a:3.9},{p:'2024',e:7.2,k:10.8,a:21.7},{p:'2025',e:7,k:22,a:14}],
+    mdrMax:{e:31,k:23,a:24},
+    hm:[{p:'2021',v:26.20},{p:'2022',v:50.70},{p:'2023',v:32.00},{p:'2024',v:28.60},{p:'jan/24',v:44.55},{p:'fev/24',v:47.30},{p:'mar/24',v:40.98},{p:'abr/24',v:32.71},{p:'mai/24',v:37.85},{p:'jun/24',v:40.00},{p:'jul/24',v:55.56},{p:'ago/24',v:30.36},{p:'set/24',v:28.17},{p:'out/24',v:42.59},{p:'nov/24',v:28.57},{p:'dez/24',v:54.58},{p:'jan/26',v:0.0}],
+    audit:{ok:35,nc:2,pct:5},
+    auditSeries:[{p:'jan/26',ok:35,nc:2,pct:5}]
+  },
+  utiNeo:{
+    ipcs:[{p:'2019',v:29.10},{p:'2020',v:16.58},{p:'2021',v:12.35},{p:'2022',v:9.82},{p:'2023',v:17.21},{p:'2024',v:10.12},{p:'jan/25',v:12.66,lMin:16.62,lMax:40.00},{p:'fev/25',v:9.80,lMin:13.73,lMax:23.33},{p:'mar/25',v:10.64,lMin:10.12,lMax:22.80},{p:'abr/25',v:35.09,lMin:9.95,lMax:28.24},{p:'mai/25',v:20.00,lMin:12.11,lMax:32.85},{p:'jun/25',v:24.39,lMin:8.30,lMax:34.40},{p:'jul/25',v:17.14,lMin:9.70,lMax:25.00},{p:'ago/25',v:17.70,lMin:10.10,lMax:20.80},{p:'set/25',v:31.75,lMin:11.10,lMax:28.80},{p:'out/25',v:9.90,lMin:2.22,lMax:10.10},{p:'nov/25',v:37.50,lMin:10.00,lMax:30.00},{p:'dez/25',v:18.35,lMin:15.00,lMax:22.00},{p:'jan/26',v:0.0}],
+    audit:{ok:16,nc:0,pct:0},
+    auditSeries:[{p:'2024',ok:122,nc:87,pct:40},{p:'jan/25',ok:13,nc:5,pct:28},{p:'fev/25',ok:14,nc:7,pct:33},{p:'mar/25',ok:9,nc:5,pct:36},{p:'abr/25',ok:6,nc:20,pct:91},{p:'mai/25',ok:12,nc:12,pct:50},{p:'jun/25',ok:6,nc:15,pct:71},{p:'jul/25',ok:10,nc:11,pct:52},{p:'ago/25',ok:6,nc:12,pct:67},{p:'set/25',ok:1,nc:13,pct:93},{p:'out/25',ok:3,nc:4,pct:57},{p:'nov/25',ok:5,nc:8,pct:62},{p:'dez/25',ok:11,nc:13,pct:54},{p:'jan/26',ok:16,nc:0,pct:0}]
+  },
+  mdrInst:{
+    s:[{p:'2015',e:7.3,k:5.6,a:3.4},{p:'2016',e:9.8,k:6.5,a:4.9},{p:'2017',e:12.6,k:7.2,a:6.0},{p:'2018',e:23.8,k:10.8,a:12.1},{p:'2019',e:21.0,k:10.3,a:11.4},{p:'2020',e:37.5,k:24.5,a:8.0},{p:'2021',e:28.3,k:27.1,a:32.5},{p:'2022',e:30.0,k:12.0,a:22.0},{p:'2023',e:31.4,k:9.9,a:12.9},{p:'2024',e:51.5,k:16.0,a:25.0},{p:'2025',e:55,k:3,a:13}],
+    max:{e:37,k:11,a:10}
+  },
+  abio:{
+    gnCols:['Amicacina','Ampi/Sul','Cefepime','Ceftriaxona','Cipro','Gentamicina','Meropenem','Nitrofurantoína','Fosfomicina','Pip/Tazo','Polimixina B'],
+    gn:[{o:'Acinetobacter',vs:[8,null,null,null,0,null,0,null,null,0,100]},{o:'Citrobacter',vs:[100,null,100,80,65,100,100,100,100,100,null]},{o:'Enterobacter',vs:[100,null,95,75,87,98,100,89,96,85,null]},{o:'E. coli',vs:[99,84,81,83,70,87,99,99,100,83,100]},{o:'Klebsiella',vs:[99,43,45,45,42,68,79,90,93,45,78]},{o:'Morganella',vs:[100,50,50,50,83,100,100,null,null,50,null]},{o:'Proteus',vs:[99,75,87,87,96,77,100,null,96,76,null]},{o:'Pseudomonas',vs:[100,null,50,null,83,null,91,null,null,31,100]},{o:'Serratia',vs:[100,null,91,89,91,74,95,null,null,90,null]}],
+    gpCols:['Ampicilina','Oxacilina','Eritromicina','Clindamicina','Levofloxacina','Genta HLR','SMT/TMP','Vancomicina','Linezolida','Daptomicina'],
+    gp:[{o:'S. aureus',vs:[null,57,29,48,76,84,97,100,100,93]},{o:'S. coag-neg',vs:[null,19,17,33,null,38,34,100,100,98]},{o:'E. faecalis',vs:[100,null,null,null,100,null,null,100,100,null]},{o:'E. faecium',vs:[0,null,null,null,0,null,null,100,100,null]}]
+  }
+};
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+function makeTip(unit){
+  return function T(p){
+    if(!p.active||!p.payload||!p.payload.length) return null;
+    return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
+      padding:'8px 12px',fontSize:12,boxShadow:'0 2px 8px rgba(0,0,0,0.12)'}},
+      h('div',{style:{color:LIGHT,fontSize:10,marginBottom:4,fontWeight:500}},p.label),
+      p.payload.map(function(pt,i){
+        if(pt.value==null) return null;
+        var name=pt.name&&pt.name!=='v'?pt.name+': ':'';
+        var val=typeof pt.value==='number'?pt.value.toFixed(2):pt.value;
+        return h('div',{key:i,style:{color:pt.color||NAVY,
+          fontFamily:"'IBM Plex Mono',monospace",fontWeight:600,fontSize:11}},
+          name+val+(unit||''));
+      })
+    );
+  };
+}
+
+// ── BarS with per-point thresholds ────────────────────────────────────────────
+function BarS(props){
+  var data=props.data,title=props.title,unit=props.unit||'';
+  var badge=props.badge,maxY=props.maxY,refY=props.refY,refLbl=props.refLbl;
+  var ht=props.h||160,note=props.note;
+  var hasLim=data.some(function(d){return d.lMin!=null||d.lMax!=null;});
+
+  return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+    padding:'14px 14px 8px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}},
+      h('span',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+        color:NAVY,maxWidth:'75%',lineHeight:1.35}},title),
+      badge?h('span',{style:{background:'#e8f5e9',color:GREEN,fontSize:8,fontWeight:600,
+        letterSpacing:.5,padding:'2px 7px',borderRadius:4,border:'1px solid '+GREEN+'44',
+        whiteSpace:'nowrap'}},badge):null
+    ),
+    h(RCont,{width:'100%',height:ht},
+      h(ComposedChart,{data:data,margin:{top:4,right:4,left:-28,bottom:0}},
+        h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
+        h(XAxis,{dataKey:'p',tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,domain:[0,maxY||'auto']}),
+        h(RCTip,{content:makeTip(unit)}),
+        refY!=null?h(RefLine,{y:refY,stroke:AMBER,strokeDasharray:'4 2',strokeWidth:1,
+          label:{value:refLbl||'',fill:AMBER,fontSize:7,position:'insideTopRight'}}):null,
+        h(Bar,{dataKey:'v',radius:[3,3,0,0]},
+          data.map(function(d,i){return h(Cell,{key:i,fill:d.c?CURR:HIST,opacity:d.c?1:.7});})),
+        hasLim?h(Line,{type:'linear',dataKey:'lMax',stroke:RED,strokeDasharray:'5 3',
+          strokeWidth:1.5,dot:false,connectNulls:false,legendType:'none'}):null,
+        hasLim?h(Line,{type:'linear',dataKey:'lMin',stroke:GREEN,strokeDasharray:'5 3',
+          strokeWidth:1.5,dot:false,connectNulls:false,legendType:'none'}):null
+      )
+    ),
+    note?h('div',{style:{fontSize:8,color:MUTED,marginTop:3,
+      fontFamily:"'IBM Plex Mono',monospace"}},note):null
+  );
+}
+
+// ── LineMDR ───────────────────────────────────────────────────────────────────
+function LineMDR(props){
+  var title=props.title,data=props.data,maxE=props.maxE,maxK=props.maxK,maxA=props.maxA,ht=props.h||200;
+  return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+    padding:'14px 14px 8px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+    h('span',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+      color:NAVY,display:'block',marginBottom:10}},title),
+    h(RCont,{width:'100%',height:ht},
+      h(LineChart,{data:data,margin:{top:4,right:12,left:-28,bottom:0}},
+        h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
+        h(XAxis,{dataKey:'p',tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(RCTip,{content:makeTip('/mil pd')}),
+        h(Legend,{iconSize:7,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:4}}),
+        maxE!=null?h(RefLine,{y:maxE,stroke:GREEN,strokeDasharray:'4 2',strokeWidth:1}):null,
+        maxK!=null?h(RefLine,{y:maxK,stroke:RED,strokeDasharray:'4 2',strokeWidth:1}):null,
+        maxA!=null?h(RefLine,{y:maxA,stroke:BLUE,strokeDasharray:'4 2',strokeWidth:1}):null,
+        h(Line,{type:'monotone',dataKey:'e',name:'ESBL',stroke:GREEN,strokeWidth:2,
+          dot:{r:2.5,fill:GREEN},activeDot:{r:4},connectNulls:false}),
+        h(Line,{type:'monotone',dataKey:'k',name:'KPC',stroke:RED,strokeWidth:2,
+          dot:{r:2.5,fill:RED},activeDot:{r:4},connectNulls:false}),
+        h(Line,{type:'monotone',dataKey:'a',name:'Acinetobacter',stroke:BLUE,strokeWidth:2,
+          dot:{r:2.5,fill:BLUE},activeDot:{r:4},connectNulls:false})
+      )
+    ),
+    h('div',{style:{fontSize:8,color:MUTED,marginTop:3}},
+      'Tracejado = limiar de endemicidade · Clopper-Pearson')
+  );
+}
+
+// ── AuditCard ─────────────────────────────────────────────────────────────────
+function AuditCard(props){
+  var d=props.data;
+  var pct=d.pct!=null?d.pct:Math.round(d.nc/Math.max(1,d.ok+d.nc)*100);
+  var col=pct===0?TEAL:pct<15?GREEN:pct<30?AMBER:RED;
+  return h('div',{style:{background:WHITE,border:'1px solid '+(pct>20?col:BRDR),
+    borderRadius:8,padding:16,boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
+      h('span',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,color:NAVY}},
+        'Auditoria — Inserção de CVC'),
+      h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:22,fontWeight:700,color:col}},
+        pct+'% NC')
+    ),
+    h('div',{style:{height:8,borderRadius:4,overflow:'hidden',display:'flex',gap:2}},
+      h('div',{style:{flex:Math.max(d.ok,0.01),background:TEAL,opacity:.8,borderRadius:4}}),
+      d.nc>0?h('div',{style:{flex:d.nc,background:col,borderRadius:4}}):null
+    ),
+    h('div',{style:{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:9,
+      color:MUTED,fontFamily:"'IBM Plex Mono',monospace"}},
+      h('span',{style:{color:TEAL}},'✓ '+d.ok+' conformes'),
+      h('span',{style:{color:col}},d.nc+' não-conformes')
+    )
+  );
+}
+
+// ── SH section header ─────────────────────────────────────────────────────────
+function SH(props){
+  return h('div',{style:{fontSize:9,color:SLATE,letterSpacing:1,fontWeight:600,
+    textTransform:'uppercase',margin:'14px 0 6px',paddingBottom:4,
+    borderBottom:'1px solid '+BRDR,display:'flex',alignItems:'center',gap:8}},
+    h('span',{style:{width:3,height:12,background:BLUE,display:'inline-block',borderRadius:2}}),
+    props.t);
+}
+
+// ── LimLegenda ────────────────────────────────────────────────────────────────
+function LimLegenda(){
+  return h('div',{style:{display:'flex',gap:14,padding:'6px 12px',background:'#f8f9fa',
+    borderRadius:6,border:'1px solid '+BRDR,marginBottom:12,fontSize:8,
+    color:MUTED,alignItems:'center',flexWrap:'wrap'}},
+    h('span',{style:{color:SLATE,fontWeight:600}},'Limiares Poisson/Bin-Neg:'),
+    h('span',{style:{color:RED,display:'flex',alignItems:'center',gap:4}},
+      h('span',{style:{display:'inline-block',width:18,height:0,borderTop:'1.5px dashed '+RED}}),
+      'Máximo previsto'),
+    h('span',{style:{color:GREEN,display:'flex',alignItems:'center',gap:4}},
+      h('span',{style:{display:'inline-block',width:18,height:0,borderTop:'1.5px dashed '+GREEN}}),
+      'Mínimo previsto'),
+    h('span',{style:{fontStyle:'italic'}},'Quebra = mês sem dado')
+  );
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+function OverviewSection(props){
+  var D=props.D;
+  var curr=D.global.taxaIH.filter(function(d){return d.c;})[0];
+  var mdrLast=D.mdrInst.s[D.mdrInst.s.length-1];
+  var kpis=[
+    {l:'Taxa IH Global',v:curr?curr.v.toFixed(2)+'%':'—',ok:true,s:'Endêmica'},
+    {l:'ESBL Institucional',v:mdrLast.e+'/mil pd',ok:mdrLast.e<=D.mdrInst.max.e,s:'Limiar: '+D.mdrInst.max.e},
+    {l:'KPC Institucional',v:mdrLast.k+'/mil pd',ok:mdrLast.k<=D.mdrInst.max.k,s:'Limiar: '+D.mdrInst.max.k},
+    {l:'UTI A/B — CVC NC',v:D.utiAB.audit.pct+'%',ok:D.utiAB.audit.pct===0,s:'Auditoria'}
+  ];
+  return h('div',{className:'fi'},
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:14}},
+      kpis.map(function(k,i){
+        return h('div',{key:i,style:{background:WHITE,border:'1px solid '+(k.ok?BRDR:AMBER),
+          borderRadius:8,padding:'14px 16px',position:'relative',overflow:'hidden',
+          boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+          k.ok?null:h('div',{style:{position:'absolute',top:0,left:0,width:'100%',height:3,background:AMBER}}),
+          h('div',{style:{fontSize:9,color:SLATE,marginBottom:4}},k.l),
+          h('div',{style:{fontSize:24,fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,
+            color:k.ok?TEAL:AMBER,lineHeight:1}},k.v),
+          h('div',{style:{fontSize:8,color:k.ok?TEAL:AMBER,marginTop:5,fontWeight:600}},k.s)
+        );
+      })
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
+      h(BarS,{title:'Taxa de Infecção Hospitalar Global — HUSF',data:D.global.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:14,h:190}),
+      h(LineMDR,{title:'MDR Institucional (/1000 pac-dia)',data:D.mdrInst.s,maxE:D.mdrInst.max.e,maxK:D.mdrInst.max.k,maxA:D.mdrInst.max.a,h:190})
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
+      h(BarS,{title:'Taxa IH — Clínica Médica',data:D.clinicaMedica.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8}),
+      h(BarS,{title:'Taxa IH — Clínica Cirúrgica',data:D.clinicaCirurgica.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8}),
+      h(BarS,{title:'Taxa IH — EPM / Apartamentos',data:D.epm.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8})
+    )
+  );
+}
+
+function UtiSection(props){
+  var D=props.D,ud=D[props.u];
+  return h('div',{className:'fi'},
+    h(LimLegenda),
+    h(SH,{t:'IrAS — Densidade (/1000 dispositivo-dia)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
+      h(BarS,{title:'PAV (/1000 VM-dia)',data:ud.pav,maxY:35}),
+      h(BarS,{title:'ITU Relacionada a SVD (/1000 SVD-dia)',data:ud.itu,maxY:14}),
+      h(BarS,{title:'IPCS Laboratorial — CVC (/1000 CVC-dia)',data:ud.ipcs,maxY:40})
+    ),
+    h(SH,{t:'Utilização de Dispositivos (%)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
+      h(BarS,{title:'SVD',data:ud.svd,unit:'%',maxY:100}),
+      h(BarS,{title:'CVC',data:ud.cvc,unit:'%',maxY:100}),
+      h(BarS,{title:'TOT / TQT',data:ud.tot,unit:'%',maxY:100})
+    ),
+    h(SH,{t:'Consumo de Antimicrobianos (DDD/1000 pac-dia)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+      h(BarS,{title:'Pip/Tazo',data:ud.dddPip,maxY:300}),
+      h(BarS,{title:'Carbapenêmicos',data:ud.dddCarba,maxY:400}),
+      h(BarS,{title:'Glicopeptídeos',data:ud.dddGlico,maxY:320}),
+      h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200})
+    ),
+    h(SH,{t:'MDR · Clopper-Pearson'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:10}},
+      h(LineMDR,{title:'MDR — Densidade (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
+      h(BarS,{title:'Higiene das Mãos (ml/pac-dia)',data:ud.hm,refY:20,refLbl:'OMS',unit:'ml',maxY:80,h:175,note:'OMS ≥ 20 ml/pac-dia'})
+    ),
+    h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
+      (function(){
+        var auditData=(ud.auditSeries||[]).map(function(a){return {p:a.p,v:a.pct,c:a.c};});
+        return auditData.length>0?h(BarS,{title:'% Não-conformes por Mês',data:auditData,unit:'%',maxY:100,h:180}):null;
+      })(),
+      (function(){
+        var as=ud.auditSeries;
+        var lastAudit=as&&as.length?as[as.length-1]:ud.audit;
+        return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,padding:16,
+          boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+          h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+            color:NAVY,marginBottom:10}},'Última competência'),
+          h('div',{style:{fontSize:9,color:MUTED,marginBottom:4}},lastAudit.p||'—'),
+          h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:6}},
+            h('span',{style:{fontSize:11,color:SLATE}},'Conformes'),
+            h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:18,fontWeight:700,color:TEAL}},lastAudit.ok)
+          ),
+          h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:10}},
+            h('span',{style:{fontSize:11,color:SLATE}},'Não-conformes'),
+            h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:18,fontWeight:700,
+              color:lastAudit.pct>50?RED:lastAudit.pct>30?AMBER:GREEN}},lastAudit.nc)
+          ),
+          h('div',{style:{height:8,borderRadius:4,overflow:'hidden',display:'flex'}},
+            h('div',{style:{flex:Math.max(lastAudit.ok,0.01),background:TEAL,opacity:.8,borderRadius:4}}),
+            lastAudit.nc>0?h('div',{style:{flex:lastAudit.nc,background:RED,opacity:.7,borderRadius:4,marginLeft:2}}):null
+          ),
+          h('div',{style:{fontSize:8,color:MUTED,marginTop:6}},lastAudit.pct+'% não-conformidade')
+        );
+      })()
+    )
+  );
+}
+
+function UtiNeoSection(props){
+  var D=props.D,neo=D.utiNeo;
+  var auditData=(neo.auditSeries||[]).map(function(a){return {p:a.p,v:a.pct};});
+  var lastAudit=neo.auditSeries?neo.auditSeries[neo.auditSeries.length-1]:neo.audit;
+  return h('div',{className:'fi'},
+    h(LimLegenda),
+    h(SH,{t:'IrAS — IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)'}),
+    h(BarS,{title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',data:neo.ipcs,maxY:55,h:220}),
+    h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
+      auditData.length>0?h(BarS,{title:'% Não-conformes por Mês',data:auditData,unit:'%',maxY:100,h:180}):null,
+      h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,padding:16,
+        boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+        h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+          color:NAVY,marginBottom:10}},'Última competência registrada'),
+        h('div',{style:{fontSize:9,color:MUTED,marginBottom:4}},lastAudit.p||'dez/25'),
+        h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:6}},
+          h('span',{style:{fontSize:11,color:SLATE}},'Conformes'),
+          h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:18,fontWeight:700,color:TEAL}},lastAudit.ok)
+        ),
+        h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:10}},
+          h('span',{style:{fontSize:11,color:SLATE}},'Não-conformes'),
+          h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:18,fontWeight:700,
+            color:lastAudit.pct>50?RED:lastAudit.pct>30?AMBER:GREEN}},lastAudit.nc)
+        ),
+        h('div',{style:{height:8,borderRadius:4,overflow:'hidden',display:'flex'}},
+          h('div',{style:{flex:Math.max(lastAudit.ok,0.01),background:TEAL,opacity:.8,borderRadius:4}}),
+          lastAudit.nc>0?h('div',{style:{flex:lastAudit.nc,
+            background:lastAudit.pct>50?RED:lastAudit.pct>30?AMBER:GREEN,borderRadius:4}}):null
+        ),
+        h('div',{style:{textAlign:'right',marginTop:6,fontFamily:"'IBM Plex Mono',monospace",
+          fontSize:20,fontWeight:700,
+          color:lastAudit.pct>50?RED:lastAudit.pct>30?AMBER:GREEN}},
+          lastAudit.pct+'% NC')
+      )
+    )
+  );
+}
+
+function HdSection(props){
+  var D=props.D;
+  var hasAccess=(D.hd.ilavTemp&&D.hd.ilavTemp.length>0)||(D.hd.ilavPerm&&D.hd.ilavPerm.length>0);
+  return h('div',{className:'fi'},
+    h(SH,{t:'Infecções Relacionadas ao Cateter de Hemodiálise · Clopper-Pearson'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
+      h(BarS,{title:'ILAV — Infecção Local/Externa · Total (/1000 cat-dia)',data:D.hd.ilav,badge:'ENDÊMICA',maxY:35}),
+      h(BarS,{title:'Bacteremia / ICS · Total (/1000 cat-dia)',data:D.hd.bact,badge:'ENDÊMICA',maxY:35})
+    ),
+    hasAccess?h('div',null,
+      h(SH,{t:'Por Tipo de Acesso · /1000 cat-dia · Cateter Temporário vs Permanente'}),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
+        h(BarS,{title:'ILAV · Cateter Temporário (/1000 cat-dia)',
+          data:D.hd.ilavTemp||[],
+          note:'Cateter não-tunelizado',maxY:20}),
+        h(BarS,{title:'ILAV · Cateter Permanente (/1000 cat-dia)',
+          data:D.hd.ilavPerm||[],
+          note:'Cateter tunelizado',maxY:20})
+      ),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
+        h(BarS,{title:'Bacteremia · Cateter Temporário (/1000 cat-dia)',
+          data:D.hd.bactTemp||[],
+          note:'Cateter não-tunelizado',maxY:35}),
+        h(BarS,{title:'Bacteremia · Cateter Permanente (/1000 cat-dia)',
+          data:D.hd.bactPerm||[],
+          note:'Cateter tunelizado',maxY:35})
+      )
+    ):null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
+      h(BarS,{title:'Pacientes em uso de Vancomicina (%)',data:D.hd.vanco,unit:'%',maxY:20}),
+      D.hd.cvc3m?h(BarS,{title:'Cateter Rígido > 3 meses (/1000 cat-dia)',data:D.hd.cvc3m,maxY:8}):null
+    ),
+    h(AuditCard,{data:D.hd.audit})
+  );
+}
+
+function DiarreiaSection(props){
+  var D=props.D;
+  var dd=D.diarreia||{};
+
+  var DUNITS=[
+    {key:'utiab',label:'UTI A/B',    color:RED},
+    {key:'utic', label:'UTI C',      color:PURPLE},
+    {key:'cm',   label:'Cl. Médica', color:BLUE},
+    {key:'cc',   label:'Cl. Cirúrgica',color:GREEN},
+    {key:'epm',  label:'EPM / Apto', color:AMBER},
+  ];
+
+  // Build timeline from the cm series (longest/most complete)
+  var ref=dd.cm||[];
+  if(!ref.length) return h('div',{className:'fi'},h('div',{style:{color:MUTED,padding:24,fontSize:12}},'Sem dados de diarreia disponíveis.'));
+
+  var lastLbl=(ref[ref.length-1]||{}).p||'';
+  var currYr=(lastLbl.split('/')[1])||'';
+
+  var allLabels=ref.map(function(pt){return pt.p;});
+
+  var chartData=allLabels.map(function(lbl){
+    var ptYr=(lbl.split('/')[1])||'';
+    var prev=ptYr!==currYr;
+    var row={m:lbl,prev:prev};
+    DUNITS.forEach(function(u){
+      var series=dd[u.key]||[];
+      var pt=series.find(function(s){return s.p===lbl;})||{};
+      var v=pt.v!=null?pt.v:null;
+      row[u.key]=v;
+      row[u.key+'_prev']=prev?v:null;
+      row[u.key+'_curr']=!prev?v:null;
+      // Share boundary point so lines connect across year boundary
+      var prevPt=allLabels.indexOf(lbl)>0&&allLabels[allLabels.indexOf(lbl)-1];
+      if(!prev&&prevPt&&(prevPt.split('/')[1])!==currYr) row[u.key+'_prev']=v;
+    });
+    return row;
+  });
+
+  var pvFirst=null,pvLast=null;
+  chartData.forEach(function(d){if(d.prev){if(!pvFirst)pvFirst=d.m;pvLast=d.m;}});
+
+  // KPI strip — latest value per unit
+  var kpis=DUNITS.map(function(u){
+    var series=dd[u.key]||[];
+    var curr=null,currLbl='—';
+    for(var i=series.length-1;i>=0;i--){
+      if(series[i].v!=null){curr=series[i].v;currLbl=series[i].p;break;}
+    }
+    var prev=null;
+    var ci=series.findIndex(function(s){return s.v===curr&&s.p===currLbl;});
+    for(var j=ci-1;j>=0;j--){
+      if(series[j].v!=null){prev=series[j].v;break;}
+    }
+    var trend=curr===null?'—':prev===null?'→':curr>prev?'↑':curr<prev?'↓':'→';
+    return {u:u,curr:curr,currLbl:currLbl,trend:trend};
+  });
+
+  function makeTipDiarr(){
+    return function T(p){
+      if(!p.active||!p.payload||!p.payload.length) return null;
+      var items=p.payload.filter(function(x){return x.value!=null&&x.value>0;})
+        .sort(function(a,b){return b.value-a.value;});
+      if(!items.length) return null;
+      return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
+        padding:'10px 14px',fontSize:12,boxShadow:'0 2px 8px rgba(0,0,0,0.12)',minWidth:180}},
+        h('div',{style:{color:LIGHT,fontSize:10,marginBottom:6}},'Diarreia /1000 pac-dia · '+p.label),
+        items.map(function(it,i){
+          return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',gap:14,marginBottom:2}},
+            h('span',{style:{color:SLATE,fontSize:11}},it.name),
+            h('span',{style:{color:it.color,fontFamily:"'IBM Plex Mono',monospace",fontSize:11,fontWeight:700}},
+              it.value.toFixed(2))
+          );
+        })
+      );
+    };
+  }
+
+  return h('div',{className:'fi'},
+    // KPI strip
+    h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}},
+      kpis.map(function(k,i){
+        var ok=k.curr==null||k.curr<20;
+        return h('div',{key:i,style:{background:WHITE,border:'1px solid '+(ok?BRDR:k.u.color+'55'),
+          borderRadius:8,padding:'10px 14px',flex:'1',minWidth:120,
+          boxShadow:ok?'0 1px 3px rgba(0,0,0,0.06)':'0 2px 8px '+k.u.color+'22',
+          position:'relative',overflow:'hidden'}},
+          h('div',{style:{position:'absolute',top:0,left:0,width:'100%',height:3,background:k.u.color}}),
+          h('div',{style:{fontSize:9,color:SLATE,marginBottom:4,marginTop:2}},k.u.label),
+          h('div',{style:{display:'flex',alignItems:'baseline',gap:6}},
+            k.curr!=null
+              ?h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:26,fontWeight:700,
+                  color:ok?NAVY:k.u.color,lineHeight:1}},k.curr.toFixed(1))
+              :h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:26,color:MUTED}},'—'),
+            k.trend!=='—'?h('span',{style:{fontSize:14,fontWeight:700,
+              color:k.trend==='↑'?RED:k.trend==='↓'?GREEN:MUTED}},k.trend):null
+          ),
+          h('div',{style:{fontSize:8,color:MUTED,marginTop:4}},k.currLbl+' · /1000 pac-dia')
+        );
+      })
+    ),
+    // Line chart
+    h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+      padding:'16px 16px 10px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)',marginBottom:12}},
+      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+        color:NAVY,marginBottom:4}},'Densidade de Incidência de Diarreia Hospitalar (/1000 pac-dia)'),
+      h('div',{style:{fontSize:8,color:MUTED,marginBottom:12}},
+        'Vigilância iniciada em jun/2025 · diarreia instalada ≥48h após admissão em paciente previamente sem diarreia'),
+      h(RCont,{width:'100%',height:300},
+        h(ComposedChart,{data:chartData,margin:{top:8,right:12,left:-20,bottom:0}},
+          h(CartGrid,{strokeDasharray:'2 4',stroke:GRID,vertical:false}),
+          pvFirst?h(RefArea,{x1:pvFirst,x2:pvLast,fill:'#f0f2f5',fillOpacity:0.7,stroke:'none'}):null,
+          pvLast?h(RefLine,{x:pvLast,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1.2,
+            label:{value:'2026',fill:'#9eaab8',fontSize:8,position:'insideTopRight'}}):null,
+          h(XAxis,{dataKey:'m',tick:{fill:LIGHT,fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+          h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,allowDecimals:true}),
+          h(RCTip,{content:makeTipDiarr()}),
+          h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:6}}),
+          DUNITS.map(function(u){
+            return [
+              h(Line,{key:u.key+'_p',type:'monotone',dataKey:u.key+'_prev',
+                stroke:u.color,strokeWidth:1.5,strokeOpacity:0.25,
+                dot:false,connectNulls:true,legendType:'none',name:undefined}),
+              h(Line,{key:u.key+'_c',type:'monotone',dataKey:u.key+'_curr',
+                stroke:u.color,strokeWidth:2,strokeOpacity:1,
+                dot:{r:3,fill:u.color,stroke:WHITE,strokeWidth:1.5},
+                connectNulls:true,legendType:'plainline',name:u.label,
+                activeDot:{r:5,fill:u.color,stroke:WHITE,strokeWidth:2}})
+            ];
+          }).reduce(function(a,b){return a.concat(b);})
+        )
+      )
+    )
+  );
+}
+
+function ClinicaSection(props){
+  var D=props.D,which=props.which;
+  var labels={clinicaMedica:'Clínica Médica',clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos'};
+  var cd=D[which];
+  return h('div',{className:'fi'},
+    h(BarS,{title:'Taxa IH — '+labels[which],data:cd.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8,h:280})
+  );
+}
+
+function MdrInstSection(props){
+  var D=props.D,s=D.mdrInst.s;
+  var last=s[s.length-1],prev=s[s.length-2];
+  var items=[{l:'ESBL',k:'e',col:GREEN},{l:'KPC',k:'k',col:RED},{l:'Acinetobacter MDR',k:'a',col:BLUE}];
+  return h('div',{className:'fi'},
+    h(LineMDR,{title:'Densidade de Incidência de Bactérias MDR — HUSF (/1000 pac-dia)',
+      data:D.mdrInst.s,maxE:D.mdrInst.max.e,maxK:D.mdrInst.max.k,maxA:D.mdrInst.max.a,h:280}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginTop:12}},
+      items.map(function(item,i){
+        var val=last[item.k],tr=val>prev[item.k]?'↑':val<prev[item.k]?'↓':'→';
+        var ok=val<=D.mdrInst.max[item.k];
+        return h('div',{key:i,style:{background:WHITE,border:'1px solid '+(ok?BRDR:item.col+'55'),
+          borderRadius:8,padding:'16px 18px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+          h('div',{style:{fontSize:9,color:SLATE,marginBottom:6}},item.l),
+          h('div',{style:{display:'flex',alignItems:'baseline',gap:7}},
+            h('span',{style:{fontSize:30,fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,color:item.col}},val),
+            h('span',{style:{fontSize:16,color:item.col,fontWeight:700}},tr)
+          ),
+          h('div',{style:{fontSize:8,color:MUTED,marginTop:4}},'Limiar: '+D.mdrInst.max[item.k]+'/mil pd'),
+          h('div',{style:{fontSize:9,marginTop:3,color:ok?TEAL:AMBER,fontWeight:600}},ok?'✓ Endêmico':'⚠ Acima do limiar')
+        );
+      })
+    )
+  );
+}
+
+function AbioSection(props){
+  var D=props.D;
+  function cc(v){
+    if(v==null) return {bg:'transparent',c:MUTED,t:'—'};
+    if(v>=90)   return {bg:'#e8f5e9',c:GREEN,t:v+'%'};
+    if(v>=70)   return {bg:'#f1f8e9',c:'#558b2f',t:v+'%'};
+    if(v>=50)   return {bg:'#fff3e0',c:AMBER,t:v+'%'};
+    return {bg:'#ffebee',c:RED,t:v+'%'};
+  }
+  function Tbl(tp){
+    return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+      padding:16,overflowX:'auto',marginBottom:12,boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+      h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:12,fontWeight:600,
+        color:NAVY,marginBottom:12}},tp.title),
+      h('table',{style:{borderCollapse:'collapse',width:'100%',fontSize:10,minWidth:580}},
+        h('thead',{},h('tr',{},
+          [h('th',{key:'o',style:{textAlign:'left',padding:'5px 10px',color:SLATE,fontWeight:600,
+            borderBottom:'1px solid '+BRDR,minWidth:120,background:'#f8f9fa'}}, 'Organismo')]
+          .concat(tp.cols.map(function(c,i){
+            return h('th',{key:i,style:{padding:'5px 5px',color:SLATE,fontWeight:600,
+              borderBottom:'1px solid '+BRDR,textAlign:'center',fontSize:8,
+              whiteSpace:'nowrap',background:'#f8f9fa'}},c);
+          }))
+        )),
+        h('tbody',{},tp.rows.map(function(row,ri){
+          return h('tr',{key:ri,style:{background:ri%2===0?'transparent':'#fafbfc'}},
+            [h('td',{key:'o',style:{padding:'6px 10px',color:NAVY,
+              fontFamily:"'IBM Plex Mono',monospace",fontSize:10,
+              borderBottom:'1px solid '+BRDR+'33'}},row.o)]
+            .concat(row.vs.map(function(v,ci){
+              var r=cc(v);
+              return h('td',{key:ci,style:{padding:'5px 4px',textAlign:'center',
+                background:r.bg,color:r.c,fontFamily:"'IBM Plex Mono',monospace",
+                fontSize:10,fontWeight:v!=null?600:400,
+                borderBottom:'1px solid '+BRDR+'22'}},r.t);
+            }))
+          );
+        }))
+      ),
+      h('div',{style:{marginTop:8,display:'flex',gap:14,fontSize:8,color:MUTED}},
+        h('span',{style:{color:GREEN}},'■ ≥90%'),h('span',{style:{color:'#558b2f'}},'■ 70–89%'),
+        h('span',{style:{color:AMBER}},'■ 50–69%'),h('span',{style:{color:RED}},'■ <50%'),
+        h('span',{},'— não testado')
+      )
+    );
+  }
+  return h('div',{className:'fi'},
+    h(Tbl,{title:'Gram-Negativos — Sensibilidade (%)',cols:D.abio.gnCols,rows:D.abio.gn}),
+    h(Tbl,{title:'Gram-Positivos — Sensibilidade (%)',cols:D.abio.gpCols,rows:D.abio.gp})
+  );
+}
+
+
+// ── Methodology footer ────────────────────────────────────────────────────────
+function MetodFooter(){
+  var items=[
+    {icon:'◎', label:'Endemicidade global e HD',
+     text:'Analisado mensalmente por teste binomial exato de Clopper-Pearson. Limiar de endemicidade definido pelo intervalo de confiança de 95% calculado sobre biênio de referência fixo.'},
+    {icon:'◈', label:'Dispositivos, DDDs e IrAS com thresholds',
+     text:'Analisado mensalmente por modelo de regressão multivariada binomial negativa ou de Poisson, a depender da frequência de desfechos observada. Limiares de mínimo e máximo previstos derivados do intervalo de predição de 95% do modelo ajustado sobre série histórica.'},
+    {icon:'⬡', label:'Bactérias Multirresistentes — institucional',
+     text:'Analisado mensalmente por modelo de regressão multivariada de Poisson com teste de tendência de Cochran-Armitage. Limiar de endemicidade por Clopper-Pearson sobre biênio base.'},
+    {icon:'✦', label:'Status epidemiológico',
+     text:'Endêmico = dentro dos limiares previstos pelo modelo. Alerta supraendêmico = acima do limiar máximo. Atividade excepcional = aumento sustentado por ≥ 3 competências consecutivas acima do limiar.'}
+  ];
+  return h('div',{style:{marginTop:24,borderTop:'1px solid #d0d7de',paddingTop:14}},
+    h('div',{style:{fontSize:9,color:'#8898aa',fontWeight:600,letterSpacing:1,
+      textTransform:'uppercase',marginBottom:10}},'Notas metodológicas'),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+      items.map(function(it,i){
+        return h('div',{key:i,style:{background:'#fafbfc',border:'1px solid #d0d7de',
+          borderRadius:6,padding:'10px 12px',display:'flex',gap:10,alignItems:'flex-start'}},
+          h('span',{style:{fontSize:12,color:'#b0bec5',flexShrink:0,marginTop:1}},it.icon),
+          h('div',{},
+            h('div',{style:{fontSize:9,fontWeight:600,color:'#4a5568',marginBottom:3}},it.label),
+            h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},it.text)
+          )
+        );
+      })
+    )
+    ,
+    h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
+      display:'flex',justifyContent:'space-between',alignItems:'center',
+      flexWrap:'wrap',gap:8}},
+      h('div',{style:{fontSize:9,color:'#8898aa',lineHeight:1.6}},
+        h('span',{style:{fontWeight:600,color:'#4a5568'}},'Autoria · '),
+        'Sistema de interface desenvolvido por Dr. Leandro Mendes · ',
+        'Análises epidemiológicas e estatísticas realizadas por Dr. Leandro Mendes'
+      ),
+      h('div',{style:{fontSize:8,color:'#b0bec5',fontFamily:"'IBM Plex Mono',monospace"}},
+        'SCIH/CCIH · HUSF · Bragança Paulista')
+    )
+  );
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+var NAV=[
+  {id:'overview',l:'Visão Geral',g:'Institucional',ic:'◈'},
+  {id:'mdrInst',l:'Multirresistentes',g:'Institucional',ic:'⬡'},
+  {id:'abio',l:'Antibiograma',g:'Institucional',ic:'⬟'},
+  {id:'utiAB',l:'UTI A/B',g:'Unidades Críticas',ic:'▣'},
+  {id:'utic',l:'UTI C',g:'Unidades Críticas',ic:'▣'},
+  {id:'utiNeo',l:'UTI Neonatal',g:'Unidades Críticas',ic:'◉'},
+  {id:'hd',l:'Hemodiálise',g:'Unidades Críticas',ic:'◈'},
+  {id:'clinicaMedica',l:'Clínica Médica',g:'Enfermarias',ic:'▤'},
+  {id:'clinicaCirurgica',l:'Clínica Cirúrgica',g:'Enfermarias',ic:'▤'},
+  {id:'epm',l:'EPM / Apartamentos',g:'Enfermarias',ic:'▤'},
+  {id:'diarreia',l:'Diarreia Hospitalar',g:'Vigilâncias Especiais',ic:'◎'}
+];
+var TITLES={overview:'Visão Geral — IrAS & MDR',mdrInst:'Multirresistentes — Institucional',
+  abio:'Antibiograma Institucional',utiAB:'UTI A/B',utic:'UTI C',
+  utiNeo:'UTI Neonatal',hd:'Hemodiálise / Nefrologia',clinicaMedica:'Clínica Médica',
+  clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos',
+  diarreia:'Diarreia Hospitalar'};
+var groups=NAV.reduce(function(acc,n){if(n.g&&acc.indexOf(n.g)===-1)acc.push(n.g);return acc;},[]);
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App(){
+  var s1=useState('overview'); var active=s1[0],setActive=s1[1];
+  var s2=useState(null);       var D=s2[0],setD=s2[1];
+  var s3=useState(true);       var loading=s3[0],setLoading=s3[1];
+
+  useEffect(function(){
+    setD(FB); setLoading(false);
+    fetch('./data_iras.json?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        // ── Helper: merge FB points missing from JSON series by label ──────────
+        function mergeFBPoints(jsArr, fbArr) {
+          if(!Array.isArray(jsArr)||!Array.isArray(fbArr)) return jsArr;
+          var jsLabels={};
+          jsArr.forEach(function(pt){ jsLabels[pt.p]=true; });
+          var missing=fbArr.filter(function(pt){ return !pt.c&&!jsLabels[pt.p]; });
+          if(!missing.length) return jsArr;
+          // Insert missing FB points in chronological position
+          var combined=missing.concat(jsArr);
+          // Sort: annual (4-digit) before monthly (mmm/yy), then by year/month
+          var MO=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+          combined.sort(function(a,b){
+            function rank(p){
+              if(/^\d{4}$/.test(p)) return parseInt(p)*100-1;
+              var parts=p.split('/');
+              return (2000+parseInt(parts[1]))*100+MO.indexOf(parts[0]);
+            }
+            return rank(a.p)-rank(b.p);
+          });
+          return combined;
+        }
+
+        // ── Restore lMin/lMax from FB + add missing FB points ─────────────────
+        var MERGE_SERIES={
+          utiAB:['svd','cvc','tot','pav','itu','ipcs','dddPip','dddCarba','dddGlico','dddPoli','hm'],
+          utic: ['svd','cvc','tot','pav','itu','ipcs','dddPip','dddCarba','dddGlico','dddPoli','hm'],
+          utiNeo:['ipcs'],
+          hd:['ilav','bact','vanco'],
+          clinicaMedica:['taxaIH'],
+          clinicaCirurgica:['taxaIH'],
+          epm:['taxaIH'],
+          global:['taxaIH']
+        };
+        Object.keys(MERGE_SERIES).forEach(function(unit){
+          if(!d[unit]||!FB[unit]) return;
+          MERGE_SERIES[unit].forEach(function(key){
+            var jsArr=d[unit][key], fbArr=FB[unit][key];
+            if(!Array.isArray(jsArr)||!Array.isArray(fbArr)) return;
+            // 1. Add missing FB points
+            jsArr=mergeFBPoints(jsArr,fbArr);
+            // 2. Restore lMin/lMax for points that have them in FB
+            var fbMap={};
+            fbArr.forEach(function(pt){ if(pt.lMin!=null||pt.lMax!=null) fbMap[pt.p]=pt; });
+            d[unit][key]=jsArr.map(function(pt){
+              var fb=fbMap[pt.p];
+              if(!fb) return pt;
+              var merged=Object.assign({},pt);
+              if(fb.lMin!=null) merged.lMin=fb.lMin;
+              if(fb.lMax!=null) merged.lMax=fb.lMax;
+              return merged;
+            });
+          });
+        });
+
+        // ── Inject limiares from JSON into most recent historical point ────────
+        // (the point that was c:1 last month, now historical — carries this month's thresholds)
+        var LIM_MAP={
+          svd:     {max:'svdMax',  min:'svdMin'},
+          cvc:     {max:'cvcMax',  min:'cvcMin'},
+          tot:     {max:'totMax',  min:'totMin'},
+          pav:     {max:'pavMax',  min:null},
+          itu:     {max:'ituMax',  min:null},
+          ipcs:    {max:'ipcsMax', min:null},
+          dddPip:  {max:'pipMax',  min:'pipMin'},
+          dddCarba:{max:'carbaMax',min:'carbaMin'},
+          dddGlico:{max:'glicoMax',min:'glicoMin'},
+          dddPoli: {max:'poliMax', min:'poliMin'}
+        };
+        ['utiAB','utic'].forEach(function(unit){
+          var lim=d[unit]&&d[unit].limiares;
+          if(!lim) return;
+          Object.keys(LIM_MAP).forEach(function(key){
+            var arr=d[unit][key];
+            if(!Array.isArray(arr)||!arr.length) return;
+            // Find last non-c point (most recent historical = where limiares apply)
+            var lastHistIdx=-1;
+            for(var i=arr.length-1;i>=0;i--){ if(!arr[i].c){lastHistIdx=i;break;} }
+            if(lastHistIdx<0) return;
+            var m=LIM_MAP[key];
+            var pt=Object.assign({},arr[lastHistIdx]);
+            if(m.max&&lim[m.max]!=null) pt.lMax=lim[m.max];
+            if(m.min&&lim[m.min]!=null) pt.lMin=lim[m.min];
+            arr=arr.slice();
+            arr[lastHistIdx]=pt;
+            d[unit][key]=arr;
+          });
+        });
+        // Neo ipcsMax
+        if(d.utiNeo&&d.utiNeo.limiares&&d.utiNeo.ipcs){
+          var neoLim=d.utiNeo.limiares.ipcsMax;
+          var neoArr=d.utiNeo.ipcs;
+          var lastHistIdx=-1;
+          for(var i=neoArr.length-1;i>=0;i--){ if(!neoArr[i].c){lastHistIdx=i;break;} }
+          if(lastHistIdx>=0&&neoLim!=null){
+            var pt=Object.assign({},neoArr[lastHistIdx]);
+            pt.lMax=neoLim;
+            neoArr=neoArr.slice(); neoArr[lastHistIdx]=pt;
+            d.utiNeo.ipcs=neoArr;
+          }
+        }
+
+        // ── auditSeries: merge FB historical + JSON ────────────────────────────
+        ['utiAB','utic','utiNeo'].forEach(function(unit){
+          var fbAs=FB[unit]&&FB[unit].auditSeries;
+          var jAs=d[unit]&&d[unit].auditSeries;
+          if(!Array.isArray(fbAs)) return;
+          if(!Array.isArray(jAs)||!jAs.length){
+            if(d[unit]) d[unit].auditSeries=fbAs;
+            return;
+          }
+          // Merge: FB as base, JSON points override/extend
+          var map={};
+          fbAs.forEach(function(x){ map[x.p]=x; });
+          jAs.forEach(function(x){ map[x.p]=x; });
+          var merged=Object.keys(map).map(function(k){ return map[k]; });
+          var MO2=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+          merged.sort(function(a,b){
+            function rank(p){
+              if(/^\d{4}$/.test(p)) return parseInt(p)*100-1;
+              var parts=p.split('/');
+              return (2000+parseInt(parts[1]))*100+MO2.indexOf(parts[0]);
+            }
+            return rank(a.p)-rank(b.p);
+          });
+          d[unit].auditSeries=merged;
+        });
+
+        // ── HD monthly: merge FB historical + current JSON point ──────────────
+        var HD_MONTHLY=['ilavTemp','ilavPerm','bactTemp','bactPerm'];
+        if(d.hd){
+          HD_MONTHLY.forEach(function(k){
+            var jv=d.hd[k], fbv=FB.hd&&FB.hd[k];
+            if(!Array.isArray(jv)||!Array.isArray(fbv)) return;
+            var onlyCurr=jv.length>0&&jv.every(function(x){return x.c;});
+            if(onlyCurr){
+              var currLabel=jv[0].p;
+              var hist=fbv.filter(function(x){return !x.c&&x.p!==currLabel;});
+              d.hd[k]=hist.concat(jv);
+            }
+          });
+        }
+
+        // ── Diarreia ──────────────────────────────────────────────────────────
+        if(d.diarreia){
+          var DIARR_KEYS=['cm','cc','epm','utiab','utic'];
+          DIARR_KEYS.forEach(function(k){
+            var jv=d.diarreia[k], fbv=FB.diarreia&&FB.diarreia[k];
+            if(!Array.isArray(jv)||!Array.isArray(fbv)) return;
+            var onlyCurr=jv.length>0&&jv.every(function(x){return x.c;});
+            if(onlyCurr){
+              var currLabel=jv[0].p;
+              var hist=fbv.filter(function(x){return !x.c&&x.p!==currLabel;});
+              d.diarreia[k]=hist.concat(jv);
+            }
+          });
+        }
+
+        setD(d);
+      })
+      .catch(function(){});
+  },[]);
+
+  if(loading) return h('div',{style:{display:'flex',alignItems:'center',
+    justifyContent:'center',height:'100vh',flexDirection:'column',gap:14}},
+    h('div',{className:'pulse',style:{width:36,height:36,borderRadius:'50%',
+      background:BLUE,opacity:.4}}),
+    h('div',{style:{color:SLATE,fontSize:12}},'Carregando dados...')
+  );
+
+  function renderSection(){
+    switch(active){
+      case 'overview':         return h(OverviewSection,{D:D});
+      case 'mdrInst':          return h(MdrInstSection,{D:D});
+      case 'abio':             return h(AbioSection,{D:D});
+      case 'utiAB':            return h(UtiSection,{D:D,u:'utiAB'});
+      case 'utic':             return h(UtiSection,{D:D,u:'utic'});
+      case 'utiNeo':           return h(UtiNeoSection,{D:D});
+      case 'hd':               return h(HdSection,{D:D});
+      case 'clinicaMedica':    return h(ClinicaSection,{D:D,which:'clinicaMedica'});
+      case 'clinicaCirurgica': return h(ClinicaSection,{D:D,which:'clinicaCirurgica'});
+      case 'epm':              return h(ClinicaSection,{D:D,which:'epm'});
+      case 'diarreia':         return h(DiarreiaSection,{D:D});
+      default: return null;
+    }
+  }
+
+  return h('div',{style:{display:'flex',height:'100vh',background:BG}},
+    // ── Sidebar ──
+    h('div',{style:{width:210,minWidth:210,background:'#1a2744',
+      borderRight:'1px solid #0f1e38',display:'flex',flexDirection:'column',overflow:'hidden'}},
+      h('div',{style:{padding:'18px 16px 14px',borderBottom:'1px solid #0f1e38'}},
+        h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:13,fontWeight:700,
+          color:'#4db6ac',letterSpacing:.2}},'SCIH / CCIH'),
+        h('div',{style:{fontSize:9,color:'#7b9bbf',marginTop:2}},
+          'Hospital Universitário São Francisco'),
+        h('div',{style:{fontSize:8,color:'#5a7a9a',marginTop:1}},'Bragança Paulista · SP'),
+        h('div',{style:{display:'inline-flex',alignItems:'center',gap:5,marginTop:10,
+          background:'rgba(0,105,92,.15)',padding:'3px 9px',borderRadius:4,
+          border:'1px solid rgba(77,182,172,.25)'}},
+          h('div',{className:'pulse',style:{width:5,height:5,borderRadius:'50%',background:'#4db6ac'}}),
+          h('span',{style:{fontSize:8,color:'#4db6ac',fontWeight:600}},D.periodo)
+        ),
+        h('a',{href:'./entrada_dados.html',style:{display:'block',marginTop:10,
+          background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.12)',
+          borderRadius:6,padding:'5px 10px',color:'#9ab0cc',fontSize:9,
+          textDecoration:'none',textAlign:'center',fontWeight:500}},
+          '⊕ Atualizar dados')
+      ),
+      h('div',{style:{flex:1,overflowY:'auto',padding:'6px 0',background:'#1a2744'}},
+        groups.map(function(g){
+          return h('div',{key:g},
+            h('div',{style:{padding:'10px 16px 3px',fontSize:9,color:'#5a7a9a',
+              letterSpacing:.5,fontWeight:600,textTransform:'uppercase'}},g),
+            NAV.filter(function(n){return n.g===g;}).map(function(item){
+              var isA=active===item.id;
+              return h('button',{key:item.id,onClick:function(){setActive(item.id);},
+                style:{width:'100%',display:'flex',alignItems:'center',gap:8,
+                  padding:'8px 16px',border:'none',cursor:'pointer',
+                  background:isA?'rgba(255,255,255,.08)':'transparent',
+                  borderLeft:isA?'3px solid #4db6ac':'3px solid transparent',
+                  color:isA?'#4db6ac':'#9ab0cc',
+                  fontFamily:"'IBM Plex Sans',sans-serif",
+                  fontSize:11,fontWeight:isA?600:400,textAlign:'left'}},
+                h('span',{style:{fontSize:10,color:isA?'#4db6ac':'#5a7a9a',minWidth:12}},item.ic),
+                item.l
+              );
+            })
+          );
+        })
+      ),
+      h('div',{style:{padding:'10px 16px',borderTop:'1px solid #0f1e38'}},
+        h('div',{style:{fontSize:8,color:'#5a7a9a',lineHeight:1.8}},
+          h('div',{},'Metodologia NHSN'),
+          h('div',{},'Clopper-Pearson · Poisson/Bin-Neg')
+        )
+      )
+    ),
+    // ── Main ──
+    h('div',{style:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}},
+      h('div',{style:{padding:'12px 20px',borderBottom:'1px solid '+BRDR,
+        background:WHITE,display:'flex',justifyContent:'space-between',
+        alignItems:'center',flexShrink:0}},
+        h('div',{},
+          h('h1',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:15,
+            fontWeight:600,color:NAVY,margin:0}},TITLES[active]),
+          h('div',{style:{fontSize:9,color:LIGHT,marginTop:2}},
+            'HUSF · SCIH/CCIH · '+D.periodo)
+        ),
+        (function(){
+          var st=(D.global&&D.global.status)||'endemic';
+          var cfg={endemic:{bg:'#e8f5e9',bc:GREEN+'44',dot:GREEN,c:GREEN,lbl:'Atividade ENDÊMICA'},
+            alert:{bg:'#fff3e0',bc:'#e65100'+'44',dot:'#e65100',c:'#e65100',lbl:'⚠ Alerta supraendêmico'},
+            exceptional:{bg:'#ffebee',bc:'#c62828'+'44',dot:'#c62828',c:'#c62828',lbl:'⚠⚠ Atividade excepcional'}};
+          var s=cfg[st]||cfg.endemic;
+          return h('div',{style:{display:'flex',alignItems:'center',gap:6,background:s.bg,
+            padding:'5px 12px',borderRadius:6,border:'1px solid '+s.bc}},
+            h('div',{style:{width:6,height:6,borderRadius:'50%',background:s.dot}}),
+            h('span',{style:{fontSize:9,color:s.c,fontWeight:600}},s.lbl));
+        })()
+      ),
+      h('div',{key:active,style:{flex:1,overflowY:'auto',padding:16}},renderSection(),h(MetodFooter))
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>

@@ -3,142 +3,414 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SCIH/CCIH — Entrada de Dados Mensais</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>CCIH/HUSF — Entrada de Dados</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#07101f;--surf:#0c1829;--card:#101d35;--hover:#142444;
-    --brdr:#172845;--glow:#1e3a68;
-    --teal:#00d4b4;--blue:#4b9cf5;--amber:#fbbf24;--red:#f87171;--green:#4ade80;--indigo:#818cf8;
-    --ti:#ddeeff;--ts:#7da8d8;--tm:#294469;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f8f9fa;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: #1a1a2e;
   }
-  body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ti);min-height:100vh;
-    background-image:radial-gradient(circle,rgba(75,156,245,0.035) 1px,transparent 1px);background-size:26px 26px}
-  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--brdr);border-radius:4px}
 
-  .header{background:var(--surf);border-bottom:1px solid var(--brdr);padding:14px 32px;
-    display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:100}
-  .header-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--teal)}
-  .header-sub{font-size:10px;color:var(--ts)}
+  /* ── Layout ── */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+  .topbar-sub   { font-size: 11px; color: #666; }
+  .topbar-actions { margin-left: auto; display: flex; gap: 8px; }
 
-  .container{max-width:980px;margin:0 auto;padding:22px 20px}
+  .page { max-width: 1100px; margin: 0 auto; padding: 24px 32px 60px; }
 
-  .steps{display:flex;gap:0;margin-bottom:24px;background:var(--surf);border:1px solid var(--brdr);border-radius:12px;overflow:hidden}
-  .step{flex:1;padding:13px 16px;font-size:11px;color:var(--ts);border-right:1px solid var(--brdr);
-    display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
-  .step:last-child{border-right:none}
-  .step.active{background:var(--hover);color:var(--teal)}
-  .step.done{background:#001a0e;color:var(--green)}
-  .step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;background:var(--brdr);color:var(--ts);flex-shrink:0}
-  .step.active .step-num{background:var(--teal);color:#001a14}
-  .step.done .step-num{background:var(--green);color:#001a14}
+  /* ── Step bar ── */
+  .stepbar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .step {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #888;
+    border-right: 1px solid #ddd;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step:last-child { border-right: none; }
+  .step.active { background: #1a1a2e; color: #fff; }
+  .step.done   { background: #e8f5e9; color: #2e7d32; }
+  .step-num {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .step.active .step-num { background: rgba(255,255,255,0.25); }
+  .step.done   .step-num { background: #2e7d32; color: #fff; }
 
-  .sc{background:var(--card);border:1px solid var(--brdr);border-radius:12px;margin-bottom:12px;overflow:hidden}
-  .sh{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;border-bottom:1px solid var(--brdr)}
-  .sh:hover{background:var(--hover)}
-  .sl{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--ti);display:flex;align-items:center;gap:10px}
-  .su{font-size:9px;color:var(--ts);background:var(--hover);padding:2px 8px;border-radius:4px}
-  .sb{padding:18px;display:none}
-  .sb.open{display:block}
-  .chev{color:var(--ts);transition:transform .2s;font-size:12px}
-  .chev.open{transform:rotate(180deg)}
+  /* ── Section header ── */
+  .sec {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .sec-head {
+    padding: 8px 16px;
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sec-head .badge {
+    background: rgba(255,255,255,0.15);
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .sec-body { padding: 14px 16px; }
 
-  /* field grids */
-  .fg{display:grid;gap:10px;margin-bottom:12px}
-  .fg2{grid-template-columns:1fr 1fr}
-  .fg3{grid-template-columns:repeat(3,1fr)}
-  .fg4{grid-template-columns:repeat(4,1fr)}
-  .fg5{grid-template-columns:repeat(5,1fr)}
-  .f{display:flex;flex-direction:column;gap:5px}
-  .f label{font-size:9px;color:var(--ts);letter-spacing:.5px;text-transform:uppercase;font-weight:600}
-  .f input,.f select{background:var(--surf);border:1px solid var(--glow);border-radius:7px;
-    color:var(--ti);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
-    padding:8px 10px;outline:none;transition:border-color .15s;width:100%}
-  .f input:focus,.f select:focus{border-color:var(--teal);box-shadow:0 0 0 2px #00d4b422}
-  .f input::placeholder{color:var(--tm);font-size:11px;font-weight:400}
-  .fu{font-size:8px;color:var(--tm);margin-top:1px}
+  /* ── Sub-section label ── */
+  .sub {
+    font-size: 10px;
+    font-weight: 600;
+    color: #555;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 10px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .sub:first-child { margin-top: 0; }
 
-  /* limiar block */
-  .lim-block{background:var(--surf);border:1px solid var(--brdr);border-radius:8px;padding:12px 14px;margin-bottom:10px}
-  .lim-title{font-size:9px;color:var(--ts);letter-spacing:2px;font-weight:700;text-transform:uppercase;
-    margin-bottom:10px;display:flex;align-items:center;gap:8px}
-  .lim-title::before{content:'';width:10px;height:1px;display:inline-block}
-  .lim-title.lim-max::before{background:var(--red)}
-  .lim-title.lim-both::before{background:linear-gradient(90deg,var(--red),var(--green))}
-  .lim-note{font-size:8px;color:var(--tm);margin-top:6px;font-style:italic;
-    border-left:2px solid var(--glow);padding-left:8px;line-height:1.6}
+  /* ── Field grid ── */
+  .fg { display: grid; gap: 8px; margin-bottom: 6px; }
+  .fg2  { grid-template-columns: repeat(2, 1fr); }
+  .fg3  { grid-template-columns: repeat(3, 1fr); }
+  .fg4  { grid-template-columns: repeat(4, 1fr); }
+  .fg5  { grid-template-columns: repeat(5, 1fr); }
+  .fg6  { grid-template-columns: repeat(6, 1fr); }
+  .fg8  { grid-template-columns: repeat(8, 1fr); }
+  .fg10 { grid-template-columns: repeat(10, 1fr); }
 
-  .divider{height:1px;background:var(--brdr);margin:12px 0}
-  .sub-lbl{font-size:9px;color:var(--ts);letter-spacing:2px;font-weight:700;text-transform:uppercase;
-    margin-bottom:8px;display:flex;align-items:center;gap:8px}
-  .sub-lbl::before{content:'';width:10px;height:1px;background:var(--teal);display:inline-block}
+  /* ── Field ── */
+  .f { display: flex; flex-direction: column; gap: 3px; }
+  .f label {
+    font-size: 9px;
+    font-weight: 600;
+    color: #444;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .f label.red   { color: #c62828; }
+  .f label.green { color: #2e7d32; }
 
-  /* poisson badge */
-  .pbadge{display:inline-flex;align-items:center;gap:5px;background:#1a0a2e;border:1px solid var(--indigo)44;
-    border-radius:4px;padding:2px 8px;font-size:8px;color:var(--indigo);font-weight:700;margin-left:8px}
+  .f input, .f select {
+    height: 30px;
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1a2e;
+    padding: 0 7px;
+    outline: none;
+    width: 100%;
+    transition: border-color .12s;
+  }
+  .f input:focus, .f select:focus {
+    border-color: #1a1a2e;
+    background: #fff;
+  }
+  .f input::placeholder { color: #bbb; font-size: 11px; }
+  .f input.lim-max { border-left: 3px solid #ef9a9a; }
+  .f input.lim-min { border-left: 3px solid #a5d6a7; }
 
-  .info-box{background:var(--surf);border:1px solid var(--brdr);border-radius:8px;padding:13px 15px;
-    font-size:11px;color:var(--ts);line-height:1.8;margin-bottom:14px}
-  .info-box strong{color:var(--ti)}
+  /* ── Divider ── */
+  .divider { height: 1px; background: #f0f0f0; margin: 10px 0; }
 
-  textarea{width:100%;min-height:170px;background:var(--surf);border:1px solid var(--glow);
-    border-radius:8px;color:var(--ti);font-family:'JetBrains Mono',monospace;font-size:11px;
-    padding:13px;resize:vertical;outline:none}
-  textarea:focus{border-color:var(--teal)}
+  /* ── Info note ── */
+  .note {
+    font-size: 10px;
+    color: #777;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    border-left: 3px solid #ccc;
+    line-height: 1.6;
+  }
 
-  select{background:var(--surf);border:1px solid var(--glow);border-radius:7px;color:var(--ti);
-    font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;outline:none;width:100%;cursor:pointer}
+  /* ── Threshold legend ── */
+  .lim-legend {
+    font-size: 10px;
+    color: #666;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .lim-legend span { display: flex; align-items: center; gap: 4px; }
+  .lim-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
 
-  .btn{border:none;border-radius:8px;padding:10px 22px;font-family:'Syne',sans-serif;font-weight:700;
-    font-size:12px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s}
-  .btn:hover{opacity:.85}
-  .btn-teal{background:var(--teal);color:#001a14}
-  .btn-blue{background:var(--blue);color:white}
-  .btn-ghost{background:var(--hover);color:var(--ts);border:1px solid var(--brdr)}
-  .btn-green{background:var(--green);color:#001a14}
-  .btn-row{display:flex;gap:10px;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--brdr)}
+  /* ── Buttons ── */
+  .btn {
+    height: 34px;
+    border: none;
+    border-radius: 6px;
+    padding: 0 18px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .12s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-dark  { background: #1a1a2e; color: #fff; }
+  .btn-green { background: #2e7d32; color: #fff; }
+  .btn-grey  { background: #e8e8e8; color: #444; }
+  .btn-blue  { background: #1565c0; color: #fff; }
 
-  .msg{padding:9px 13px;border-radius:7px;font-size:11px;margin-top:8px}
-  .msg-ok{background:#001a0e;color:var(--green);border:1px solid #4ade8033}
-  .msg-err{background:#1a0000;color:var(--red);border:1px solid #f8717133}
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+  }
 
-  .preview-box{background:var(--surf);border:1px solid var(--brdr);border-radius:8px;
-    padding:13px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ts);
-    max-height:320px;overflow-y:auto;white-space:pre;margin-bottom:12px}
+  /* ── Antibiogram table ── */
+  .abio-wrap { overflow-x: auto; }
+  .abio-wrap table { border-collapse: collapse; font-size: 10px; min-width: 600px; width: 100%; }
+  .abio-wrap th {
+    background: #f0f0f0;
+    font-size: 9px;
+    font-weight: 600;
+    color: #444;
+    padding: 4px 5px;
+    border: 1px solid #ddd;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .abio-wrap th.org { text-align: left; min-width: 110px; }
+  .abio-wrap td { border: 1px solid #eee; padding: 2px 3px; }
+  .abio-wrap td.org-name {
+    font-size: 10px;
+    font-weight: 500;
+    color: #1a1a2e;
+    padding: 3px 8px;
+    background: #fafafa;
+    white-space: nowrap;
+  }
+  .abio-wrap input[type=number] {
+    width: 46px;
+    height: 24px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-align: center;
+    padding: 0 2px;
+    outline: none;
+    background: #fff;
+  }
+  .abio-wrap input[type=number]:focus { border-color: #1a1a2e; }
+
+  /* ── Step 1 textarea ── */
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 10px;
+    outline: none;
+    resize: vertical;
+    background: #fafafa;
+    color: #1a1a2e;
+  }
+  textarea:focus { border-color: #1a1a2e; background: #fff; }
+
+  /* ── Comp selector ── */
+  .comp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  select {
+    height: 30px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    padding: 0 8px;
+    outline: none;
+    background: #fafafa;
+    width: 100%;
+  }
+  select:focus { border-color: #1a1a2e; }
+
+  /* ── Preview ── */
+  .preview-box {
+    background: #1a1a2e;
+    color: #a8d8a8;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    border-radius: 6px;
+    padding: 14px;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre;
+    margin-bottom: 12px;
+  }
+
+  /* ── Summary grid ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .summary-item {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .summary-item .sl { font-size: 11px; color: #555; }
+  .summary-item .sv { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #1a1a2e; }
+
+  /* ── Alert ── */
+  .alert { padding: 8px 12px; border-radius: 5px; font-size: 11px; margin-top: 8px; }
+  .alert-ok  { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .alert-err { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+  /* ── CVE Upload zone ── */
+  .cve-drop {
+    border: 2px dashed #c0c0c0;
+    border-radius: 8px;
+    padding: 20px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .15s;
+    background: #fafafa;
+  }
+  .cve-drop:hover, .cve-drop.dragover { border-color: #1a1a2e; background: #f0f2f8; }
+  .cve-drop.loaded  { border-color: #2e7d32; background: #e8f5e9; }
+  .cve-drop.error   { border-color: #c62828; background: #ffebee; }
+  .cve-icon { font-size: 28px; margin-bottom: 6px; }
+  .cve-title { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
+  .cve-sub   { font-size: 11px; color: #666; }
+  .cve-status { font-size: 11px; margin-top: 8px; font-weight: 600; }
+  .cve-status.ok  { color: #2e7d32; }
+  .cve-status.err { color: #c62828; }
+
+  .fill-btn {
+    display: none;
+    margin-top: 12px;
+    width: 100%;
+    height: 38px;
+    background: #1565c0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .12s;
+  }
+  .fill-btn:hover { opacity: .88; }
+  .fill-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.22);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    margin-left: 8px;
+    font-weight: 500;
+  }
+
+  .autofill-log {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #555;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    max-height: 120px;
+    overflow-y: auto;
+    display: none;
+    line-height: 1.7;
+  }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-<div class="header">
+
+<div class="topbar">
   <div>
-    <div class="header-title">SCIH / CCIH — HUSF</div>
-    <div class="header-sub">Entrada de Dados Mensais · IrAS & Determinantes</div>
+    <div class="topbar-title">CCIH / HUSF — Entrada de Dados Mensais</div>
+    <div class="topbar-sub">IrAS & Determinantes · Gera data_iras.json</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-grey" onclick="goStep(1)">① Competência</button>
+    <button class="btn btn-grey" onclick="goStep(2)">② Dados</button>
+    <button class="btn btn-grey" onclick="goStep(3)">③ Exportar</button>
   </div>
 </div>
 
-<div class="container">
+<div class="page">
 
-  <div class="steps">
-    <div class="step active" id="st1" onclick="goStep(1)"><div class="step-num">1</div>Competência & JSON Base</div>
-    <div class="step" id="st2" onclick="goStep(2)"><div class="step-num">2</div>Dados da Competência</div>
-    <div class="step" id="st3" onclick="goStep(3)"><div class="step-num">3</div>Revisar & Exportar</div>
+  <!-- STEP BAR -->
+  <div class="stepbar">
+    <div class="step active" id="st1" onclick="goStep(1)"><div class="step-num">1</div>Competência & base</div>
+    <div class="step"        id="st2" onclick="goStep(2)"><div class="step-num">2</div>Dados observados + limiares</div>
+    <div class="step"        id="st3" onclick="goStep(3)"><div class="step-num">3</div>Revisar & exportar</div>
   </div>
 
-  <!-- ══ STEP 1 ══ -->
+  <!-- ═══════════════════════════════ STEP 1 ═══════════════════════════════ -->
   <div id="step1">
-    <div class="info-box">
-      <strong>Fluxo mensal:</strong><br>
-      1 · Cole o <code style="color:var(--teal)">data_iras.json</code> da competência anterior (ou deixe vazio para usar Jan/26 como base)<br>
-      2 · Preencha os dados observados + limiares derivados do seu modelo de regressão<br>
-      3 · Baixe o novo JSON → substitua no repositório → push
-    </div>
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">📅 Competência</span><span class="chev open">▾</span></div>
-      <div class="sb open">
-        <div class="fg fg3">
-          <div class="f"><label>Mês</label>
+    <div class="sec">
+      <div class="sec-head">Competência</div>
+      <div class="sec-body">
+        <div class="comp-grid">
+          <div class="f">
+            <label>Mês</label>
             <select id="c_mes">
               <option value="jan">Janeiro</option><option value="fev">Fevereiro</option>
               <option value="mar">Março</option><option value="abr">Abril</option>
@@ -148,613 +420,1973 @@
               <option value="nov">Novembro</option><option value="dez">Dezembro</option>
             </select>
           </div>
-          <div class="f"><label>Ano</label><input type="number" id="c_ano" value="2026" min="2020" max="2050"></div>
-          <div class="f"><label>Rótulo exibido</label><input type="text" id="c_label" placeholder="fev/26" maxlength="8"></div>
+          <div class="f">
+            <label>Ano</label>
+            <input type="number" id="c_ano" value="2026" min="2020" max="2050">
+          </div>
+          <div class="f">
+            <label>Rótulo (ex: fev/26)</label>
+            <input type="text" id="c_label" placeholder="fev/26" maxlength="8">
+          </div>
         </div>
       </div>
     </div>
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">📋 JSON da competência anterior (opcional)</span><span class="chev open">▾</span></div>
-      <div class="sb open">
-        <textarea id="jsonBase" placeholder="Cole aqui o data_iras.json da competência anterior...&#10;&#10;Se vazio, Jan/26 será usado como base histórica."></textarea>
+
+    <div class="sec">
+      <div class="sec-head">Planilha CVE Mestre <span class="badge">Auto-preenchimento · Plan2 + Plan3 + Plan4 + Plan6</span></div>
+      <div class="sec-body">
+        <div class="note" style="margin-bottom:10px">
+          Faça upload da <strong>PLANILHA_CVE_HUSF_mestre2026.xlsx</strong>. O mês selecionado acima será extraído automaticamente
+          e os campos de UTI A/B, UTIC, Neo e DDDs serão preenchidos. Os limiares, MDR e demais campos permanecem manuais.
+        </div>
+
+        <div class="cve-drop" id="cveDrop" onclick="document.getElementById('cveFileInput').click()">
+          <div class="cve-icon">📊</div>
+          <div class="cve-title">Clique ou arraste a planilha CVE aqui</div>
+          <div class="cve-sub">PLANILHA_CVE_HUSF_mestre2026.xlsx</div>
+          <input type="file" id="cveFileInput" accept=".xlsx" style="display:none" onchange="loadCVE(this.files[0])">
+          <div class="cve-status" id="cveStatus"></div>
+        </div>
+
+        <button class="fill-btn" id="fillBtn" onclick="doAutoFill()">
+          🔄 Auto-preencher do CVE
+          <span class="fill-badge" id="fillBadge"></span>
+        </button>
+        <div class="autofill-log" id="autofillLog"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head">Planilha CVE Diálise <span class="badge">Auto-preenchimento · Aba Hemodiálise</span></div>
+      <div class="sec-body">
+        <div class="note" style="margin-bottom:10px">
+          Upload da <strong>PLANILHA_CVE_Dialise_mestre2026.xlsx</strong>. Extrai automaticamente IAV e Bacteremia por tipo de acesso + Vancomicina.
+        </div>
+        <div class="cve-drop" id="dialDrop" onclick="document.getElementById('dialFileInput').click()">
+          <div class="cve-icon">🩸</div>
+          <div class="cve-title">Clique ou arraste a planilha CVE Diálise aqui</div>
+          <div class="cve-sub">PLANILHA_CVE_Dialise_mestre2026.xlsx</div>
+          <input type="file" id="dialFileInput" accept=".xlsx" style="display:none" onchange="loadDialise(this.files[0])">
+          <div class="cve-status" id="dialStatus"></div>
+        </div>
+        <button class="fill-btn" id="dialFillBtn" onclick="doDialFill()" style="display:none">
+          🩸 Auto-preencher Hemodiálise
+          <span class="fill-badge" id="dialFillBadge"></span>
+        </button>
+        <div class="autofill-log" id="dialLog"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head">Planilha CVE UTI C <span class="badge">Auto-preenchimento · HM álcool UCO + DDDs UTIC calculados</span></div>
+      <div class="sec-body">
+        <div class="note" style="margin-bottom:10px">
+          Upload da <strong>CVE_UTI_C_mestre2026.xlsx</strong> — versão adaptada com dados da UTIC na linha UCO.
+          Extrai álcool gel /pac-dia da UTIC e os DDDs calculados (Pip/Tazo, Carba, Glico, Poli) direto da seção computada da Plan6.
+        </div>
+        <div class="cve-drop" id="ucDrop" onclick="document.getElementById('ucFileInput').click()">
+          <div class="cve-icon">🏥</div>
+          <div class="cve-title">Clique ou arraste a planilha CVE UTI C aqui</div>
+          <div class="cve-sub">CVE_UTI_C_mestre2026.xlsx</div>
+          <input type="file" id="ucFileInput" accept=".xlsx" style="display:none" onchange="loadUTIC(this.files[0])">
+          <div class="cve-status" id="ucStatus"></div>
+        </div>
+        <button class="fill-btn" id="ucFillBtn" onclick="doUTICFill()" style="display:none">
+          🏥 Auto-preencher UTIC
+          <span class="fill-badge" id="ucFillBadge"></span>
+        </button>
+        <div class="autofill-log" id="ucLog"></div>
+      </div>
+    </div>
+      <div class="sec-body">
+        <textarea id="jsonBase" placeholder="Cole aqui o data_iras.json da competência anterior..."></textarea>
         <div id="jsonMsg"></div>
       </div>
     </div>
+
     <div class="btn-row">
-      <button class="btn btn-teal" onclick="proceedStep2()">Continuar →</button>
+      <button class="btn btn-dark" onclick="proceedStep2()">Continuar →</button>
     </div>
   </div>
 
-  <!-- ══ STEP 2 ══ -->
+  <!-- ═══════════════════════════════ STEP 2 ═══════════════════════════════ -->
   <div id="step2" style="display:none">
 
-    <!-- GLOBAL -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">◈ Taxa de Infecção Hospitalar Global</span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="fg fg2">
-          <div class="f"><label>Taxa IH Global (%)</label><input type="number" step="0.01" id="g_taxa" placeholder="0.86"><span class="fu">% de pacientes com IH no período</span></div>
+    <div class="lim-legend">
+      <strong>Limiares de regressão Poisson/Bin-Neg:</strong>
+      <span><span class="lim-swatch" style="background:#ef9a9a"></span> Borda vermelha = máximo previsto</span>
+      <span><span class="lim-swatch" style="background:#a5d6a7"></span> Borda verde = mínimo previsto</span>
+      <span style="color:#aaa">Campo vazio = linha não exibida no gráfico</span>
+    </div>
+
+    <!-- ── Limiares R ── -->
+    <div class="sec">
+      <div class="sec-head">Limiares do modelo R <span class="badge">Auto-preenchimento · resumo_ultimo_mes → JSON</span></div>
+      <div class="sec-body">
+        <div class="note" style="margin-bottom:10px">
+          No R, exporte o tibble com:<br>
+          <code style="font-size:10px;background:#f0f0f0;padding:2px 6px;border-radius:3px;display:inline-block;margin-top:4px">
+            jsonlite::write_json(<br>
+            &nbsp;&nbsp;list(<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;utiab = resumo_utiab,&nbsp;&nbsp;<span style="color:#888"># tibble do UTI A/B</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;utic  = resumo_utic&nbsp;&nbsp;&nbsp;<span style="color:#888"># tibble do UTIC</span><br>
+            &nbsp;&nbsp;),<br>
+            &nbsp;&nbsp;"limiares.json", auto_unbox = TRUE<br>
+            )
+          </code><br>
+          <span style="font-size:10px;color:#777;margin-top:6px;display:block">Colunas usadas: <strong>indicador · rate_obs_txt · min_txt · max_txt</strong>. As demais colunas são ignoradas.</span>
+        </div>
+
+        <div class="cve-drop" id="limDrop" onclick="document.getElementById('limFileInput').click()">
+          <div class="cve-icon">📐</div>
+          <div class="cve-title">Clique ou arraste o limiares.json aqui</div>
+          <div class="cve-sub">Gerado pelo script R · contém UTI A/B e UTIC</div>
+          <input type="file" id="limFileInput" accept=".json" style="display:none" onchange="loadLimiares(this.files[0])">
+          <div class="cve-status" id="limStatus"></div>
+        </div>
+        <div class="autofill-log" id="limLog"></div>
+      </div>
+    </div>
+
+    <!-- ── Taxa IH Global ── -->
+    <div class="sec">
+      <div class="sec-head">Taxa de Infecção Hospitalar Global — HUSF</div>
+      <div class="sec-body">
+        <div class="fg" style="grid-template-columns:1fr 1fr 1fr 1.5fr;gap:8px">
+          <div class="f"><label>Taxa IH Global (%)</label><input type="number" step="0.01" id="g_taxa" placeholder="0.00"></div>
+          <div class="f" style="grid-column:span 2">
+            <label>Status epidemiológico</label>
+            <select id="g_status">
+              <option value="endemic">Atividade endêmica</option>
+              <option value="alert">Estado de alerta supraendêmico</option>
+              <option value="exceptional">Atividade excepcional</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- MDR INSTITUCIONAL -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">⬡ MDR Institucional <span class="su">Clopper-Pearson · biênio fixo</span></span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="sub-lbl">Densidade de Incidência (/1000 pacientes-dia)</div>
+    <!-- ── MDR Institucional ── -->
+    <div class="sec">
+      <div class="sec-head">MDR Institucional <span class="badge">Clopper-Pearson bienal — sem limiares mensais</span></div>
+      <div class="sec-body">
         <div class="fg fg3">
-          <div class="f"><label>ESBL</label><input type="number" step="0.1" id="mdr_esbl" placeholder="55.0"><span class="fu">/1000 pac-dia · limiar Clopper-Pearson: 37</span></div>
-          <div class="f"><label>KPC</label><input type="number" step="0.1" id="mdr_kpc" placeholder="3.0"><span class="fu">/1000 pac-dia · limiar: 11</span></div>
-          <div class="f"><label>Acinetobacter MDR</label><input type="number" step="0.1" id="mdr_acin" placeholder="13.0"><span class="fu">/1000 pac-dia · limiar: 10</span></div>
+          <div class="f"><label>ESBL (/1000 pac-dia)</label><input type="number" step="0.1" id="mdr_esbl" placeholder="0.0"></div>
+          <div class="f"><label>KPC (/1000 pac-dia)</label><input type="number" step="0.1" id="mdr_kpc" placeholder="0.0"></div>
+          <div class="f"><label>Acinetobacter MDR (/1000 pac-dia)</label><input type="number" step="0.1" id="mdr_acin" placeholder="0.0"></div>
         </div>
       </div>
     </div>
 
-    <!-- UTI ADULTO -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)">
-        <span class="sl">▣ UTI Adulto (UTIAB) <span class="su">NHSN</span></span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="sb">
+    <!-- ── UTI A/B ── -->
+    <div class="sec">
+      <div class="sec-head">UTI A/B <span class="badge">NHSN</span></div>
+      <div class="sec-body">
 
-        <div class="sub-lbl">IrAS — Densidade de Incidência</div>
-        <div class="fg fg3">
-          <div class="f"><label>PAV (/1000 VM-dia)</label><input type="number" step="0.1" id="ab_pav" placeholder="0.0"></div>
-          <div class="f"><label>ITU relacionada a SVD (/1000 SVD-dia)</label><input type="number" step="0.1" id="ab_itu" placeholder="0.0"></div>
-          <div class="f"><label>IPCS laboratorial (/1000 CVC-dia)</label><input type="number" step="0.1" id="ab_ipcs" placeholder="0.0"></div>
-        </div>
-        <!-- limiares IrAS: só máximo -->
-        <div class="lim-block">
-          <div class="lim-title lim-max">Limiares previstos por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div style="font-size:9px;color:var(--tm);margin-bottom:8px">Apenas limiar máximo (vermelho). Derive do seu modelo com a série histórica e informe abaixo.</div>
-          <div class="fg fg3">
-            <div class="f"><label style="color:var(--red)">PAV — Máximo previsto</label><input type="number" step="0.01" id="ab_l_pavMax" placeholder="—"><span class="fu">deixe vazio se não calculado</span></div>
-            <div class="f"><label style="color:var(--red)">ITU/SVD — Máximo previsto</label><input type="number" step="0.01" id="ab_l_ituMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">IPCS/CVC — Máximo previsto</label><input type="number" step="0.01" id="ab_l_ipcsMax" placeholder="—"></div>
-          </div>
+        <div class="sub">IrAS — /1000 dispositivo-dia <span style="font-weight:400;color:#999">(só máx previsto)</span></div>
+        <div class="fg fg6">
+          <div class="f"><label>PAV obs.</label><input type="number" step="0.01" id="ab_pav" placeholder="0.00"></div>
+          <div class="f"><label class="red">PAV máx</label><input class="lim-max" type="number" step="0.01" id="ab_l_pavMax" placeholder="—"></div>
+          <div class="f"><label>ITU/SVD obs.</label><input type="number" step="0.01" id="ab_itu" placeholder="0.00"></div>
+          <div class="f"><label class="red">ITU/SVD máx</label><input class="lim-max" type="number" step="0.01" id="ab_l_ituMax" placeholder="—"></div>
+          <div class="f"><label>IPCS/CVC obs.</label><input type="number" step="0.01" id="ab_ipcs" placeholder="0.00"></div>
+          <div class="f"><label class="red">IPCS/CVC máx</label><input class="lim-max" type="number" step="0.01" id="ab_l_ipcsMax" placeholder="—"></div>
         </div>
 
-        <div class="divider"></div>
-        <div class="sub-lbl">Utilização de Dispositivos (%)</div>
-        <div class="fg fg3">
-          <div class="f"><label>SVD (%)</label><input type="number" step="0.1" id="ab_svd" placeholder="75.0"></div>
-          <div class="f"><label>CVC (%)</label><input type="number" step="0.1" id="ab_cvc" placeholder="65.0"></div>
-          <div class="f"><label>TOT / TQT (%)</label><input type="number" step="0.1" id="ab_tot" placeholder="57.0"></div>
+        <div class="sub">Utilização de dispositivos (%) <span style="font-weight:400;color:#999">(máx + mín previstos)</span></div>
+        <div class="fg fg6">
+          <div class="f"><label>SVD obs.</label><input type="number" step="0.1" id="ab_svd" placeholder="0.0"></div>
+          <div class="f"><label class="red">SVD máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_svdMax" placeholder="—"></div>
+          <div class="f"><label class="green">SVD mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_svdMin" placeholder="—"></div>
+          <div class="f"><label>CVC obs.</label><input type="number" step="0.1" id="ab_cvc" placeholder="0.0"></div>
+          <div class="f"><label class="red">CVC máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_cvcMax" placeholder="—"></div>
+          <div class="f"><label class="green">CVC mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_cvcMin" placeholder="—"></div>
         </div>
-        <div class="lim-block">
-          <div class="lim-title lim-both">Limiares previstos por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div style="font-size:9px;color:var(--tm);margin-bottom:8px">Máximo (vermelho) e mínimo (verde).</div>
-          <div class="fg fg3">
-            <div class="f"><label style="color:var(--red)">SVD — Máximo</label><input type="number" step="0.1" id="ab_l_svdMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">CVC — Máximo</label><input type="number" step="0.1" id="ab_l_cvcMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">TOT/TQT — Máximo</label><input type="number" step="0.1" id="ab_l_totMax" placeholder="—"></div>
-          </div>
-          <div class="fg fg3" style="margin-top:8px">
-            <div class="f"><label style="color:var(--green)">SVD — Mínimo</label><input type="number" step="0.1" id="ab_l_svdMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">CVC — Mínimo</label><input type="number" step="0.1" id="ab_l_cvcMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">TOT/TQT — Mínimo</label><input type="number" step="0.1" id="ab_l_totMin" placeholder="—"></div>
-          </div>
+        <div class="fg fg6">
+          <div class="f"><label>TOT/TQT obs.</label><input type="number" step="0.1" id="ab_tot" placeholder="0.0"></div>
+          <div class="f"><label class="red">TOT/TQT máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_totMax" placeholder="—"></div>
+          <div class="f"><label class="green">TOT/TQT mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_totMin" placeholder="—"></div>
         </div>
 
-        <div class="divider"></div>
-        <div class="sub-lbl">Consumo de Antimicrobianos (DDD/1000 pac-dia)</div>
+        <div class="sub">DDDs — /1000 pac-dia <span style="font-weight:400;color:#999">(máx + mín previstos)</span></div>
+        <div class="fg fg8">
+          <div class="f"><label>Pip/Tazo obs.</label><input type="number" step="0.1" id="ab_pip" placeholder="0.0"></div>
+          <div class="f"><label class="red">Pip máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_pipMax" placeholder="—"></div>
+          <div class="f"><label class="green">Pip mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_pipMin" placeholder="—"></div>
+          <div class="f"><label>Carba obs.</label><input type="number" step="0.1" id="ab_carba" placeholder="0.0"></div>
+          <div class="f"><label class="red">Carba máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_carbaMax" placeholder="—"></div>
+          <div class="f"><label class="green">Carba mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_carbaMin" placeholder="—"></div>
+          <div class="f"><label>Glico obs.</label><input type="number" step="0.1" id="ab_glico" placeholder="0.0"></div>
+          <div class="f"><label class="red">Glico máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_glicoMax" placeholder="—"></div>
+        </div>
+        <div class="fg fg8">
+          <div class="f"><label class="green">Glico mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_glicoMin" placeholder="—"></div>
+          <div class="f"><label>Polimixina obs.</label><input type="number" step="0.1" id="ab_poli" placeholder="0.0"></div>
+          <div class="f"><label class="red">Poli máx</label><input class="lim-max" type="number" step="0.1" id="ab_l_poliMax" placeholder="—"></div>
+          <div class="f"><label class="green">Poli mín</label><input class="lim-min" type="number" step="0.1" id="ab_l_poliMin" placeholder="—"></div>
+        </div>
+
+        <div class="sub">MDR na UTI AB — /1000 pac-dia</div>
+        <input type="hidden" id="ab_pac_dia" value="">
+        <div class="note" style="margin-bottom:6px;font-size:10px;display:flex;align-items:center;gap:8px">
+          Pac-dia UTI A/B: <strong id="ab_pac_dia_display" style="color:#1a1a2e;font-family:'IBM Plex Mono',monospace">—</strong>
+          <span style="color:#aaa">· Preenchido automaticamente pela CVE mestre. Insira contagens absolutas → taxa calculada automaticamente.</span>
+        </div>
+        <div class="note" style="margin-bottom:6px;font-size:10px">Contagens absolutas (n isolados no mês)</div>
+        <div class="fg fg4" style="margin-bottom:6px">
+          <div class="f"><label>ESBL (n)</label><input type="number" id="ab_esbl_n" placeholder="0" oninput="calcMDRrate('ab','esbl')"></div>
+          <div class="f"><label>KPC (n)</label><input type="number" id="ab_kpc_n" placeholder="0" oninput="calcMDRrate('ab','kpc')"></div>
+          <div class="f"><label>Acinetobacter (n)</label><input type="number" id="ab_acin_n" placeholder="0" oninput="calcMDRrate('ab','acin')"></div>
+          <div class="f"><label>Pseudomonas (n)</label><input type="number" id="ab_pseu_n" placeholder="0" oninput="calcMDRrate('ab','pseu')"></div>
+        </div>
+        <div class="note" style="margin-bottom:4px;font-size:10px">Taxas calculadas (/1000 pac-dia) — editáveis</div>
+        <div class="fg fg4" style="margin-bottom:4px">
+          <div class="f"><label>ESBL</label><input type="number" step="0.01" id="ab_esbl" placeholder="0.00"></div>
+          <div class="f"><label>KPC</label><input type="number" step="0.01" id="ab_kpc" placeholder="0.00"></div>
+          <div class="f"><label>Acinetobacter MDR</label><input type="number" step="0.01" id="ab_acin" placeholder="0.00"></div>
+          <div class="f"><label>Pseudomonas MDR</label><input type="number" step="0.01" id="ab_pseu" placeholder="0.00"></div>
+        </div>
+
+        <div class="sub">Higiene das Mãos & Auditoria CVC</div>
         <div class="fg fg4">
-          <div class="f"><label>Pip/Tazo + Cefepime</label><input type="number" step="0.1" id="ab_pip" placeholder="22.0"></div>
-          <div class="f"><label>Carbapenêmicos</label><input type="number" step="0.1" id="ab_carba" placeholder="130.0"></div>
-          <div class="f"><label>Glicopeptídeos</label><input type="number" step="0.1" id="ab_glico" placeholder="100.0"></div>
-          <div class="f"><label>Polimixina B</label><input type="number" step="0.1" id="ab_poli" placeholder="30.0"></div>
-        </div>
-        <div class="lim-block">
-          <div class="lim-title lim-both">Limiares previstos por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div class="fg fg4">
-            <div class="f"><label style="color:var(--red)">Pip/Tazo — Máximo</label><input type="number" step="0.1" id="ab_l_pipMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">Carba — Máximo</label><input type="number" step="0.1" id="ab_l_carbaMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">Glico — Máximo</label><input type="number" step="0.1" id="ab_l_glicoMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">Polimixina — Máximo</label><input type="number" step="0.1" id="ab_l_poliMax" placeholder="—"></div>
-          </div>
-          <div class="fg fg4" style="margin-top:8px">
-            <div class="f"><label style="color:var(--green)">Pip/Tazo — Mínimo</label><input type="number" step="0.1" id="ab_l_pipMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">Carba — Mínimo</label><input type="number" step="0.1" id="ab_l_carbaMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">Glico — Mínimo</label><input type="number" step="0.1" id="ab_l_glicoMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">Polimixina — Mínimo</label><input type="number" step="0.1" id="ab_l_poliMin" placeholder="—"></div>
-          </div>
-          <div class="lim-note">Campos vazios = limiar não será desenhado no gráfico desta competência.</div>
-        </div>
-
-        <div class="divider"></div>
-        <div class="sub-lbl">MDR na UTI Adulto (/1000 pac-dia)</div>
-        <div class="fg fg3">
-          <div class="f"><label>ESBL</label><input type="number" step="0.1" id="ab_esbl" placeholder="5.0"></div>
-          <div class="f"><label>KPC</label><input type="number" step="0.1" id="ab_kpc" placeholder="9.0"></div>
-          <div class="f"><label>Acinetobacter MDR</label><input type="number" step="0.1" id="ab_acin" placeholder="5.0"></div>
-        </div>
-
-        <div class="divider"></div>
-        <div class="sub-lbl">Higiene das Mãos & Auditoria CVC</div>
-        <div class="fg fg3">
-          <div class="f"><label>Álcool gel — HM (ml/pac-dia)</label><input type="number" step="0.1" id="ab_hm" placeholder="0.0"><span class="fu">OMS recomenda ≥ 20 ml/pac-dia</span></div>
-          <div class="f"><label>CVC — Checklists OK (n)</label><input type="number" id="ab_aud_ok" placeholder="16"></div>
-          <div class="f"><label>CVC — Não conformes (n)</label><input type="number" id="ab_aud_nc" placeholder="0"></div>
+          <div class="f"><label>HM álcool gel (ml/pac-dia)</label><input type="number" step="0.1" id="ab_hm" placeholder="0.0"></div>
+          <div class="f"><label>CVC OK (n)</label><input type="number" id="ab_aud_ok" placeholder="0"></div>
+          <div class="f"><label>CVC NC (n)</label><input type="number" id="ab_aud_nc" placeholder="0"></div>
         </div>
       </div>
     </div>
 
-    <!-- UTIC -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)">
-        <span class="sl">▣ UTI Cardiotorácica (UTIC) <span class="su">NHSN</span></span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="sb">
-        <div class="sub-lbl">IrAS — Densidade de Incidência</div>
-        <div class="fg fg3">
-          <div class="f"><label>PAV (/1000 VM-dia)</label><input type="number" step="0.1" id="uc_pav" placeholder="0.0"></div>
-          <div class="f"><label>ITU relacionada a SVD (/1000 SVD-dia)</label><input type="number" step="0.1" id="uc_itu" placeholder="0.0"></div>
-          <div class="f"><label>IPCS laboratorial (/1000 CVC-dia)</label><input type="number" step="0.1" id="uc_ipcs" placeholder="0.0"></div>
-        </div>
-        <div class="lim-block">
-          <div class="lim-title lim-max">Limiares previstos por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div class="fg fg3">
-            <div class="f"><label style="color:var(--red)">PAV — Máximo previsto</label><input type="number" step="0.01" id="uc_l_pavMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">ITU/SVD — Máximo previsto</label><input type="number" step="0.01" id="uc_l_ituMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">IPCS/CVC — Máximo previsto</label><input type="number" step="0.01" id="uc_l_ipcsMax" placeholder="—"></div>
-          </div>
+    <!-- ── UTIC ── -->
+    <div class="sec">
+      <div class="sec-head">UTI C <span class="badge">NHSN</span></div>
+      <div class="sec-body">
+
+        <div class="sub">IrAS — /1000 dispositivo-dia</div>
+        <div class="fg fg6">
+          <div class="f"><label>PAV obs.</label><input type="number" step="0.01" id="uc_pav" placeholder="0.00"></div>
+          <div class="f"><label class="red">PAV máx</label><input class="lim-max" type="number" step="0.01" id="uc_l_pavMax" placeholder="—"></div>
+          <div class="f"><label>ITU/SVD obs.</label><input type="number" step="0.01" id="uc_itu" placeholder="0.00"></div>
+          <div class="f"><label class="red">ITU/SVD máx</label><input class="lim-max" type="number" step="0.01" id="uc_l_ituMax" placeholder="—"></div>
+          <div class="f"><label>IPCS/CVC obs.</label><input type="number" step="0.01" id="uc_ipcs" placeholder="0.00"></div>
+          <div class="f"><label class="red">IPCS/CVC máx</label><input class="lim-max" type="number" step="0.01" id="uc_l_ipcsMax" placeholder="—"></div>
         </div>
 
-        <div class="divider"></div>
-        <div class="sub-lbl">Utilização de Dispositivos (%)</div>
-        <div class="fg fg3">
-          <div class="f"><label>SVD (%)</label><input type="number" step="0.1" id="uc_svd" placeholder="76.0"></div>
-          <div class="f"><label>CVC (%)</label><input type="number" step="0.1" id="uc_cvc" placeholder="72.0"></div>
-          <div class="f"><label>TOT / TQT (%)</label><input type="number" step="0.1" id="uc_tot" placeholder="60.0"></div>
+        <div class="sub">Utilização de dispositivos (%)</div>
+        <div class="fg fg6">
+          <div class="f"><label>SVD obs.</label><input type="number" step="0.1" id="uc_svd" placeholder="0.0"></div>
+          <div class="f"><label class="red">SVD máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_svdMax" placeholder="—"></div>
+          <div class="f"><label class="green">SVD mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_svdMin" placeholder="—"></div>
+          <div class="f"><label>CVC obs.</label><input type="number" step="0.1" id="uc_cvc" placeholder="0.0"></div>
+          <div class="f"><label class="red">CVC máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_cvcMax" placeholder="—"></div>
+          <div class="f"><label class="green">CVC mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_cvcMin" placeholder="—"></div>
         </div>
-        <div class="lim-block">
-          <div class="lim-title lim-both">Limiares previstos por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div class="fg fg3">
-            <div class="f"><label style="color:var(--red)">SVD — Máximo</label><input type="number" step="0.1" id="uc_l_svdMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">CVC — Máximo</label><input type="number" step="0.1" id="uc_l_cvcMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">TOT/TQT — Máximo</label><input type="number" step="0.1" id="uc_l_totMax" placeholder="—"></div>
-          </div>
-          <div class="fg fg3" style="margin-top:8px">
-            <div class="f"><label style="color:var(--green)">SVD — Mínimo</label><input type="number" step="0.1" id="uc_l_svdMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">CVC — Mínimo</label><input type="number" step="0.1" id="uc_l_cvcMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">TOT/TQT — Mínimo</label><input type="number" step="0.1" id="uc_l_totMin" placeholder="—"></div>
-          </div>
+        <div class="fg fg6">
+          <div class="f"><label>TOT/TQT obs.</label><input type="number" step="0.1" id="uc_tot" placeholder="0.0"></div>
+          <div class="f"><label class="red">TOT/TQT máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_totMax" placeholder="—"></div>
+          <div class="f"><label class="green">TOT/TQT mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_totMin" placeholder="—"></div>
         </div>
 
-        <div class="divider"></div>
-        <div class="sub-lbl">Consumo de Antimicrobianos (DDD/1000 pac-dia)</div>
+        <div class="sub">DDDs — /1000 pac-dia</div>
+        <div class="fg fg8">
+          <div class="f"><label>Pip/Tazo obs.</label><input type="number" step="0.1" id="uc_pip" placeholder="0.0"></div>
+          <div class="f"><label class="red">Pip máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_pipMax" placeholder="—"></div>
+          <div class="f"><label class="green">Pip mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_pipMin" placeholder="—"></div>
+          <div class="f"><label>Carba obs.</label><input type="number" step="0.1" id="uc_carba" placeholder="0.0"></div>
+          <div class="f"><label class="red">Carba máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_carbaMax" placeholder="—"></div>
+          <div class="f"><label class="green">Carba mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_carbaMin" placeholder="—"></div>
+          <div class="f"><label>Glico obs.</label><input type="number" step="0.1" id="uc_glico" placeholder="0.0"></div>
+          <div class="f"><label class="red">Glico máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_glicoMax" placeholder="—"></div>
+        </div>
+        <div class="fg fg8">
+          <div class="f"><label class="green">Glico mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_glicoMin" placeholder="—"></div>
+          <div class="f"><label>Polimixina obs.</label><input type="number" step="0.1" id="uc_poli" placeholder="0.0"></div>
+          <div class="f"><label class="red">Poli máx</label><input class="lim-max" type="number" step="0.1" id="uc_l_poliMax" placeholder="—"></div>
+          <div class="f"><label class="green">Poli mín</label><input class="lim-min" type="number" step="0.1" id="uc_l_poliMin" placeholder="—"></div>
+        </div>
+
+        <div class="sub">MDR na UTIC — /1000 pac-dia</div>
+        <input type="hidden" id="uc_pac_dia" value="">
+        <div class="note" style="margin-bottom:6px;font-size:10px;display:flex;align-items:center;gap:8px">
+          Pac-dia UTIC: <strong id="uc_pac_dia_display" style="color:#1a1a2e;font-family:'IBM Plex Mono',monospace">—</strong>
+          <span style="color:#aaa">· Preenchido automaticamente pela CVE mestre. Insira contagens absolutas → taxa calculada automaticamente.</span>
+        </div>
+        <div class="note" style="margin-bottom:6px;font-size:10px">Contagens absolutas (n isolados no mês)</div>
+        <div class="fg fg4" style="margin-bottom:6px">
+          <div class="f"><label>ESBL (n)</label><input type="number" id="uc_esbl_n" placeholder="0" oninput="calcMDRrate('uc','esbl')"></div>
+          <div class="f"><label>KPC (n)</label><input type="number" id="uc_kpc_n" placeholder="0" oninput="calcMDRrate('uc','kpc')"></div>
+          <div class="f"><label>Acinetobacter (n)</label><input type="number" id="uc_acin_n" placeholder="0" oninput="calcMDRrate('uc','acin')"></div>
+          <div class="f"><label>Pseudomonas (n)</label><input type="number" id="uc_pseu_n" placeholder="0" oninput="calcMDRrate('uc','pseu')"></div>
+        </div>
+        <div class="note" style="margin-bottom:4px;font-size:10px">Taxas calculadas (/1000 pac-dia) — editáveis</div>
+        <div class="fg fg4" style="margin-bottom:4px">
+          <div class="f"><label>ESBL</label><input type="number" step="0.01" id="uc_esbl" placeholder="0.00"></div>
+          <div class="f"><label>KPC</label><input type="number" step="0.01" id="uc_kpc" placeholder="0.00"></div>
+          <div class="f"><label>Acinetobacter MDR</label><input type="number" step="0.01" id="uc_acin" placeholder="0.00"></div>
+          <div class="f"><label>Pseudomonas MDR</label><input type="number" step="0.01" id="uc_pseu" placeholder="0.00"></div>
+        </div>
+
+        <div class="sub">Higiene das Mãos & Auditoria CVC</div>
         <div class="fg fg4">
-          <div class="f"><label>Pip/Tazo + Cefepime</label><input type="number" step="0.1" id="uc_pip" placeholder="65.0"></div>
-          <div class="f"><label>Carbapenêmicos</label><input type="number" step="0.1" id="uc_carba" placeholder="128.0"></div>
-          <div class="f"><label>Glicopeptídeos</label><input type="number" step="0.1" id="uc_glico" placeholder="110.0"></div>
-          <div class="f"><label>Polimixina B</label><input type="number" step="0.1" id="uc_poli" placeholder="70.0"></div>
+          <div class="f"><label>HM álcool gel (ml/pac-dia)</label><input type="number" step="0.1" id="uc_hm" placeholder="0.0"></div>
+          <div class="f"><label>CVC OK (n)</label><input type="number" id="uc_aud_ok" placeholder="0"></div>
+          <div class="f"><label>CVC NC (n)</label><input type="number" id="uc_aud_nc" placeholder="0"></div>
         </div>
-        <div class="lim-block">
-          <div class="lim-title lim-both">Limiares previstos por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div class="fg fg4">
-            <div class="f"><label style="color:var(--red)">Pip/Tazo — Máximo</label><input type="number" step="0.1" id="uc_l_pipMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">Carba — Máximo</label><input type="number" step="0.1" id="uc_l_carbaMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">Glico — Máximo</label><input type="number" step="0.1" id="uc_l_glicoMax" placeholder="—"></div>
-            <div class="f"><label style="color:var(--red)">Polimixina — Máximo</label><input type="number" step="0.1" id="uc_l_poliMax" placeholder="—"></div>
+      </div>
+    </div>
+
+    <!-- ── UTI Neonatal ── -->
+    <div class="sec">
+      <div class="sec-head">UTI Neonatal <span class="badge">NHSN</span></div>
+      <div class="sec-body">
+        <div class="fg fg4">
+          <div class="f"><label>IPCS/CVC obs. (/1000 CVC-dia)</label><input type="number" step="0.01" id="neo_ipcs" placeholder="0.00"></div>
+          <div class="f"><label class="red">IPCS/CVC máx previsto</label><input class="lim-max" type="number" step="0.01" id="neo_l_ipcsMax" placeholder="—"></div>
+          <div class="f"><label>CVC OK (n)</label><input type="number" id="neo_aud_ok" placeholder="0"></div>
+          <div class="f"><label>CVC NC (n)</label><input type="number" id="neo_aud_nc" placeholder="0"></div>
+        </div>
+        <div class="sub" style="margin-top:8px">MDR Neo — contagens absolutas (n isolados)</div>
+        <div class="fg fg4">
+          <div class="f"><label>ESBL (n)</label><input type="number" id="neo_esbl_n" placeholder="0"></div>
+          <div class="f"><label>KPC (n)</label><input type="number" id="neo_kpc_n" placeholder="0"></div>
+          <div class="f"><label>Acinetobacter (n)</label><input type="number" id="neo_acin_n" placeholder="0"></div>
+          <div class="f"><label>Pseudomonas (n)</label><input type="number" id="neo_pseu_n" placeholder="0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Hemodiálise ── -->
+    <div class="sec">
+      <div class="sec-head">Hemodiálise / Nefrologia <span class="badge">Clopper-Pearson — sem limiares mensais</span></div>
+      <div class="sec-body">
+
+        <div class="sub">IAV — Infecção do Acesso Vascular</div>
+        <div class="fg" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px">
+          <div class="f"><label>Cateter temporário (/1000 cat-dia)</label><input type="number" step="0.01" id="hd_ilav"      placeholder="0.00"></div>
+          <div class="f"><label>Cateter permanente (/1000 cat-dia)</label><input type="number" step="0.01" id="hd_ilav_perm" placeholder="0.00"></div>
+          <div class="f"><label>Fístula (/100 pac-mês)</label>           <input type="number" step="0.01" id="hd_ilav_fist" placeholder="0.00"></div>
+        </div>
+
+        <div class="sub">Bacteremia (ICS)</div>
+        <div class="fg" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px">
+          <div class="f"><label>Cateter temporário (/1000 cat-dia)</label><input type="number" step="0.01" id="hd_bact"      placeholder="0.00"></div>
+          <div class="f"><label>Cateter permanente (/1000 cat-dia)</label><input type="number" step="0.01" id="hd_bact_perm" placeholder="0.00"></div>
+          <div class="f"><label>Fístula (/100 pac-mês)</label>           <input type="number" step="0.01" id="hd_bact_fist" placeholder="0.00"></div>
+        </div>
+
+        <div class="sub">Outros</div>
+        <div class="fg" style="grid-template-columns:1fr 1fr 1fr 1.4fr;gap:8px">
+          <div class="f"><label>Vancomicina (%pac)</label><input type="number" step="0.01" id="hd_vanco"  placeholder="0.00"></div>
+          <div class="f"><label>CVC OK (n)</label>        <input type="number"             id="hd_aud_ok" placeholder="0"></div>
+          <div class="f"><label>CVC NC (n)</label>        <input type="number"             id="hd_aud_nc" placeholder="0"></div>
+          <div class="f">
+            <label>Status epidemiológico</label>
+            <select id="hd_status">
+              <option value="endemic">Atividade endêmica</option>
+              <option value="alert">Estado de alerta supraendêmico</option>
+              <option value="exceptional">Atividade excepcional</option>
+            </select>
           </div>
-          <div class="fg fg4" style="margin-top:8px">
-            <div class="f"><label style="color:var(--green)">Pip/Tazo — Mínimo</label><input type="number" step="0.1" id="uc_l_pipMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">Carba — Mínimo</label><input type="number" step="0.1" id="uc_l_carbaMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">Glico — Mínimo</label><input type="number" step="0.1" id="uc_l_glicoMin" placeholder="—"></div>
-            <div class="f"><label style="color:var(--green)">Polimixina — Mínimo</label><input type="number" step="0.1" id="uc_l_poliMin" placeholder="—"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Enfermarias ── -->
+    <div class="sec">
+      <div class="sec-head">Enfermarias <span class="badge">Infecções absolutas no mês + pacientes-dia</span></div>
+      <div class="sec-body">
+        <div class="sub">Clínica Médica</div>
+        <div class="fg" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;gap:8px">
+          <div class="f"><label>Acesso central (n)</label><input type="number" id="cm_ac"   placeholder="0"></div>
+          <div class="f"><label>ITU (n)</label>           <input type="number" id="cm_itu"  placeholder="0"></div>
+          <div class="f"><label>Pneumonias (n)</label>    <input type="number" id="cm_pneu" placeholder="0"></div>
+          <div class="f"><label>Pacientes-dia</label>     <input type="number" id="cm_pd"   placeholder="0"></div>
+          <div class="f">
+            <label>Status</label>
+            <select id="cm_status">
+              <option value="endemic">Atividade endêmica</option>
+              <option value="alert">Alerta supraendêmico</option>
+              <option value="exceptional">Atividade excepcional</option>
+            </select>
           </div>
-          <div class="lim-note">Campos vazios = limiar não será desenhado no gráfico desta competência.</div>
         </div>
-
-        <div class="divider"></div>
-        <div class="sub-lbl">MDR na UTIC (/1000 pac-dia)</div>
-        <div class="fg fg3">
-          <div class="f"><label>ESBL</label><input type="number" step="0.1" id="uc_esbl" placeholder="7.0"></div>
-          <div class="f"><label>KPC</label><input type="number" step="0.1" id="uc_kpc" placeholder="22.0"></div>
-          <div class="f"><label>Acinetobacter MDR</label><input type="number" step="0.1" id="uc_acin" placeholder="14.0"></div>
-        </div>
-
-        <div class="divider"></div>
-        <div class="sub-lbl">Higiene das Mãos & Auditoria CVC</div>
-        <div class="fg fg3">
-          <div class="f"><label>Álcool gel — HM (ml/pac-dia)</label><input type="number" step="0.1" id="uc_hm" placeholder="0.0"></div>
-          <div class="f"><label>CVC — Checklists OK (n)</label><input type="number" id="uc_aud_ok" placeholder="35"></div>
-          <div class="f"><label>CVC — Não conformes (n)</label><input type="number" id="uc_aud_nc" placeholder="2"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- UTI NEO -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)">
-        <span class="sl">◉ UTI Neonatal <span class="su">NHSN</span></span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="sb">
-        <div class="sub-lbl">IrAS — IPCS Associada a CVC</div>
-        <div class="fg fg2">
-          <div class="f"><label>IPCS Clinicamente Definida (/1000 CVC-dia)</label><input type="number" step="0.1" id="neo_ipcs" placeholder="0.0"></div>
-        </div>
-        <div class="lim-block">
-          <div class="lim-title lim-max">Limiar previsto por regressão <span class="pbadge">Poisson / Bin-Neg</span></div>
-          <div class="fg fg2">
-            <div class="f"><label style="color:var(--red)">IPCS/CVC — Máximo previsto</label><input type="number" step="0.01" id="neo_l_ipcsMax" placeholder="—"><span class="fu">apenas limiar máximo (sem mínimo)</span></div>
+        <div class="sub">Clínica Cirúrgica</div>
+        <div class="fg" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr 1.4fr;gap:8px">
+          <div class="f"><label>Acesso central (n)</label> <input type="number" id="cc_ac"   placeholder="0"></div>
+          <div class="f"><label>ITU (n)</label>             <input type="number" id="cc_itu"  placeholder="0"></div>
+          <div class="f"><label>Pneumonias (n)</label>      <input type="number" id="cc_pneu" placeholder="0"></div>
+          <div class="f"><label>Sítio cirúrgico (n)</label> <input type="number" id="cc_sc"   placeholder="0"></div>
+          <div class="f"><label>Pacientes-dia</label>       <input type="number" id="cc_pd"   placeholder="0"></div>
+          <div class="f">
+            <label>Status</label>
+            <select id="cc_status">
+              <option value="endemic">Atividade endêmica</option>
+              <option value="alert">Alerta supraendêmico</option>
+              <option value="exceptional">Atividade excepcional</option>
+            </select>
           </div>
-          <div class="lim-note">Campo vazio = linha não desenhada.</div>
         </div>
-        <div class="divider"></div>
-        <div class="sub-lbl">Auditoria CVC</div>
-        <div class="fg fg2">
-          <div class="f"><label>Checklists OK (n)</label><input type="number" id="neo_aud_ok" placeholder="20"></div>
-          <div class="f"><label>Não conformes (n)</label><input type="number" id="neo_aud_nc" placeholder="8"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HEMODIÁLISE -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">◈ Hemodiálise / Nefrologia <span class="su">Clopper-Pearson · sem limiares mensais</span></span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="sub-lbl">Infecções de Cateter</div>
-        <div class="fg fg3">
-          <div class="f"><label>ILAV — Externa (/1000 cat-dia)</label><input type="number" step="0.01" id="hd_ilav" placeholder="2.45"></div>
-          <div class="f"><label>Bacteremia / ICS (/1000 cat-dia)</label><input type="number" step="0.01" id="hd_bact" placeholder="11.53"></div>
-          <div class="f"><label>Pacientes em uso de Vancomicina (%)</label><input type="number" step="0.01" id="hd_vanco" placeholder="5.88"></div>
-        </div>
-        <div class="divider"></div>
-        <div class="sub-lbl">Auditoria CVC</div>
-        <div class="fg fg2">
-          <div class="f"><label>Checklists OK (n)</label><input type="number" id="hd_aud_ok" placeholder="10"></div>
-          <div class="f"><label>Não conformes (n)</label><input type="number" id="hd_aud_nc" placeholder="4"></div>
+        <div class="sub">EPM / Apartamentos</div>
+        <div class="fg" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr 1.4fr;gap:8px">
+          <div class="f"><label>Acesso central (n)</label> <input type="number" id="ep_ac"   placeholder="0"></div>
+          <div class="f"><label>ITU (n)</label>             <input type="number" id="ep_itu"  placeholder="0"></div>
+          <div class="f"><label>Pneumonias (n)</label>      <input type="number" id="ep_pneu" placeholder="0"></div>
+          <div class="f"><label>Sítio cirúrgico (n)</label> <input type="number" id="ep_sc"   placeholder="0"></div>
+          <div class="f"><label>Pacientes-dia</label>       <input type="number" id="ep_pd"   placeholder="0"></div>
+          <div class="f">
+            <label>Status</label>
+            <select id="ep_status">
+              <option value="endemic">Atividade endêmica</option>
+              <option value="alert">Alerta supraendêmico</option>
+              <option value="exceptional">Atividade excepcional</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- CLÍNICA MÉDICA -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">▤ Clínica Médica <span class="su">Enfermaria · Clopper-Pearson</span></span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="sub-lbl">Infecções — contagem absoluta no mês</div>
-        <div class="fg fg4" style="grid-template-columns:repeat(4,1fr)">
-          <div class="f"><label>Inf. Acesso Central (n)</label><input type="number" id="cm_ac" placeholder="2"></div>
-          <div class="f"><label>Inf. Urinária (n)</label><input type="number" id="cm_itu" placeholder="0"></div>
-          <div class="f"><label>Pneumonias (n)</label><input type="number" id="cm_pneu" placeholder="6"></div>
-          <div class="f"><label>Pacientes-dia</label><input type="number" id="cm_pd" placeholder="664"></div>
+    <!-- ── DOTs de ATB ── -->
+    <div class="sec">
+      <div class="sec-head">DOT de Antimicrobianos <span class="badge">DOT/1000 pac-dia · por unidade · xlsx</span></div>
+      <div class="sec-body">
+
+        <!-- Upload zone -->
+        <div class="cve-drop" id="dotsDrop" onclick="document.getElementById('dotsFileInput').click()" style="margin-bottom:10px">
+          <div class="cve-icon">💊</div>
+          <div class="cve-title">Clique ou arraste o DOTs 2026.xlsx aqui</div>
+          <div class="cve-sub">Exportado do Google Sheets · Abas: Tot_CTO · Tot_PPTZ · Tot_CBP · Tot_GPP · Tot_PB</div>
+          <input type="file" id="dotsFileInput" accept=".xlsx" style="display:none" onchange="loadDots(this.files[0])">
+          <div class="cve-status" id="dotsStatus"></div>
+        </div>
+
+        <!-- Detected month badge -->
+        <div id="dotsMesDetectado" style="display:none;margin-bottom:10px;font-size:11px;color:#1565c0;font-weight:600;background:#e3f2fd;padding:6px 10px;border-radius:4px;border-left:3px solid #1565c0"></div>
+
+        <!-- Grid header -->
+        <div class="sub" style="margin-top:4px">Valores extraídos — último mês preenchido</div>
+        <div class="fg" style="grid-template-columns:120px repeat(6,1fr);margin-bottom:2px">
+          <div style="font-size:9px;color:#888;padding:3px 0">Classe ATB</div>
+          <div style="font-size:9px;color:#444;font-weight:600;text-align:center">UTI A/B</div>
+          <div style="font-size:9px;color:#444;font-weight:600;text-align:center">UTIC</div>
+          <div style="font-size:9px;color:#444;font-weight:600;text-align:center">Cl.Médica</div>
+          <div style="font-size:9px;color:#444;font-weight:600;text-align:center">Cl.Cirúrgica</div>
+          <div style="font-size:9px;color:#444;font-weight:600;text-align:center">Apartamentos</div>
+          <div style="font-size:9px;color:#444;font-weight:600;text-align:center">EPM</div>
+        </div>
+
+        <!-- Ceftriaxona -->
+        <div class="fg" style="grid-template-columns:120px repeat(6,1fr);margin-bottom:6px;align-items:center">
+          <div style="font-size:10px;font-weight:700;color:#4ade80">Ceftriaxona</div>
+          <div class="f"><input type="number" step="0.01" id="dot_cef_utiab" placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cef_utic"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cef_clin"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cef_cir"   placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cef_apto"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cef_epm"   placeholder="0.00"></div>
+        </div>
+        <!-- Pip/Tazo -->
+        <div class="fg" style="grid-template-columns:120px repeat(6,1fr);margin-bottom:6px;align-items:center">
+          <div style="font-size:10px;font-weight:700;color:#facc15">Pip/Tazo</div>
+          <div class="f"><input type="number" step="0.01" id="dot_pip_utiab" placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pip_utic"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pip_clin"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pip_cir"   placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pip_apto"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pip_epm"   placeholder="0.00"></div>
+        </div>
+        <!-- Carbapenêmico -->
+        <div class="fg" style="grid-template-columns:120px repeat(6,1fr);margin-bottom:6px;align-items:center">
+          <div style="font-size:10px;font-weight:700;color:#fb923c">Carbapenêmico</div>
+          <div class="f"><input type="number" step="0.01" id="dot_cbp_utiab" placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cbp_utic"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cbp_clin"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cbp_cir"   placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cbp_apto"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_cbp_epm"   placeholder="0.00"></div>
+        </div>
+        <!-- Glicopeptídeo -->
+        <div class="fg" style="grid-template-columns:120px repeat(6,1fr);margin-bottom:6px;align-items:center">
+          <div style="font-size:10px;font-weight:700;color:#f87171">Glicopeptídeo</div>
+          <div class="f"><input type="number" step="0.01" id="dot_gpp_utiab" placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_gpp_utic"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_gpp_clin"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_gpp_cir"   placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_gpp_apto"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_gpp_epm"   placeholder="0.00"></div>
+        </div>
+        <!-- Polimixina B -->
+        <div class="fg" style="grid-template-columns:120px repeat(6,1fr);align-items:center">
+          <div style="font-size:10px;font-weight:700;color:#c084fc">Polimixina B</div>
+          <div class="f"><input type="number" step="0.01" id="dot_pb_utiab" placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pb_utic"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pb_clin"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pb_cir"   placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pb_apto"  placeholder="0.00"></div>
+          <div class="f"><input type="number" step="0.01" id="dot_pb_epm"   placeholder="0.00"></div>
+        </div>
+
+        <div class="note" style="margin-top:10px">
+          Abas esperadas: <strong>Tot_CTO</strong> · <strong>Tot_PPTZ</strong> · <strong>Tot_CBP</strong> · <strong>Tot_GPP</strong> · <strong>Tot_PB</strong>.
+          A linha do último mês com dados é detectada automaticamente.
         </div>
       </div>
     </div>
 
-    <!-- CLÍNICA CIRÚRGICA -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">▤ Clínica Cirúrgica <span class="su">Enfermaria · Clopper-Pearson</span></span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="sub-lbl">Infecções — contagem absoluta no mês</div>
-        <div class="fg fg5">
-          <div class="f"><label>Inf. Acesso Central (n)</label><input type="number" id="cc_ac" placeholder="4"></div>
-          <div class="f"><label>Inf. Urinária (n)</label><input type="number" id="cc_itu" placeholder="2"></div>
-          <div class="f"><label>Pneumonias (n)</label><input type="number" id="cc_pneu" placeholder="8"></div>
-          <div class="f"><label>Inf. Sítio Cirúrgico (n)</label><input type="number" id="cc_sc" placeholder="6"></div>
-          <div class="f"><label>Pacientes-dia</label><input type="number" id="cc_pd" placeholder="746"></div>
+    <!-- ── Diarreia Hospitalar ── -->
+    <div class="sec">
+      <div class="sec-head">Diarreia Hospitalar <span class="badge">Incidência /1000 pac-dia · Censo Diarreia xlsx</span></div>
+      <div class="sec-body">
+        <div class="note" style="margin-bottom:10px">
+          Upload do <strong>Censo_Diarreia_20XX_HUSF.xlsx</strong>. Extrai automaticamente a Tabela 3 (Incidência /1000 pac-dia) da aba <em>Totais</em> para o mês selecionado.
+        </div>
+        <div class="cve-drop" id="diarrDrop" onclick="document.getElementById('diarrFileInput').click()">
+          <div class="cve-icon">🦠</div>
+          <div class="cve-title">Clique ou arraste o Censo Diarreia aqui</div>
+          <div class="cve-sub">Censo_Diarreia_2025_HUSF.xlsx ou 2026</div>
+          <input type="file" id="diarrFileInput" accept=".xlsx" style="display:none" onchange="loadDiarr(this.files[0])">
+          <div class="cve-status" id="diarrStatus"></div>
+        </div>
+        <button class="fill-btn" id="diarrFillBtn" onclick="doDiarrFill()" style="display:none">
+          🦠 Auto-preencher Diarreia
+          <span class="fill-badge" id="diarrFillBadge"></span>
+        </button>
+        <div class="autofill-log" id="diarrLog"></div>
+
+        <div class="sub" style="margin-top:14px">Incidência /1000 pac-dia — mês atual</div>
+        <div class="fg" style="grid-template-columns:repeat(5,1fr);gap:8px">
+          <div class="f"><label>Cl. Médica</label><input type="number" step="0.01" id="diarr_cm"    placeholder="0.00"></div>
+          <div class="f"><label>Cl. Cirúrgica</label><input type="number" step="0.01" id="diarr_cc" placeholder="0.00"></div>
+          <div class="f"><label>EPM / Apto</label><input type="number" step="0.01" id="diarr_epm"   placeholder="0.00"></div>
+          <div class="f"><label>UTI A/B</label><input type="number" step="0.01" id="diarr_utiab"    placeholder="0.00"></div>
+          <div class="f"><label>UTI C</label><input type="number" step="0.01" id="diarr_utic"       placeholder="0.00"></div>
         </div>
       </div>
     </div>
 
-    <!-- EPM -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">▤ EPM / Apartamentos <span class="su">Enfermaria · Clopper-Pearson</span></span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="sub-lbl">Infecções — contagem absoluta no mês</div>
-        <div class="fg fg5">
-          <div class="f"><label>Inf. Acesso Central (n)</label><input type="number" id="ep_ac" placeholder="0"></div>
-          <div class="f"><label>Inf. Urinária (n)</label><input type="number" id="ep_itu" placeholder="0"></div>
-          <div class="f"><label>Pneumonias (n)</label><input type="number" id="ep_pneu" placeholder="2"></div>
-          <div class="f"><label>Inf. Sítio Cirúrgico (n)</label><input type="number" id="ep_sc" placeholder="2"></div>
-          <div class="f"><label>Pacientes-dia</label><input type="number" id="ep_pd" placeholder="619"></div>
+    <!-- ── Antibiograma ── -->
+    <div class="sec">
+      <div class="sec-head">Antibiograma Institucional <span class="badge">Atualizar apenas se houver nova versão</span></div>
+      <div class="sec-body">
+        <div class="sub">Gram-Negativos — Sensibilidade (%)</div>
+        <div class="abio-wrap" style="margin-bottom:12px">
+          <table><thead id="gnHead"></thead><tbody id="gnBody"></tbody></table>
         </div>
-      </div>
-    </div>
-
-    <!-- ANTIBIOGRAMA -->
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">⬟ Antibiograma <span class="su">Atualização periódica — deixe vazio para manter anterior</span></span><span class="chev">▾</span></div>
-      <div class="sb">
-        <div class="sub-lbl">Gram-Negativos — Sensibilidade (%)</div>
-        <div style="overflow-x:auto;margin-bottom:14px"><table id="abioGN" style="border-collapse:collapse;font-size:11px;min-width:700px;width:100%"><thead id="abioGNHead"></thead><tbody id="abioGNBody"></tbody></table></div>
-        <div class="sub-lbl">Gram-Positivos — Sensibilidade (%)</div>
-        <div style="overflow-x:auto"><table id="abioGP" style="border-collapse:collapse;font-size:11px;min-width:600px;width:100%"><thead id="abioGPHead"></thead><tbody id="abioGPBody"></tbody></table></div>
+        <div class="sub">Gram-Positivos — Sensibilidade (%)</div>
+        <div class="abio-wrap">
+          <table><thead id="gpHead"></thead><tbody id="gpBody"></tbody></table>
+        </div>
       </div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="goStep(1)">← Voltar</button>
-      <button class="btn btn-teal" onclick="proceedStep3()">Gerar JSON →</button>
+      <button class="btn btn-grey" onclick="goStep(1)">← Voltar</button>
+      <button class="btn btn-dark" onclick="proceedStep3()">Gerar JSON →</button>
     </div>
   </div>
 
-  <!-- ══ STEP 3 ══ -->
+  <!-- ═══════════════════════════════ STEP 3 ═══════════════════════════════ -->
   <div id="step3" style="display:none">
-    <div class="sc">
-      <div class="sh" onclick="toggle(this)"><span class="sl">🔍 Resumo da Competência</span><span class="chev open">▾</span></div>
-      <div class="sb open" id="resumoBody"></div>
+    <div class="sec">
+      <div class="sec-head">Resumo</div>
+      <div class="sec-body">
+        <div class="summary-grid" id="resumoGrid"></div>
+      </div>
     </div>
-    <div class="sc" style="margin-top:12px">
-      <div class="sh" onclick="toggle(this)"><span class="sl">{ } JSON gerado — data_iras.json</span><span class="chev">▾</span></div>
-      <div class="sb"><div class="preview-box" id="jsonPreview"></div></div>
+    <div class="sec" style="margin-top:12px">
+      <div class="sec-head">JSON gerado — data_iras.json</div>
+      <div class="sec-body">
+        <div class="preview-box" id="jsonPreview"></div>
+        <div class="btn-row" style="margin-top:0;padding-top:0;border-top:none">
+          <button class="btn btn-green" onclick="downloadJSON()">⬇ Baixar data_iras.json</button>
+          <button class="btn btn-blue"  onclick="copyJSON()">📋 Copiar</button>
+          <div id="copyMsg" style="font-size:11px;color:#2e7d32;margin-left:8px"></div>
+        </div>
+      </div>
     </div>
-    <div class="info-box" style="margin-top:12px">
-      <strong>Próximo passo:</strong><br>
-      1 · Baixe o arquivo <code style="color:var(--teal)">data_iras.json</code><br>
-      2 · Substitua no repositório: <code style="color:var(--teal)">~/vigilancia_husf_braganca/data_iras.json</code><br>
-      3 · <code style="color:var(--teal)">git add data_iras.json &amp;&amp; git commit -m "IrAS <span id="periodoCommit"></span>" &amp;&amp; git push</code>
+    <div class="note" style="margin-top:12px">
+      <strong>Próximo passo:</strong>
+      Substitua <code>data_iras.json</code> no repositório e execute:
+      <code>git add data_iras.json &amp;&amp; git commit -m "IrAS <span id="periodoCommit"></span>" &amp;&amp; git push</code>
     </div>
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="goStep(2)">← Editar</button>
-      <button class="btn btn-green" onclick="downloadJSON()">⬇ Baixar data_iras.json</button>
-      <button class="btn btn-blue" onclick="copyJSON()">📋 Copiar JSON</button>
+      <button class="btn btn-grey" onclick="goStep(2)">← Editar</button>
     </div>
-    <div id="copyMsg"></div>
   </div>
 
-</div><!-- /container -->
+</div><!-- /page -->
 
 <script>
-// ─── ANTIBIOGRAMA BASE ────────────────────────────────────────────────────────
-const GN_COLS=["Amicacina","Ampi/Sul","Cefepime","Ceftriaxona","Cipro","Gentamicina","Meropenem","Nitrofurantoína","Fosfomicina","Pip/Tazo","Polimixina B"];
-const GN_ROWS=[
-  {o:"Acinetobacter",vs:[8,null,null,null,0,null,0,null,null,0,100]},
-  {o:"Citrobacter",vs:[100,null,100,80,65,100,100,100,100,100,null]},
-  {o:"Enterobacter",vs:[100,null,95,75,87,98,100,89,96,85,null]},
-  {o:"E. coli",vs:[99,84,81,83,70,87,99,99,100,83,100]},
-  {o:"Klebsiella",vs:[99,43,45,45,42,68,79,90,93,45,78]},
-  {o:"Morganella",vs:[100,50,50,50,83,100,100,null,null,50,null]},
-  {o:"Proteus",vs:[99,75,87,87,96,77,100,null,96,76,null]},
-  {o:"Pseudomonas",vs:[100,null,50,null,83,null,91,null,null,31,100]},
-  {o:"Serratia",vs:[100,null,91,89,91,74,95,null,null,90,null]},
+// ── Antibiogram base data ─────────────────────────────────────────────────────
+var GN_COLS = ['Amicacina','Ampi/Sul','Cefepime','Ceftriaxona','Cipro','Gentamicina','Meropenem','Nitrofurantoína','Fosfomicina','Pip/Tazo','Polimixina B'];
+var GN_ROWS = [
+  {o:'Acinetobacter',vs:[8,null,null,null,0,null,0,null,null,0,100]},
+  {o:'Citrobacter',  vs:[100,null,100,80,65,100,100,100,100,100,null]},
+  {o:'Enterobacter', vs:[100,null,95,75,87,98,100,89,96,85,null]},
+  {o:'E. coli',      vs:[99,84,81,83,70,87,99,99,100,83,100]},
+  {o:'Klebsiella',   vs:[99,43,45,45,42,68,79,90,93,45,78]},
+  {o:'Morganella',   vs:[100,50,50,50,83,100,100,null,null,50,null]},
+  {o:'Proteus',      vs:[99,75,87,87,96,77,100,null,96,76,null]},
+  {o:'Pseudomonas',  vs:[100,null,50,null,83,null,91,null,null,31,100]},
+  {o:'Serratia',     vs:[100,null,91,89,91,74,95,null,null,90,null]}
 ];
-const GP_COLS=["Ampicilina","Oxacilina","Eritromicina","Clindamicina","Levofloxacina","Genta HLR","SMT/TMP","Vancomicina","Linezolida","Daptomicina"];
-const GP_ROWS=[
-  {o:"S. aureus",vs:[null,57,29,48,76,84,97,100,100,93]},
-  {o:"S. coag-neg",vs:[null,19,17,33,null,38,34,100,100,98]},
-  {o:"E. faecalis",vs:[100,null,null,null,100,null,null,100,100,null]},
-  {o:"E. faecium",vs:[0,null,null,null,0,null,null,100,100,null]},
+var GP_COLS = ['Ampicilina','Oxacilina','Eritromicina','Clindamicina','Levofloxacina','Genta HLR','SMT/TMP','Vancomicina','Linezolida','Daptomicina'];
+var GP_ROWS = [
+  {o:'S. aureus',   vs:[null,57,29,48,76,84,97,100,100,93]},
+  {o:'S. coag-neg', vs:[null,19,17,33,null,38,34,100,100,98]},
+  {o:'E. faecalis', vs:[100,null,null,null,100,null,null,100,100,null]},
+  {o:'E. faecium',  vs:[0,null,null,null,0,null,null,100,100,null]}
 ];
 
-function buildTable(pfx,cols,rows,hId,bId){
-  const th='padding:5px 5px;color:#7da8d8;font-size:8px;border-bottom:1px solid #172845;text-align:center;white-space:nowrap;background:#0c1829';
-  const td='padding:4px 3px;font-size:10px;font-family:"JetBrains Mono",monospace;border-bottom:1px solid #17284522;text-align:center';
-  document.getElementById(hId).innerHTML='<tr><th style="'+th+';text-align:left;min-width:110px">Organismo</th>'+cols.map(c=>'<th style="'+th+'">'+c+'</th>').join('')+'</tr>';
-  document.getElementById(bId).innerHTML=rows.map((r,ri)=>
-    '<tr style="background:'+(ri%2===0?'transparent':'#142444aa')+'"><td style="'+td+';text-align:left;color:#ddeeff">'+r.o+'</td>'+
-    r.vs.map((v,ci)=>'<td style="'+td+'"><input type="number" id="'+pfx+'_'+ri+'_'+ci+'" value="'+(v!==null?v:'')+'" placeholder="—" min="0" max="100" step="1" style="width:46px;background:#07101f;border:1px solid #1e3a68;border-radius:4px;color:#ddeeff;font-family:\'JetBrains Mono\',monospace;font-size:10px;padding:3px 4px;text-align:center;outline:none"></td>').join('')+'</tr>'
-  ).join('');
+function buildAbioTable(cols, rows, headId, bodyId, pfx) {
+  var h = document.getElementById(headId);
+  var b = document.getElementById(bodyId);
+  h.innerHTML = '<tr><th class="org">Organismo</th>' +
+    cols.map(function(c){ return '<th>'+c+'</th>'; }).join('') + '</tr>';
+  b.innerHTML = rows.map(function(row, ri) {
+    return '<tr><td class="org-name">'+row.o+'</td>' +
+      row.vs.map(function(v, ci) {
+        return '<td><input type="number" id="'+pfx+'_'+ri+'_'+ci+'" value="'+(v!=null?v:'')+'" placeholder="—" min="0" max="100"></td>';
+      }).join('') + '</tr>';
+  }).join('');
 }
-buildTable('gn',GN_COLS,GN_ROWS,'abioGNHead','abioGNBody');
-buildTable('gp',GP_COLS,GP_ROWS,'abioGPHead','abioGPBody');
+buildAbioTable(GN_COLS, GN_ROWS, 'gnHead', 'gnBody', 'gn');
+buildAbioTable(GP_COLS, GP_ROWS, 'gpHead', 'gpBody', 'gp');
 
-document.getElementById('c_mes').addEventListener('change',autoLabel);
-document.getElementById('c_ano').addEventListener('input',autoLabel);
-function autoLabel(){
-  const m=document.getElementById('c_mes').value;
-  const y=String(document.getElementById('c_ano').value).slice(-2);
-  document.getElementById('c_label').value=m+'/'+y;
+// Auto-fill label
+document.getElementById('c_mes').addEventListener('change', autoLabel);
+document.getElementById('c_ano').addEventListener('input',  autoLabel);
+function autoLabel() {
+  var m = document.getElementById('c_mes').value;
+  var y = String(document.getElementById('c_ano').value).slice(-2);
+  document.getElementById('c_label').value = m + '/' + y;
 }
 autoLabel();
 
-// ─── TOGGLE ──────────────────────────────────────────────────────────────────
-function toggle(head){
-  const body=head.nextElementSibling,chev=head.querySelector('.chev');
-  const open=body.classList.contains('open');
-  body.style.display=open?'none':'block';
-  body.classList.toggle('open',!open);
-  chev.classList.toggle('open',!open);
-}
-
-// ─── STEP NAVIGATION ─────────────────────────────────────────────────────────
-let baseData=null;
-function goStep(n){
-  [1,2,3].forEach(i=>document.getElementById('step'+i).style.display=i===n?'block':'none');
-  ['st1','st2','st3'].forEach((id,i)=>{
-    const el=document.getElementById(id);
+// ── Step navigation ───────────────────────────────────────────────────────────
+var baseData = null;
+function goStep(n) {
+  [1,2,3].forEach(function(i){ document.getElementById('step'+i).style.display = i===n?'block':'none'; });
+  ['st1','st2','st3'].forEach(function(id,i){
+    var el = document.getElementById(id);
     el.classList.remove('active','done');
-    if(i+1===n) el.classList.add('active');
-    else if(i+1<n) el.classList.add('done');
+    if (i+1===n) el.classList.add('active');
+    else if (i+1<n) el.classList.add('done');
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function proceedStep2(){
-  const txt=document.getElementById('jsonBase').value.trim();
-  const msg=document.getElementById('jsonMsg');
-  if(txt){
-    try{baseData=JSON.parse(txt);msg.innerHTML='<div class="msg msg-ok">✓ JSON carregado. Histórico preservado.</div>';}
-    catch(e){msg.innerHTML='<div class="msg msg-err">✗ JSON inválido.</div>';return;}
+function proceedStep2() {
+  var txt = document.getElementById('jsonBase').value.trim();
+  var msg = document.getElementById('jsonMsg');
+  if (txt) {
+    try { baseData = JSON.parse(txt); msg.innerHTML = '<div class="alert alert-ok">✓ JSON carregado — histórico preservado.</div>'; }
+    catch(e) { msg.innerHTML = '<div class="alert alert-err">✗ JSON inválido.</div>'; return; }
   } else {
-    baseData=null;
-    msg.innerHTML='<div class="msg msg-ok" style="margin-top:8px">ℹ Base Jan/2026 será usada como histórico.</div>';
+    baseData = null;
+    msg.innerHTML = '<div class="alert alert-ok">ℹ Usando base Jan/2026.</div>';
   }
   goStep(2);
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-function num(id,def=0){const v=document.getElementById(id)?.value;return(v===''||v==null)?def:parseFloat(v);}
-function numOrNull(id){const v=document.getElementById(id)?.value;return(v===''||v==null)?null:parseFloat(v);}
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function num(id, def) { var v = document.getElementById(id) && document.getElementById(id).value; return (v===''||v==null) ? (def||0) : parseFloat(v); }
+function numN(id)     { var v = document.getElementById(id) && document.getElementById(id).value; return (v===''||v==null) ? null : parseFloat(v); }
+function stripC(arr)  { return arr.map(function(d){ var n=Object.assign({},d); delete n.c; return n; }); }
+function appS(arr,lbl,v) { return stripC(arr).concat([{p:lbl,v:v,c:1}]); }
+function appMDR(arr,lbl,e,k,a) { return arr.concat([{p:lbl,e:e,k:k,a:a}]); }
 
-function getAbio(pfx,rows,cols){
-  return rows.map((r,ri)=>({o:r.o,vs:cols.map((_,ci)=>{
-    const el=document.getElementById(pfx+'_'+ri+'_'+ci);
-    return(!el||el.value==='')?null:parseFloat(el.value);
-  })}));
+function getAbio(pfx, rows, cols) {
+  return rows.map(function(row,ri){
+    return {o:row.o, vs:cols.map(function(_,ci){
+      var el=document.getElementById(pfx+'_'+ri+'_'+ci);
+      return (!el||el.value==='') ? null : parseFloat(el.value);
+    })};
+  });
 }
 
-function stripC(arr){return arr.map(d=>{const n={...d};delete n.c;return n;});}
-function appendSeries(arr,lbl,v){return[...stripC(arr),{p:lbl,v,c:1}];}
-function appendMDR(arr,lbl,e,k,a){return[...arr,{p:lbl,e,k,a}];}
-
-// ─── BUILD JSON ──────────────────────────────────────────────────────────────
-const BASE_FALLBACK={
-  "periodo":"Janeiro 2026",
-  "global":{"taxaIH":[{"p":"2020","v":2.40},{"p":"2021","v":2.81},{"p":"2022","v":1.80},{"p":"2023","v":1.03},{"p":"2024","v":1.10},{"p":"2025","v":1.04},{"p":"jan/26","v":0.86,"c":1}]},
-  "clinicaMedica":{"taxaIH":[{"p":"2020","v":0.82},{"p":"2021","v":1.15},{"p":"2022","v":1.18},{"p":"2023","v":1.63},{"p":"2024","v":1.57},{"p":"2025","v":1.28},{"p":"jan/26","v":1.20,"c":1}],"inf":{"ac":2,"itu":0,"pneu":6,"sc":null,"total":8,"pd":664}},
-  "clinicaCirurgica":{"taxaIH":[{"p":"2020","v":0.91},{"p":"2021","v":1.15},{"p":"2022","v":1.61},{"p":"2023","v":3.13},{"p":"2024","v":3.00},{"p":"2025","v":3.18},{"p":"jan/26","v":2.68,"c":1}],"inf":{"ac":4,"itu":2,"pneu":8,"sc":6,"total":20,"pd":746}},
-  "epm":{"taxaIH":[{"p":"2020","v":0.66},{"p":"2021","v":0.83},{"p":"2022","v":0.78},{"p":"2023","v":1.20},{"p":"2024","v":0.82},{"p":"2025","v":1.01},{"p":"jan/26","v":0.65,"c":1}],"inf":{"ac":0,"itu":0,"pneu":2,"sc":2,"total":4,"pd":619}},
-  "hd":{"ilav":[{"p":"2016","v":24.4},{"p":"2017","v":27.8},{"p":"2018","v":12.6},{"p":"2019","v":10.4},{"p":"2020","v":5.4},{"p":"2021","v":5.71},{"p":"2022","v":6.8},{"p":"2023","v":3.15},{"p":"2024","v":3.36},{"p":"2025","v":2.12},{"p":"jan/26","v":2.45,"c":1}],"bact":[{"p":"2016","v":12.5},{"p":"2017","v":6.7},{"p":"2018","v":5.9},{"p":"2019","v":5.6},{"p":"2020","v":5.1},{"p":"2021","v":8.68},{"p":"2022","v":6.79},{"p":"2023","v":8.3},{"p":"2024","v":24.32},{"p":"2025","v":8.61},{"p":"jan/26","v":11.53,"c":1}],"vanco":[{"p":"2016","v":8.8},{"p":"2017","v":7.5},{"p":"2018","v":8.5},{"p":"2019","v":5.9},{"p":"2020","v":4.5},{"p":"2021","v":7.15},{"p":"2022","v":7.79},{"p":"2023","v":8.02},{"p":"2024","v":10.22},{"p":"2025","v":6.93},{"p":"jan/26","v":5.88,"c":1}],"audit":{"ok":10,"nc":4,"pct":29}},
-  "utiAB":{"svd":[{"p":"2020","v":77},{"p":"2021","v":82},{"p":"2022","v":76},{"p":"2023","v":76},{"p":"2024","v":76},{"p":"2025","v":74},{"p":"jan/26","v":75,"c":1}],"cvc":[{"p":"2020","v":74},{"p":"2021","v":70},{"p":"2022","v":74},{"p":"2023","v":74},{"p":"2024","v":72},{"p":"2025","v":70},{"p":"jan/26","v":65,"c":1}],"tot":[{"p":"2019","v":50},{"p":"2020","v":55},{"p":"2021","v":60},{"p":"2022","v":62},{"p":"2023","v":56},{"p":"2024","v":55},{"p":"2025","v":52},{"p":"jan/26","v":57,"c":1}],"pav":[{"p":"2020","v":6},{"p":"2021","v":7},{"p":"2022","v":5},{"p":"2023","v":8},{"p":"2024","v":5},{"p":"2025","v":4},{"p":"jan/26","v":0,"c":1}],"itu":[{"p":"2020","v":3},{"p":"2021","v":4},{"p":"2022","v":2},{"p":"2023","v":3},{"p":"2024","v":2},{"p":"2025","v":2},{"p":"jan/26","v":0,"c":1}],"ipcs":[{"p":"2015","v":10},{"p":"2016","v":8},{"p":"2017","v":7},{"p":"2018","v":12},{"p":"2019","v":9},{"p":"2020","v":9},{"p":"2021","v":8},{"p":"2022","v":7},{"p":"2023","v":8},{"p":"2024","v":5},{"p":"2025","v":7},{"p":"jan/26","v":0,"c":1}],"dddPip":[{"p":"2020","v":145},{"p":"2021","v":155},{"p":"2022","v":130},{"p":"2023","v":125},{"p":"2024","v":85},{"p":"2025","v":58},{"p":"jan/26","v":22,"c":1}],"dddCarba":[{"p":"2020","v":180},{"p":"2021","v":155},{"p":"2022","v":150},{"p":"2023","v":150},{"p":"2024","v":130},{"p":"2025","v":120},{"p":"jan/26","v":130,"c":1}],"dddGlico":[{"p":"2020","v":140},{"p":"2021","v":120},{"p":"2022","v":90},{"p":"2023","v":90},{"p":"2024","v":95},{"p":"2025","v":100},{"p":"jan/26","v":100,"c":1}],"dddPoli":[{"p":"2020","v":40},{"p":"2021","v":40},{"p":"2022","v":35},{"p":"2023","v":35},{"p":"2024","v":35},{"p":"2025","v":30},{"p":"jan/26","v":30,"c":1}],"mdr":[{"p":"2019","e":5,"k":10,"a":6},{"p":"2020","e":5,"k":10,"a":6},{"p":"2021","e":5,"k":11,"a":8},{"p":"2022","e":8,"k":10,"a":5},{"p":"2023","e":19,"k":3,"a":8},{"p":"2024","e":22,"k":6,"a":11},{"p":"2025","e":5,"k":9,"a":5}],"mdrMax":{"e":34,"k":17,"a":28},"hm":[{"p":"2021","v":50},{"p":"2022","v":27},{"p":"2023","v":38},{"p":"2024","v":32},{"p":"2025","v":0},{"p":"jan/26","v":0,"c":1}],"audit":{"ok":16,"nc":0,"pct":0},"limiares":{"svdMax":null,"svdMin":null,"cvcMax":null,"cvcMin":null,"totMax":null,"totMin":null,"pavMax":null,"ituMax":null,"ipcsMax":null,"pipMax":null,"pipMin":null,"carbaMax":null,"carbaMin":null,"glicoMax":null,"glicoMin":null,"poliMax":null,"poliMin":null}},
-  "utic":{"svd":[{"p":"2020","v":77},{"p":"2021","v":82},{"p":"2022","v":76},{"p":"2023","v":76},{"p":"2024","v":76},{"p":"2025","v":74},{"p":"jan/26","v":76,"c":1}],"cvc":[{"p":"2020","v":74},{"p":"2021","v":70},{"p":"2022","v":74},{"p":"2023","v":74},{"p":"2024","v":72},{"p":"2025","v":72},{"p":"jan/26","v":72,"c":1}],"tot":[{"p":"2019","v":50},{"p":"2020","v":55},{"p":"2021","v":60},{"p":"2022","v":62},{"p":"2023","v":60},{"p":"2024","v":65},{"p":"2025","v":62},{"p":"jan/26","v":60,"c":1}],"pav":[{"p":"2024","v":0},{"p":"2025","v":0},{"p":"jan/26","v":0,"c":1}],"itu":[{"p":"2024","v":0},{"p":"2025","v":0},{"p":"jan/26","v":0,"c":1}],"ipcs":[{"p":"2024","v":0},{"p":"2025","v":0},{"p":"jan/26","v":0,"c":1}],"dddPip":[{"p":"2024","v":80},{"p":"2025","v":62},{"p":"jan/26","v":65,"c":1}],"dddCarba":[{"p":"2024","v":160},{"p":"2025","v":145},{"p":"jan/26","v":128,"c":1}],"dddGlico":[{"p":"2024","v":100},{"p":"2025","v":100},{"p":"jan/26","v":110,"c":1}],"dddPoli":[{"p":"2024","v":50},{"p":"2025","v":42},{"p":"jan/26","v":70,"c":1}],"mdr":[{"p":"2021","e":19,"k":6,"a":6},{"p":"2022","e":8,"k":4,"a":9},{"p":"2023","e":6,"k":3,"a":4},{"p":"2024","e":4,"k":25,"a":21},{"p":"2025","e":7,"k":22,"a":14}],"mdrMax":{"e":31,"k":23,"a":24},"hm":[{"p":"2021","v":50},{"p":"2022","v":27},{"p":"2023","v":67},{"p":"2024","v":35},{"p":"2025","v":0},{"p":"jan/26","v":0,"c":1}],"audit":{"ok":35,"nc":2,"pct":5},"limiares":{"svdMax":null,"svdMin":null,"cvcMax":null,"cvcMin":null,"totMax":null,"totMin":null,"pavMax":null,"ituMax":null,"ipcsMax":null,"pipMax":null,"pipMin":null,"carbaMax":null,"carbaMin":null,"glicoMax":null,"glicoMin":null,"poliMax":null,"poliMin":null}},
-  "utiNeo":{"ipcs":[{"p":"2019","v":15},{"p":"2020","v":12},{"p":"2021","v":10},{"p":"2022","v":8},{"p":"2023","v":12},{"p":"2024","v":10},{"p":"2025","v":8},{"p":"jan/26","v":0,"c":1}],"audit":{"ok":20,"nc":8,"pct":28},"limiares":{"ipcsMax":null}},
-  "mdrInst":{"s":[{"p":"2015","e":6,"k":6,"a":3},{"p":"2016","e":10,"k":6,"a":6},{"p":"2017","e":12,"k":11,"a":11},{"p":"2018","e":24,"k":10,"a":12},{"p":"2019","e":20,"k":10,"a":9},{"p":"2020","e":38,"k":10,"a":9},{"p":"2021","e":30,"k":28,"a":32},{"p":"2022","e":27,"k":28,"a":28},{"p":"2023","e":30,"k":11,"a":10},{"p":"2024","e":52,"k":10,"a":14},{"p":"2025","e":55,"k":3,"a":13}],"max":{"e":37,"k":11,"a":10}},
-  "abio":{"gnCols":GN_COLS,"gn":GN_ROWS,"gpCols":GP_COLS,"gp":GP_ROWS}
+// ── Fallback base ─────────────────────────────────────────────────────────────
+var BASE = {
+  periodo:'Janeiro 2026',
+  global:{taxaIH:[{p:'2020',v:2.40},{p:'2021',v:2.81},{p:'2022',v:1.80},{p:'2023',v:1.03},{p:'2024',v:1.10},{p:'2025',v:1.04},{p:'jan/26',v:0.86,c:1}]},
+  clinicaMedica:{taxaIH:[{p:'2020',v:0.82},{p:'2021',v:1.15},{p:'2022',v:1.18},{p:'2023',v:1.63},{p:'2024',v:1.57},{p:'2025',v:1.28},{p:'jan/26',v:1.20,c:1}],inf:{ac:2,itu:0,pneu:6,sc:null,total:8,pd:664}},
+  clinicaCirurgica:{taxaIH:[{p:'2020',v:0.91},{p:'2021',v:1.15},{p:'2022',v:1.61},{p:'2023',v:3.13},{p:'2024',v:3.00},{p:'2025',v:3.18},{p:'jan/26',v:2.68,c:1}],inf:{ac:4,itu:2,pneu:8,sc:6,total:20,pd:746}},
+  epm:{taxaIH:[{p:'2020',v:0.66},{p:'2021',v:0.83},{p:'2022',v:0.78},{p:'2023',v:1.20},{p:'2024',v:0.82},{p:'2025',v:1.01},{p:'jan/26',v:0.65,c:1}],inf:{ac:0,itu:0,pneu:2,sc:2,total:4,pd:619}},
+  hd:{ilav:[{p:'2016',v:24.4},{p:'2017',v:27.8},{p:'2018',v:12.6},{p:'2019',v:10.4},{p:'2020',v:5.4},{p:'2021',v:5.71},{p:'2022',v:6.8},{p:'2023',v:3.15},{p:'2024',v:3.36},{p:'2025',v:2.12},{p:'jan/26',v:2.45,c:1}],bact:[{p:'2016',v:12.5},{p:'2017',v:6.7},{p:'2018',v:5.9},{p:'2019',v:5.6},{p:'2020',v:5.1},{p:'2021',v:8.68},{p:'2022',v:6.79},{p:'2023',v:8.3},{p:'2024',v:24.32},{p:'2025',v:8.61},{p:'jan/26',v:11.53,c:1}],vanco:[{p:'2016',v:8.8},{p:'2017',v:7.5},{p:'2018',v:8.5},{p:'2019',v:5.9},{p:'2020',v:4.5},{p:'2021',v:7.15},{p:'2022',v:7.79},{p:'2023',v:8.02},{p:'2024',v:10.22},{p:'2025',v:6.93},{p:'jan/26',v:5.88,c:1}],audit:{ok:10,nc:4,pct:29}},
+  utiAB:{svd:[{p:'2020',v:77},{p:'2021',v:82},{p:'2022',v:76},{p:'2023',v:76},{p:'2024',v:76},{p:'2025',v:74},{p:'jan/26',v:75,c:1}],cvc:[{p:'2020',v:74},{p:'2021',v:70},{p:'2022',v:74},{p:'2023',v:74},{p:'2024',v:72},{p:'2025',v:70},{p:'jan/26',v:65,c:1}],tot:[{p:'2019',v:50},{p:'2020',v:55},{p:'2021',v:60},{p:'2022',v:62},{p:'2023',v:56},{p:'2024',v:55},{p:'2025',v:52},{p:'jan/26',v:57,c:1}],pav:[{p:'2020',v:6},{p:'2021',v:7},{p:'2022',v:5},{p:'2023',v:8},{p:'2024',v:5},{p:'2025',v:4},{p:'jan/26',v:0,c:1}],itu:[{p:'2020',v:3},{p:'2021',v:4},{p:'2022',v:2},{p:'2023',v:3},{p:'2024',v:2},{p:'2025',v:2},{p:'jan/26',v:0,c:1}],ipcs:[{p:'2015',v:10},{p:'2016',v:8},{p:'2017',v:7},{p:'2018',v:12},{p:'2019',v:9},{p:'2020',v:9},{p:'2021',v:8},{p:'2022',v:7},{p:'2023',v:8},{p:'2024',v:5},{p:'2025',v:7},{p:'jan/26',v:0,c:1}],dddPip:[{p:'2020',v:145},{p:'2021',v:155},{p:'2022',v:130},{p:'2023',v:125},{p:'2024',v:85},{p:'2025',v:58},{p:'jan/26',v:22,c:1}],dddCarba:[{p:'2020',v:180},{p:'2021',v:155},{p:'2022',v:150},{p:'2023',v:150},{p:'2024',v:130},{p:'2025',v:120},{p:'jan/26',v:130,c:1}],dddGlico:[{p:'2020',v:140},{p:'2021',v:120},{p:'2022',v:90},{p:'2023',v:90},{p:'2024',v:95},{p:'2025',v:100},{p:'jan/26',v:100,c:1}],dddPoli:[{p:'2020',v:40},{p:'2021',v:40},{p:'2022',v:35},{p:'2023',v:35},{p:'2024',v:35},{p:'2025',v:30},{p:'jan/26',v:30,c:1}],mdr:[{p:'2019',e:5,k:10,a:6},{p:'2020',e:5,k:10,a:6},{p:'2021',e:5,k:11,a:8},{p:'2022',e:8,k:10,a:5},{p:'2023',e:19,k:3,a:8},{p:'2024',e:22,k:6,a:11},{p:'2025',e:5,k:9,a:5}],mdrMax:{e:34,k:17,a:28},hm:[{p:'2021',v:50},{p:'2022',v:27},{p:'2023',v:38},{p:'2024',v:32},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],audit:{ok:16,nc:0,pct:0},limiares:{svdMax:null,svdMin:null,cvcMax:null,cvcMin:null,totMax:null,totMin:null,pavMax:null,ituMax:null,ipcsMax:null,pipMax:null,pipMin:null,carbaMax:null,carbaMin:null,glicoMax:null,glicoMin:null,poliMax:null,poliMin:null}},
+  utic:{svd:[{p:'2020',v:77},{p:'2021',v:82},{p:'2022',v:76},{p:'2023',v:76},{p:'2024',v:76},{p:'2025',v:74},{p:'jan/26',v:76,c:1}],cvc:[{p:'2020',v:74},{p:'2021',v:70},{p:'2022',v:74},{p:'2023',v:74},{p:'2024',v:72},{p:'2025',v:72},{p:'jan/26',v:72,c:1}],tot:[{p:'2019',v:50},{p:'2020',v:55},{p:'2021',v:60},{p:'2022',v:62},{p:'2023',v:60},{p:'2024',v:65},{p:'2025',v:62},{p:'jan/26',v:60,c:1}],pav:[{p:'2024',v:0},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],itu:[{p:'2024',v:0},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],ipcs:[{p:'2024',v:0},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],dddPip:[{p:'2024',v:80},{p:'2025',v:62},{p:'jan/26',v:65,c:1}],dddCarba:[{p:'2024',v:160},{p:'2025',v:145},{p:'jan/26',v:128,c:1}],dddGlico:[{p:'2024',v:100},{p:'2025',v:100},{p:'jan/26',v:110,c:1}],dddPoli:[{p:'2024',v:50},{p:'2025',v:42},{p:'jan/26',v:70,c:1}],mdr:[{p:'2021',e:19,k:6,a:6},{p:'2022',e:8,k:4,a:9},{p:'2023',e:6,k:3,a:4},{p:'2024',e:4,k:25,a:21},{p:'2025',e:7,k:22,a:14}],mdrMax:{e:31,k:23,a:24},hm:[{p:'2021',v:50},{p:'2022',v:27},{p:'2023',v:67},{p:'2024',v:35},{p:'2025',v:0},{p:'jan/26',v:0,c:1}],audit:{ok:35,nc:2,pct:5},limiares:{svdMax:null,svdMin:null,cvcMax:null,cvcMin:null,totMax:null,totMin:null,pavMax:null,ituMax:null,ipcsMax:null,pipMax:null,pipMin:null,carbaMax:null,carbaMin:null,glicoMax:null,glicoMin:null,poliMax:null,poliMin:null}},
+  utiNeo:{ipcs:[{p:'2019',v:15},{p:'2020',v:12},{p:'2021',v:10},{p:'2022',v:8},{p:'2023',v:12},{p:'2024',v:10},{p:'2025',v:8},{p:'jan/26',v:0,c:1}],audit:{ok:20,nc:8,pct:28},limiares:{ipcsMax:null}},
+  mdrInst:{s:[{p:'2015',e:6,k:6,a:3},{p:'2016',e:10,k:6,a:6},{p:'2017',e:12,k:11,a:11},{p:'2018',e:24,k:10,a:12},{p:'2019',e:20,k:10,a:9},{p:'2020',e:38,k:10,a:9},{p:'2021',e:30,k:28,a:32},{p:'2022',e:27,k:28,a:28},{p:'2023',e:30,k:11,a:10},{p:'2024',e:52,k:10,a:14},{p:'2025',e:55,k:3,a:13}],max:{e:37,k:11,a:10}},
+  abio:{gnCols:GN_COLS,gn:GN_ROWS,gpCols:GP_COLS,gp:GP_ROWS}
 };
 
-let generatedJSON=null;
+// ── Build JSON ────────────────────────────────────────────────────────────────
+var generatedJSON = null;
 
-function buildJSON(){
-  const mes=document.getElementById('c_mes').value;
-  const ano=document.getElementById('c_ano').value;
-  const label=document.getElementById('c_label').value||(mes+'/'+String(ano).slice(-2));
-  const periodo=document.getElementById('c_mes').options[document.getElementById('c_mes').selectedIndex].text+' '+ano;
-  const b=baseData?JSON.parse(JSON.stringify(baseData)):JSON.parse(JSON.stringify(BASE_FALLBACK));
+function buildJSON() {
+  var mes    = document.getElementById('c_mes').value;
+  var ano    = document.getElementById('c_ano').value;
+  var label  = document.getElementById('c_label').value || (mes+'/'+String(ano).slice(-2));
+  var periodo= document.getElementById('c_mes').options[document.getElementById('c_mes').selectedIndex].text+' '+ano;
+  var b = baseData ? JSON.parse(JSON.stringify(baseData)) : JSON.parse(JSON.stringify(BASE));
 
-  const taxaG=numOrNull('g_taxa');
-  const global=taxaG!==null
-    ?{taxaIH:[...stripC(b.global.taxaIH),{p:label,v:taxaG,c:1}]}
-    :b.global;
+  var taxaG = numN('g_taxa');
+  var global = taxaG !== null
+    ? {taxaIH: appS(b.global.taxaIH, label, taxaG)}
+    : b.global;
 
-  const mdrE=numOrNull('mdr_esbl'),mdrK=numOrNull('mdr_kpc'),mdrA=numOrNull('mdr_acin');
-  const mdrInst=(mdrE!==null||mdrK!==null||mdrA!==null)
-    ?{s:[...b.mdrInst.s,{p:label,e:mdrE??0,k:mdrK??0,a:mdrA??0}],max:b.mdrInst.max}
-    :b.mdrInst;
+  var mE=numN('mdr_esbl'), mK=numN('mdr_kpc'), mA=numN('mdr_acin');
+  var mdrInst = (mE!==null||mK!==null||mA!==null)
+    ? {s: appMDR(b.mdrInst.s, label, mE||0, mK||0, mA||0), max: b.mdrInst.max}
+    : b.mdrInst;
 
-  // limiares UTI AB
-  const abL={
-    pavMax:numOrNull('ab_l_pavMax'), ituMax:numOrNull('ab_l_ituMax'), ipcsMax:numOrNull('ab_l_ipcsMax'),
-    svdMax:numOrNull('ab_l_svdMax'), svdMin:numOrNull('ab_l_svdMin'),
-    cvcMax:numOrNull('ab_l_cvcMax'), cvcMin:numOrNull('ab_l_cvcMin'),
-    totMax:numOrNull('ab_l_totMax'), totMin:numOrNull('ab_l_totMin'),
-    pipMax:numOrNull('ab_l_pipMax'), pipMin:numOrNull('ab_l_pipMin'),
-    carbaMax:numOrNull('ab_l_carbaMax'), carbaMin:numOrNull('ab_l_carbaMin'),
-    glicoMax:numOrNull('ab_l_glicoMax'), glicoMin:numOrNull('ab_l_glicoMin'),
-    poliMax:numOrNull('ab_l_poliMax'), poliMin:numOrNull('ab_l_poliMin'),
-  };
-  const utiAB={
-    pav:appendSeries(stripC(b.utiAB.pav),label,num('ab_pav')),
-    itu:appendSeries(stripC(b.utiAB.itu),label,num('ab_itu')),
-    ipcs:appendSeries(stripC(b.utiAB.ipcs),label,num('ab_ipcs')),
-    svd:appendSeries(stripC(b.utiAB.svd),label,num('ab_svd')),
-    cvc:appendSeries(stripC(b.utiAB.cvc),label,num('ab_cvc')),
-    tot:appendSeries(stripC(b.utiAB.tot),label,num('ab_tot')),
-    dddPip:appendSeries(stripC(b.utiAB.dddPip),label,num('ab_pip')),
-    dddCarba:appendSeries(stripC(b.utiAB.dddCarba),label,num('ab_carba')),
-    dddGlico:appendSeries(stripC(b.utiAB.dddGlico),label,num('ab_glico')),
-    dddPoli:appendSeries(stripC(b.utiAB.dddPoli),label,num('ab_poli')),
-    mdr:appendMDR(b.utiAB.mdr,label,num('ab_esbl'),num('ab_kpc'),num('ab_acin')),
-    mdrMax:b.utiAB.mdrMax,
-    hm:appendSeries(stripC(b.utiAB.hm),label,num('ab_hm')),
-    audit:{ok:num('ab_aud_ok'),nc:num('ab_aud_nc'),pct:Math.round(num('ab_aud_nc')/(Math.max(1,num('ab_aud_ok')+num('ab_aud_nc')))*100)},
-    limiares:abL
-  };
+  function aud(ok,nc){ var o=num(ok),n=num(nc); return {ok:o,nc:n,pct:Math.round(n/Math.max(1,o+n)*100)}; }
 
-  // limiares UTIC
-  const ucL={
-    pavMax:numOrNull('uc_l_pavMax'), ituMax:numOrNull('uc_l_ituMax'), ipcsMax:numOrNull('uc_l_ipcsMax'),
-    svdMax:numOrNull('uc_l_svdMax'), svdMin:numOrNull('uc_l_svdMin'),
-    cvcMax:numOrNull('uc_l_cvcMax'), cvcMin:numOrNull('uc_l_cvcMin'),
-    totMax:numOrNull('uc_l_totMax'), totMin:numOrNull('uc_l_totMin'),
-    pipMax:numOrNull('uc_l_pipMax'), pipMin:numOrNull('uc_l_pipMin'),
-    carbaMax:numOrNull('uc_l_carbaMax'), carbaMin:numOrNull('uc_l_carbaMin'),
-    glicoMax:numOrNull('uc_l_glicoMax'), glicoMin:numOrNull('uc_l_glicoMin'),
-    poliMax:numOrNull('uc_l_poliMax'), poliMin:numOrNull('uc_l_poliMin'),
-  };
-  const utic={
-    pav:appendSeries(stripC(b.utic.pav),label,num('uc_pav')),
-    itu:appendSeries(stripC(b.utic.itu),label,num('uc_itu')),
-    ipcs:appendSeries(stripC(b.utic.ipcs),label,num('uc_ipcs')),
-    svd:appendSeries(stripC(b.utic.svd),label,num('uc_svd')),
-    cvc:appendSeries(stripC(b.utic.cvc),label,num('uc_cvc')),
-    tot:appendSeries(stripC(b.utic.tot),label,num('uc_tot')),
-    dddPip:appendSeries(stripC(b.utic.dddPip),label,num('uc_pip')),
-    dddCarba:appendSeries(stripC(b.utic.dddCarba),label,num('uc_carba')),
-    dddGlico:appendSeries(stripC(b.utic.dddGlico),label,num('uc_glico')),
-    dddPoli:appendSeries(stripC(b.utic.dddPoli),label,num('uc_poli')),
-    mdr:appendMDR(b.utic.mdr,label,num('uc_esbl'),num('uc_kpc'),num('uc_acin')),
-    mdrMax:b.utic.mdrMax,
-    hm:appendSeries(stripC(b.utic.hm),label,num('uc_hm')),
-    audit:{ok:num('uc_aud_ok'),nc:num('uc_aud_nc'),pct:Math.round(num('uc_aud_nc')/(Math.max(1,num('uc_aud_ok')+num('uc_aud_nc')))*100)},
-    limiares:ucL
+  var utiAB = {
+    pav:     appS(b.utiAB.pav,     label, num('ab_pav')),
+    itu:     appS(b.utiAB.itu,     label, num('ab_itu')),
+    ipcs:    appS(b.utiAB.ipcs,    label, num('ab_ipcs')),
+    svd:     appS(b.utiAB.svd,     label, num('ab_svd')),
+    cvc:     appS(b.utiAB.cvc,     label, num('ab_cvc')),
+    tot:     appS(b.utiAB.tot,     label, num('ab_tot')),
+    dddPip:  appS(b.utiAB.dddPip,  label, num('ab_pip')),
+    dddCarba:appS(b.utiAB.dddCarba,label, num('ab_carba')),
+    dddGlico:appS(b.utiAB.dddGlico,label, num('ab_glico')),
+    dddPoli: appS(b.utiAB.dddPoli, label, num('ab_poli')),
+    mdr:     appMDR(b.utiAB.mdr,   label, num('ab_esbl'), num('ab_kpc'), num('ab_acin')),
+    mdrMax:  b.utiAB.mdrMax,
+    hm:      appS(b.utiAB.hm,      label, num('ab_hm')),
+    audit:   aud('ab_aud_ok','ab_aud_nc'),
+    limiares:{
+      pavMax:numN('ab_l_pavMax'), ituMax:numN('ab_l_ituMax'), ipcsMax:numN('ab_l_ipcsMax'),
+      svdMax:numN('ab_l_svdMax'), svdMin:numN('ab_l_svdMin'),
+      cvcMax:numN('ab_l_cvcMax'), cvcMin:numN('ab_l_cvcMin'),
+      totMax:numN('ab_l_totMax'), totMin:numN('ab_l_totMin'),
+      pipMax:numN('ab_l_pipMax'), pipMin:numN('ab_l_pipMin'),
+      carbaMax:numN('ab_l_carbaMax'), carbaMin:numN('ab_l_carbaMin'),
+      glicoMax:numN('ab_l_glicoMax'), glicoMin:numN('ab_l_glicoMin'),
+      poliMax:numN('ab_l_poliMax'),   poliMin:numN('ab_l_poliMin')
+    }
   };
 
-  const neoIpcsMax=numOrNull('neo_l_ipcsMax');
-  const utiNeo={
-    ipcs:appendSeries(stripC(b.utiNeo.ipcs),label,num('neo_ipcs')),
-    audit:{ok:num('neo_aud_ok'),nc:num('neo_aud_nc'),pct:Math.round(num('neo_aud_nc')/(Math.max(1,num('neo_aud_ok')+num('neo_aud_nc')))*100)},
-    limiares:{ipcsMax:neoIpcsMax}
+  var utic = {
+    pav:     appS(b.utic.pav,     label, num('uc_pav')),
+    itu:     appS(b.utic.itu,     label, num('uc_itu')),
+    ipcs:    appS(b.utic.ipcs,    label, num('uc_ipcs')),
+    svd:     appS(b.utic.svd,     label, num('uc_svd')),
+    cvc:     appS(b.utic.cvc,     label, num('uc_cvc')),
+    tot:     appS(b.utic.tot,     label, num('uc_tot')),
+    dddPip:  appS(b.utic.dddPip,  label, num('uc_pip')),
+    dddCarba:appS(b.utic.dddCarba,label, num('uc_carba')),
+    dddGlico:appS(b.utic.dddGlico,label, num('uc_glico')),
+    dddPoli: appS(b.utic.dddPoli, label, num('uc_poli')),
+    mdr:     appMDR(b.utic.mdr,   label, num('uc_esbl'), num('uc_kpc'), num('uc_acin')),
+    mdrMax:  b.utic.mdrMax,
+    hm:      appS(b.utic.hm,      label, num('uc_hm')),
+    audit:   aud('uc_aud_ok','uc_aud_nc'),
+    limiares:{
+      pavMax:numN('uc_l_pavMax'), ituMax:numN('uc_l_ituMax'), ipcsMax:numN('uc_l_ipcsMax'),
+      svdMax:numN('uc_l_svdMax'), svdMin:numN('uc_l_svdMin'),
+      cvcMax:numN('uc_l_cvcMax'), cvcMin:numN('uc_l_cvcMin'),
+      totMax:numN('uc_l_totMax'), totMin:numN('uc_l_totMin'),
+      pipMax:numN('uc_l_pipMax'), pipMin:numN('uc_l_pipMin'),
+      carbaMax:numN('uc_l_carbaMax'), carbaMin:numN('uc_l_carbaMin'),
+      glicoMax:numN('uc_l_glicoMax'), glicoMin:numN('uc_l_glicoMin'),
+      poliMax:numN('uc_l_poliMax'),   poliMin:numN('uc_l_poliMin')
+    }
   };
 
-  const hd={
-    ilav:appendSeries(stripC(b.hd.ilav),label,num('hd_ilav')),
-    bact:appendSeries(stripC(b.hd.bact),label,num('hd_bact')),
-    vanco:appendSeries(stripC(b.hd.vanco),label,num('hd_vanco')),
-    audit:{ok:num('hd_aud_ok'),nc:num('hd_aud_nc'),pct:Math.round(num('hd_aud_nc')/(Math.max(1,num('hd_aud_ok')+num('hd_aud_nc')))*100)}
+  var utiNeo = {
+    ipcs:    appS(b.utiNeo.ipcs, label, num('neo_ipcs')),
+    audit:   aud('neo_aud_ok','neo_aud_nc'),
+    limiares:{ipcsMax:numN('neo_l_ipcsMax')}
   };
 
-  const cmAC=num('cm_ac'),cmI=num('cm_itu'),cmP=num('cm_pneu'),cmPD=num('cm_pd',664),cmT=cmAC+cmI+cmP;
-  const clinicaMedica={taxaIH:[...stripC(b.clinicaMedica.taxaIH),{p:label,v:parseFloat((cmT/cmPD*100).toFixed(2)),c:1}],inf:{ac:cmAC,itu:cmI,pneu:cmP,sc:null,total:cmT,pd:cmPD}};
-  const ccAC=num('cc_ac'),ccI=num('cc_itu'),ccP=num('cc_pneu'),ccS=num('cc_sc'),ccPD=num('cc_pd',746),ccT=ccAC+ccI+ccP+ccS;
-  const clinicaCirurgica={taxaIH:[...stripC(b.clinicaCirurgica.taxaIH),{p:label,v:parseFloat((ccT/ccPD*100).toFixed(2)),c:1}],inf:{ac:ccAC,itu:ccI,pneu:ccP,sc:ccS,total:ccT,pd:ccPD}};
-  const epAC=num('ep_ac'),epI=num('ep_itu'),epP=num('ep_pneu'),epS=num('ep_sc'),epPD=num('ep_pd',619),epT=epAC+epI+epP+epS;
-  const epm={taxaIH:[...stripC(b.epm.taxaIH),{p:label,v:parseFloat((epT/epPD*100).toFixed(2)),c:1}],inf:{ac:epAC,itu:epI,pneu:epP,sc:epS,total:epT,pd:epPD}};
+    var hd = {
+      ilav:     appS(b.hd.ilav,     label, num('hd_ilav')),
+      ilavPerm: appS(b.hd.ilavPerm||[], label, num('hd_ilav_perm')),
+      ilavFist: appS(b.hd.ilavFist||[], label, num('hd_ilav_fist')),
+      bact:     appS(b.hd.bact,     label, num('hd_bact')),
+      bactPerm: appS(b.hd.bactPerm||[], label, num('hd_bact_perm')),
+      bactFist: appS(b.hd.bactFist||[], label, num('hd_bact_fist')),
+      vanco:    appS(b.hd.vanco,    label, num('hd_vanco')),
+      audit:    aud('hd_aud_ok','hd_aud_nc')
+    };
 
-  const abio={gnCols:GN_COLS,gn:getAbio('gn',GN_ROWS,GN_COLS),gpCols:GP_COLS,gp:getAbio('gp',GP_ROWS,GP_COLS)};
-  return {periodo,global,clinicaMedica,clinicaCirurgica,epm,hd,utiAB,utic,utiNeo,mdrInst,abio};
+  function clinica(pfx, base, hasSC) {
+    var ac=num(pfx+'_ac'), itu=num(pfx+'_itu'), pneu=num(pfx+'_pneu');
+    var sc=hasSC?num(pfx+'_sc'):0;
+    var pd=num(pfx+'_pd',1);
+    var total=ac+itu+pneu+sc;
+    var status=document.getElementById(pfx+'_status');
+    return {
+      taxaIH: appS(base.taxaIH, label, parseFloat((total/pd*100).toFixed(2))),
+      inf:{ac:ac,itu:itu,pneu:pneu,sc:hasSC?sc:null,total:total,pd:pd},
+      status: status ? status.value : 'endemic'
+    };
+  }
+
+  // ── DOTs ─────────────────────────────────────────────────────────────────
+  var ATB_KEYS = ['cef','pip','cbp','gpp','pb'];
+  var UNIT_KEYS = ['utiab','utic','clin','cir','apto','epm'];
+  var MESES_LOWER = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+  // Build new month entry for each ATB
+  var newDots = {};
+  ATB_KEYS.forEach(function(atk){
+    newDots[atk] = {};
+    UNIT_KEYS.forEach(function(uk){
+      newDots[atk][uk] = numN('dot_'+atk+'_'+uk);
+    });
+  });
+
+  // Append to existing dots series (or create fresh)
+  function appendDotSeries(base, atk, lbl) {
+    // base.dots[atk] = {utiab:[...], utic:[...], ...}
+    var existing = (base.dots && base.dots[atk]) || {};
+    var result = {};
+    UNIT_KEYS.forEach(function(uk){
+      var arr = (existing[uk] || []).slice();
+      // remove current marker
+      arr = arr.filter(function(d){ return !d.c; });
+      var val = newDots[atk][uk];
+      if (val !== null) arr.push({p:lbl, v:val, c:1});
+      result[uk] = arr;
+    });
+    return result;
+  }
+
+  var dots = {};
+  ATB_KEYS.forEach(function(atk){
+    dots[atk] = appendDotSeries(b, atk, label);
+  });
+
+  return {
+    periodo: periodo,
+    global: {taxaIH: global.taxaIH, status: (document.getElementById('g_status')||{value:'endemic'}).value},
+    clinicaMedica:    clinica('cm', b.clinicaMedica,    false),
+    clinicaCirurgica: clinica('cc', b.clinicaCirurgica, true),
+    epm:              clinica('ep', b.epm,              true),
+    hd: {
+      ilav:     appS(b.hd.ilav,         label, num('hd_ilav')),
+      ilavTemp: appS(b.hd.ilavTemp||[], label, num('hd_ilav')),
+      ilavPerm: appS(b.hd.ilavPerm||[], label, num('hd_ilav_perm')),
+      ilavFist: appS(b.hd.ilavFist||[], label, num('hd_ilav_fist')),
+      bact:     appS(b.hd.bact,         label, num('hd_bact')),
+      bactTemp: appS(b.hd.bactTemp||[], label, num('hd_bact')),
+      bactPerm: appS(b.hd.bactPerm||[], label, num('hd_bact_perm')),
+      bactFist: appS(b.hd.bactFist||[], label, num('hd_bact_fist')),
+      vanco:    appS(b.hd.vanco,        label, num('hd_vanco')),
+      audit:    aud('hd_aud_ok','hd_aud_nc'),
+      status:   (document.getElementById('hd_status')||{value:'endemic'}).value
+    }, utiAB: utiAB, utic: utic, utiNeo: utiNeo,
+    mdrInst: mdrInst,
+    dots: dots,
+    mdrMensal: (function() {
+      var abPd  = num('ab_pac_dia') || 0;
+      var ucPd  = num('uc_pac_dia') || 0;
+      var neoPd = 0; // Neo pac-dia not explicitly tracked yet
+
+      function mdrRate(fieldId, pd) {
+        var v = numN(fieldId);
+        return v !== null ? v : null;
+      }
+
+      function mdrPoint(rate, pd) {
+        var pt = {p: label, c: 1};
+        pt.v  = rate !== null ? rate : null;
+        pt.pd = pd;
+        return pt;
+      }
+
+      function appendMdr(existing, newPt) {
+        var arr = (existing || []).slice();
+        arr = arr.filter(function(d){ return !d.c; });
+        arr.push(newPt);
+        return arr;
+      }
+
+      function appendCount(existing, n) {
+        var arr = (existing || []).slice();
+        arr.push(n || 0);
+        return arr;
+      }
+
+      var bAB = (b.mdrMensal && b.mdrMensal.utiAB) || {};
+      var bUC = (b.mdrMensal && b.mdrMensal.utic)  || {};
+      var bNeo= (b.mdrMensal && b.mdrMensal.utiNeo)|| {};
+
+      var neoEsblN = num('neo_esbl_n');
+      var neoEsblRate = (neoPd > 0) ? parseFloat((neoEsblN / neoPd * 1000).toFixed(2)) : null;
+
+      return {
+        utiAB: {
+          esbl: appendMdr(bAB.esbl, mdrPoint(mdrRate('ab_esbl', abPd), abPd)),
+          kpc:  appendMdr(bAB.kpc,  mdrPoint(mdrRate('ab_kpc',  abPd), abPd)),
+          acin: appendMdr(bAB.acin, mdrPoint(mdrRate('ab_acin', abPd), abPd)),
+          pseu: appendMdr(bAB.pseu, mdrPoint(mdrRate('ab_pseu', abPd), abPd)),
+          pd:   appendMdr(bAB.pd,   {p: label, v: abPd, c: 1}),
+          counts: {
+            esbl: appendCount(bAB.counts && bAB.counts.esbl, num('ab_esbl_n')),
+            kpc:  appendCount(bAB.counts && bAB.counts.kpc,  num('ab_kpc_n')),
+            acin: appendCount(bAB.counts && bAB.counts.acin, num('ab_acin_n')),
+            pseu: appendCount(bAB.counts && bAB.counts.pseu, num('ab_pseu_n'))
+          }
+        },
+        utic: {
+          esbl: appendMdr(bUC.esbl, mdrPoint(mdrRate('uc_esbl', ucPd), ucPd)),
+          kpc:  appendMdr(bUC.kpc,  mdrPoint(mdrRate('uc_kpc',  ucPd), ucPd)),
+          acin: appendMdr(bUC.acin, mdrPoint(mdrRate('uc_acin', ucPd), ucPd)),
+          pseu: appendMdr(bUC.pseu, mdrPoint(mdrRate('uc_pseu', ucPd), ucPd)),
+          pd:   appendMdr(bUC.pd,   {p: label, v: ucPd, c: 1}),
+          counts: {
+            esbl: appendCount(bUC.counts && bUC.counts.esbl, num('uc_esbl_n')),
+            kpc:  appendCount(bUC.counts && bUC.counts.kpc,  num('uc_kpc_n')),
+            acin: appendCount(bUC.counts && bUC.counts.acin, num('uc_acin_n')),
+            pseu: appendCount(bUC.counts && bUC.counts.pseu, num('uc_pseu_n'))
+          }
+        },
+        utiNeo: {
+          counts: {
+            esbl: appendCount(bNeo.counts && bNeo.counts.esbl, neoEsblN),
+            kpc:  appendCount(bNeo.counts && bNeo.counts.kpc,  num('neo_kpc_n')),
+            acin: appendCount(bNeo.counts && bNeo.counts.acin, num('neo_acin_n')),
+            pseu: appendCount(bNeo.counts && bNeo.counts.pseu, num('neo_pseu_n'))
+          },
+          pd:         appendCount(bNeo.pd,         neoPd),
+          esbl_rate:  appendCount(bNeo.esbl_rate,  neoEsblRate),
+          esbl_flag:  appendCount(bNeo.esbl_flag,  null)
+        }
+      };
+    })(),
+    abio: {gnCols:GN_COLS, gn:getAbio('gn',GN_ROWS,GN_COLS), gpCols:GP_COLS, gp:getAbio('gp',GP_ROWS,GP_COLS)},
+    diarreia: (function(){
+      function appDiarr(existing, newVal) {
+        var arr = (existing||[]).filter(function(d){ return !d.c; });
+        arr.push({p: label, v: newVal, c: 1});
+        return arr;
+      }
+      var bd = (b.diarreia)||{};
+      return {
+        cm:    appDiarr(bd.cm,    numN('diarr_cm')),
+        cc:    appDiarr(bd.cc,    numN('diarr_cc')),
+        epm:   appDiarr(bd.epm,   numN('diarr_epm')),
+        utiab: appDiarr(bd.utiab, numN('diarr_utiab')),
+        utic:  appDiarr(bd.utic,  numN('diarr_utic')),
+      };
+    })()
+  };
 }
 
-function proceedStep3(){
-  generatedJSON=buildJSON();
-  const label=document.getElementById('c_label').value;
-  document.getElementById('periodoCommit').textContent=label;
-  const cm=generatedJSON.clinicaMedica.inf,cc=generatedJSON.clinicaCirurgica.inf,ep=generatedJSON.epm.inf;
-  const mdrLast=generatedJSON.mdrInst.s.slice(-1)[0];
-  const abL=generatedJSON.utiAB.limiares,ucL=generatedJSON.utic.limiares;
-  const hasAbLim=Object.values(abL).some(v=>v!==null);
-  const resumo=[
-    {l:'Competência',v:generatedJSON.periodo},
-    {l:'Taxa IH Global',v:((generatedJSON.global.taxaIH.find(d=>d.c)?.v||0).toFixed(2))+'%'},
-    {l:'ESBL Institucional',v:mdrLast.e+'/mil pd'},
-    {l:'Clínica Médica — Taxa IH',v:(cm.total/cm.pd*100).toFixed(2)+'%'},
-    {l:'Clínica Cirúrgica — Taxa IH',v:(cc.total/cc.pd*100).toFixed(2)+'%'},
-    {l:'EPM — Taxa IH',v:(ep.total/ep.pd*100).toFixed(2)+'%'},
-    {l:'UTI AB — Audit. NC',v:generatedJSON.utiAB.audit.pct+'%'},
-    {l:'UTIC — Audit. NC',v:generatedJSON.utic.audit.pct+'%'},
-    {l:'UTI AB — Limiares Poisson',v:hasAbLim?'✓ Informados':'— Não informados'},
-    {l:'HD — ILAV',v:generatedJSON.hd.ilav.slice(-1)[0].v+'/mil cat-dia'},
+function proceedStep3() {
+  generatedJSON = buildJSON();
+  var lbl = document.getElementById('c_label').value;
+  document.getElementById('periodoCommit').textContent = lbl;
+  var cm = generatedJSON.clinicaMedica.inf;
+  var cc = generatedJSON.clinicaCirurgica.inf;
+  var ep = generatedJSON.epm.inf;
+  var mL = generatedJSON.mdrInst.s.slice(-1)[0];
+  var items = [
+    ['Competência',       generatedJSON.periodo],
+    ['Taxa IH Global',    (generatedJSON.global.taxaIH.filter(function(d){return d.c;})[0]||{v:0}).v.toFixed(2)+'%'],
+    ['ESBL Inst.',        mL.e+'/mil pd'],
+    ['Clínica Médica IH', (cm.total/cm.pd*100).toFixed(2)+'%'],
+    ['Clínica Cirúrg. IH',(cc.total/cc.pd*100).toFixed(2)+'%'],
+    ['EPM IH',            (ep.total/ep.pd*100).toFixed(2)+'%'],
+    ['UTI AB CVC NC',     generatedJSON.utiAB.audit.pct+'%'],
+    ['UTIC CVC NC',       generatedJSON.utic.audit.pct+'%'],
+    ['HD ILAV',           generatedJSON.hd.ilav.slice(-1)[0].v+'/mil cat-dia'],
+    ['HD Bacteremia',     generatedJSON.hd.bact.slice(-1)[0].v+'/mil cat-dia'],
+    ['Neo IPCS',          generatedJSON.utiNeo.ipcs.slice(-1)[0].v+'/mil CVC-dia'],
+    ['Limiares UTI AB',   Object.values(generatedJSON.utiAB.limiares).some(function(v){return v!==null;}) ? '✓ informados' : '— nenhum']
   ];
-  document.getElementById('resumoBody').innerHTML=
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 0">'+
-    resumo.map(r=>'<div style="display:flex;justify-content:space-between;padding:7px 10px;background:var(--surf);border-radius:6px">'+
-      '<span style="font-size:11px;color:var(--ts)">'+r.l+'</span>'+
-      '<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:600;color:var(--teal)">'+r.v+'</span></div>'
-    ).join('')+'</div>';
-  document.getElementById('jsonPreview').textContent=JSON.stringify(generatedJSON,null,2);
+  document.getElementById('resumoGrid').innerHTML = items.map(function(r){
+    return '<div class="summary-item"><span class="sl">'+r[0]+'</span><span class="sv">'+r[1]+'</span></div>';
+  }).join('');
+  document.getElementById('jsonPreview').textContent = JSON.stringify(generatedJSON, null, 2);
   goStep(3);
 }
 
-function downloadJSON(){
-  if(!generatedJSON) return;
-  const blob=new Blob([JSON.stringify(generatedJSON,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='data_iras.json';a.click();
+function downloadJSON() {
+  if (!generatedJSON) return;
+  var blob = new Blob([JSON.stringify(generatedJSON, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data_iras.json';
+  a.click();
 }
 
-function copyJSON(){
-  if(!generatedJSON) return;
-  navigator.clipboard.writeText(JSON.stringify(generatedJSON,null,2)).then(()=>{
-    const m=document.getElementById('copyMsg');
-    m.innerHTML='<div class="msg msg-ok" style="margin-top:8px">✓ JSON copiado</div>';
-    setTimeout(()=>m.innerHTML='',3000);
+function copyJSON() {
+  if (!generatedJSON) return;
+  navigator.clipboard.writeText(JSON.stringify(generatedJSON, null, 2)).then(function(){
+    var m = document.getElementById('copyMsg');
+    m.textContent = '✓ Copiado';
+    setTimeout(function(){ m.textContent=''; }, 2000);
   });
 }
+// ═══════════════════════════════════════════════════════════════════
+// LIMIARES — JSON exportado pelo R
+// ═══════════════════════════════════════════════════════════════════
+
+var LIM_MAP = {
+  'PAV':        { obs: 'pav',   max: 'pavMax',   min: null       },
+  'IPCS':       { obs: 'ipcs',  max: 'ipcsMax',  min: null       },
+  'ITU':        { obs: 'itu',   max: 'ituMax',   min: null       },
+  'Uso de SVD': { obs: 'svd',   max: 'svdMax',   min: 'svdMin'   },
+  'Uso_SVD':    { obs: 'svd',   max: 'svdMax',   min: 'svdMin'   },
+  'Uso de CVC': { obs: 'cvc',   max: 'cvcMax',   min: 'cvcMin'   },
+  'Uso_CVC':    { obs: 'cvc',   max: 'cvcMax',   min: 'cvcMin'   },
+  'Uso de VM':  { obs: 'tot',   max: 'totMax',   min: 'totMin'   },
+  'Uso_VM':     { obs: 'tot',   max: 'totMax',   min: 'totMin'   },
+  'ATB_CBP':    { obs: 'carba', max: 'carbaMax', min: 'carbaMin' },
+  'ATB_GPP':    { obs: 'glico', max: 'glicoMax', min: 'glicoMin' },
+  'ATB_PPTZ':   { obs: 'pip',   max: 'pipMax',   min: 'pipMin'   },
+  'ATB_PoliB':  { obs: 'poli',  max: 'poliMax',  min: 'poliMin'  },
+  'IPCS_Neo':   { neo: true, obs: 'neo_ipcs', max: 'neo_l_ipcsMax', min: null }
+};
+var LIM_UNITS = { utiab: 'ab', utic: 'uc' };
+
+(function() {
+  var drop = document.getElementById('limDrop');
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault(); drop.classList.remove('dragover');
+    var f = e.dataTransfer.files[0];
+    if (f) loadLimiares(f);
+  });
+})();
+
+function limSet(id, val) {
+  var el = document.getElementById(id);
+  if (!el || val === null || val === undefined) return false;
+  var n = parseFloat(String(val).replace(',', '.'));
+  if (isNaN(n)) return false;
+  el.value = parseFloat(n.toFixed(2));
+  el.style.transition = 'background .1s';
+  el.style.background = '#e3f2fd';
+  setTimeout(function(){ el.style.background = ''; el.style.transition = ''; }, 1400);
+  return true;
+}
+
+function applyLimUnit(rows, prefix, log) {
+  var filled = 0;
+  rows.forEach(function(row) {
+    var ind = (row.indicador || '').trim();
+    var map = LIM_MAP[ind];
+    if (!map) { log.push('— ignorado: ' + ind); return; }
+    if (map.neo) {
+      if (limSet(map.obs, row.rate_obs_txt)) filled++;
+      if (limSet(map.max, row.max_txt))      filled++;
+      log.push('✓ Neo · ' + ind); return;
+    }
+    var p = prefix + '_', lp = prefix + '_l_';
+    if (limSet(p  + map.obs, row.rate_obs_txt)) filled++;
+    if (limSet(lp + map.max, row.max_txt))      filled++;
+    if (map.min && limSet(lp + map.min, row.min_txt)) filled++;
+    log.push('✓ ' + prefix.toUpperCase() + ' · ' + ind +
+      '  obs=' + row.rate_obs_txt + '  max=' + row.max_txt +
+      (map.min ? '  min=' + row.min_txt : ''));
+  });
+  return filled;
+}
+
+function loadLimiares(file) {
+  if (!file) return;
+  var drop = document.getElementById('limDrop');
+  var status = document.getElementById('limStatus');
+  status.className = 'cve-status';
+  status.textContent = '⏳ Lendo…';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      var log = [], total = 0;
+      if (Array.isArray(data)) data = { utiab: data };
+      Object.keys(LIM_UNITS).forEach(function(unit) {
+        var rows = data[unit];
+        if (!rows || !Array.isArray(rows)) { log.push('⚠ ' + unit + ': não encontrado'); return; }
+        total += applyLimUnit(rows, LIM_UNITS[unit], log);
+      });
+      drop.classList.add('loaded'); drop.classList.remove('error');
+      status.className = 'cve-status ok';
+      status.textContent = '✓ ' + file.name + ' · ' + total + ' campos preenchidos';
+      var logEl = document.getElementById('limLog');
+      logEl.style.display = 'block';
+      logEl.innerHTML = log.join('<br>');
+    } catch(err) {
+      drop.classList.add('error');
+      status.className = 'cve-status err';
+      status.textContent = '✗ JSON inválido: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// CVE DIÁLISE — HEMODIÁLISE
+// ═══════════════════════════════════════════════════════════════════
+// Aba: "Hemodiálise"
+// Cabeçalhos: rows 29-30 (0-indexed) → dados a partir de row 31
+// Colunas (0-indexed):
+//   16 = IAV cateter temp /1000 cat-dia   → hd_ilav
+//   19 = IAV cateter perm /1000 cat-dia   → hd_ilav_perm
+//   21 = IAV fístula /100 pac-mês         → hd_ilav_fist
+//   24 = Bacteremia temp /1000 cat-dia    → hd_bact
+//   27 = Bacteremia perm /1000 cat-dia    → hd_bact_perm
+//   29 = Bacteremia fístula /100 pac-mês  → hd_bact_fist
+//   31 = Vancomicina %                    → hd_vanco
+
+var dialWorkbook = null;
+
+var DIAL_COL_MAP = [
+  { col: 16, field: 'hd_ilav',      label: 'IAV temp /1000cat-dia'   },
+  { col: 19, field: 'hd_ilav_perm', label: 'IAV perm /1000cat-dia'   },
+  { col: 21, field: 'hd_ilav_fist', label: 'IAV fist /100pac-mês'    },
+  { col: 24, field: 'hd_bact',      label: 'Bact temp /1000cat-dia'  },
+  { col: 27, field: 'hd_bact_perm', label: 'Bact perm /1000cat-dia'  },
+  { col: 29, field: 'hd_bact_fist', label: 'Bact fist /100pac-mês'   },
+  { col: 31, field: 'hd_vanco',     label: 'Vancomicina %'           }
+];
+
+(function() {
+  var drop = document.getElementById('dialDrop');
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault(); drop.classList.remove('dragover');
+    var f = e.dataTransfer.files[0];
+    if (f) loadDialise(f);
+  });
+})();
+
+function dialSafeN(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'object' && v.t === 'e') return null;
+  if (typeof v === 'string' && v.charAt(0) === '#') return null;
+  var n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+
+function parseCVEDialise(wb) {
+  var ws = wb.Sheets['Hemodiálise'];
+  if (!ws) throw new Error('Aba "Hemodiálise" não encontrada');
+
+  var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+  // Dados: rows[31..42] = Janeiro..Dezembro (0-indexed)
+  // Última linha com total de pacientes (col 4) > 0
+  var dataRow = null;
+  var mesDet  = null;
+  for (var i = 31; i <= 42; i++) {
+    var r = rows[i];
+    if (!r) continue;
+    var tot = dialSafeN(r[4]);
+    if (tot !== null && tot > 0) { dataRow = r; mesDet = String(r[0] || '').trim(); }
+  }
+  if (!dataRow) throw new Error('Nenhum mês preenchido encontrado');
+
+  var result = { mes: mesDet };
+  DIAL_COL_MAP.forEach(function(cm) {
+    result[cm.field] = dialSafeN(dataRow[cm.col]);
+  });
+  return result;
+}
+
+function loadDialise(file) {
+  if (!file) return;
+  var drop = document.getElementById('dialDrop');
+  var status = document.getElementById('dialStatus');
+  status.className = 'cve-status';
+  status.textContent = '⏳ Lendo…';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      dialWorkbook = XLSX.read(data, { type: 'array', cellFormula: false, cellHTML: false });
+      var preview = parseCVEDialise(dialWorkbook);
+      var count = Object.keys(preview).filter(function(k){ return k !== 'mes' && preview[k] !== null; }).length;
+      drop.classList.add('loaded'); drop.classList.remove('error');
+      status.className = 'cve-status ok';
+      status.textContent = '✓ ' + file.name + ' — ' + preview.mes + ' detectado';
+      document.getElementById('dialFillBadge').textContent = count + ' campos';
+      document.getElementById('dialFillBtn').style.display = 'block';
+    } catch(err) {
+      drop.classList.add('error'); drop.classList.remove('loaded');
+      status.className = 'cve-status err';
+      status.textContent = '✗ ' + err.message;
+      dialWorkbook = null;
+      document.getElementById('dialFillBtn').style.display = 'none';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function doDialFill() {
+  if (!dialWorkbook) return;
+  var data = parseCVEDialise(dialWorkbook);
+  var log = [], filled = 0;
+
+  DIAL_COL_MAP.forEach(function(cm) {
+    var v = data[cm.field];
+    var el = document.getElementById(cm.field);
+    if (!el || v === null) return;
+    el.value = parseFloat(v.toFixed(2));
+    el.style.transition = 'background .1s';
+    el.style.background = '#e3f2fd';
+    setTimeout(function(){ el.style.background = ''; el.style.transition = ''; }, 1400);
+    log.push('✓ ' + cm.label + ' = ' + v.toFixed(2));
+    filled++;
+  });
+
+  var logEl = document.getElementById('dialLog');
+  logEl.style.display = 'block';
+  logEl.innerHTML = log.join('<br>') + '<br><strong>' + data.mes + ' · ' + filled + ' campos preenchidos</strong>';
+
+  var btn = document.getElementById('dialFillBtn');
+  btn.style.background = '#2e7d32';
+  btn.textContent = '✓ Preenchido (' + filled + ' campos)';
+  setTimeout(function(){
+    btn.style.background = '';
+    btn.innerHTML = '🩸 Re-preencher Hemodiálise <span class="fill-badge">' + filled + ' campos</span>';
+  }, 2500);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DOTS — xlsx upload (mesmo mecanismo da planilha CVE)
+// ═══════════════════════════════════════════════════════════════════
+
+// Mapeamento aba → campo → coluna (0-indexed no sheet)
+// Estrutura da aba Tot_XXX:
+//   row[0] = cabeçalho ATB   (ignorar)
+//   row[1] = cabeçalho unid  (ignorar)
+//   row[2..13] = JAN..DEZ    col[0]=mês, [1]=UTI A/B, [2]=UTIC, [3]=Clin, [4]=Cir, [5]=Apto, [6]=EPM
+var DOTS_TABS = [
+  { sheet: 'Tot_CTO',  key: 'cef' },
+  { sheet: 'Tot_PPTZ', key: 'pip' },
+  { sheet: 'Tot_CBP',  key: 'cbp' },
+  { sheet: 'Tot_GPP',  key: 'gpp' },
+  { sheet: 'Tot_PB',   key: 'pb'  }
+];
+
+var DOTS_UNIT_COLS = [
+  { field: 'utiab', col: 1 },
+  { field: 'utic',  col: 2 },
+  { field: 'clin',  col: 3 },
+  { field: 'cir',   col: 4 },
+  { field: 'apto',  col: 5 },
+  { field: 'epm',   col: 6 }
+];
+
+// Drag-and-drop para zona DOTs
+(function() {
+  var drop = document.getElementById('dotsDrop');
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault(); drop.classList.remove('dragover');
+    var f = e.dataTransfer.files[0];
+    if (f) loadDots(f);
+  });
+})();
+
+function dotsNum(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'object' && v.t === 'e') return null; // erro SheetJS
+  if (typeof v === 'string' && v.charAt(0) === '#') return null;
+  var n = parseFloat(String(v).replace(',', '.'));
+  return isNaN(n) ? null : n;
+}
+
+function dotsLastRow(rows) {
+  // Primeira tabela = rows[2..13] (JAN..DEZ, taxas DOT/1000 pac-dia)
+  // Rows[14+] são contagens absolutas — ignorar completamente
+  var best = null;
+  for (var i = 2; i <= 13; i++) {
+    var r = rows[i];
+    if (!r || r.length < 2) continue;
+    if (dotsNum(r[1]) !== null) best = r;
+  }
+  return best;
+}
+
+function loadDots(file) {
+  if (!file) return;
+  var drop   = document.getElementById('dotsDrop');
+  var status = document.getElementById('dotsStatus');
+  status.className = 'cve-status';
+  status.textContent = '⏳ Lendo…';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var wb   = XLSX.read(data, { type: 'array', cellFormula: false, cellHTML: false });
+
+      var totalFilled = 0;
+      var detectedMes = null;
+      var tabLog = [];
+
+      DOTS_TABS.forEach(function(tab) {
+        var ws = wb.Sheets[tab.sheet];
+        if (!ws) {
+          tabLog.push('⚠ ' + tab.sheet + ': aba não encontrada');
+          return;
+        }
+        var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+        var row  = dotsLastRow(rows);
+        if (!row) {
+          tabLog.push('⚠ ' + tab.sheet + ': sem dados');
+          return;
+        }
+
+        // Detecta mês pela col 0
+        var mes = row[0] ? String(row[0]).trim().toUpperCase() : '?';
+        if (!detectedMes) detectedMes = mes;
+
+        DOTS_UNIT_COLS.forEach(function(uc) {
+          var v = dotsNum(row[uc.col]);
+          if (v === null) return;
+          var el = document.getElementById('dot_' + tab.key + '_' + uc.field);
+          if (!el) return;
+          el.value = parseFloat(v.toFixed(2));
+          // flash amarelo
+          el.style.transition = 'background .1s';
+          el.style.background = '#fff8e1';
+          setTimeout(function(){ el.style.background = ''; el.style.transition = ''; }, 1400);
+          totalFilled++;
+        });
+        tabLog.push('✓ ' + tab.sheet + ' — ' + mes);
+      });
+
+      // Atualiza UI
+      drop.classList.add('loaded'); drop.classList.remove('error');
+      status.className = 'cve-status ok';
+      status.textContent = '✓ ' + file.name + ' · ' + totalFilled + ' campos preenchidos';
+
+      var mesEl = document.getElementById('dotsMesDetectado');
+      if (detectedMes) {
+        mesEl.style.display = 'block';
+        mesEl.textContent = '📅 Mês detectado: ' + detectedMes +
+          '  ·  ' + tabLog.join('   ');
+      }
+
+    } catch(err) {
+      document.getElementById('dotsDrop').classList.add('error');
+      document.getElementById('dotsStatus').className = 'cve-status err';
+      document.getElementById('dotsStatus').textContent = '✗ Erro: ' + err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+
+var cveWorkbook = null;
+
+// ── Drag and drop ──────────────────────────────────────────────────
+(function() {
+  var drop = document.getElementById('cveDrop');
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault(); drop.classList.remove('dragover');
+    var f = e.dataTransfer.files[0];
+    if (f) loadCVE(f);
+  });
+})();
+
+function loadCVE(file) {
+  if (!file) return;
+  var drop = document.getElementById('cveDrop');
+  var status = document.getElementById('cveStatus');
+  status.className = 'cve-status';
+  status.textContent = '⏳ Lendo planilha…';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      cveWorkbook = XLSX.read(data, {type:'array', cellFormula:false, cellHTML:false});
+      drop.classList.add('loaded');
+      drop.classList.remove('error');
+      status.className = 'cve-status ok';
+      status.textContent = '✓ Planilha carregada: ' + file.name;
+
+      // Update badge with field count
+      var mes = getMesNum();
+      var preview = parseCVE(cveWorkbook, mes - 1);
+      var count = Object.values(preview).filter(function(v){ return v !== null && v !== undefined; }).length;
+      document.getElementById('fillBadge').textContent = count + ' campos';
+      document.getElementById('fillBtn').style.display = 'block';
+    } catch(err) {
+      drop.classList.add('error');
+      drop.classList.remove('loaded');
+      status.className = 'cve-status err';
+      status.textContent = '✗ Erro ao ler: ' + err.message;
+      cveWorkbook = null;
+      document.getElementById('fillBtn').style.display = 'none';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function getMesNum() {
+  var mesVal = document.getElementById('c_mes').value;
+  var meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return meses.indexOf(mesVal) + 1; // 1-indexed
+}
+
+// When month changes, re-compute badge if workbook loaded
+document.getElementById('c_mes').addEventListener('change', function() {
+  if (!cveWorkbook) return;
+  var mes = getMesNum();
+  var preview = parseCVE(cveWorkbook, mes - 1);
+  var count = Object.values(preview).filter(function(v){ return v !== null && v !== undefined; }).length;
+  document.getElementById('fillBadge').textContent = count + ' campos';
+});
+
+// ── Extraction logic ──────────────────────────────────────────────
+function safeN(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'object' && v.t === 'e') return null; // SheetJS error cell
+  if (typeof v === 'string' && v.charAt(0) === '#') return null;
+  var n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+
+function calcDI(num, den) {  // /1000 device-day
+  var n = safeN(num), d = safeN(den);
+  if (n === null || !d) return 0;
+  return parseFloat((n / d * 1000).toFixed(2));
+}
+
+function calcTX(num, den) {  // %
+  var n = safeN(num), d = safeN(den);
+  if (n === null || !d) return 0;
+  return parseFloat((n / d * 100).toFixed(1));
+}
+
+function parseCVE(wb, mesIdx) {
+  // mesIdx: 0=Jan .. 11=Dez
+
+  // ── Plan2 - UTI ──────────────────────────────────────────────────
+  var ws2 = wb.Sheets['Plan2 - UTI'];
+  var d2  = XLSX.utils.sheet_to_json(ws2, {header:1, defval:null, raw:true});
+
+  // January block header at row 31 (1-indexed) = index 30 (0-indexed)
+  // Each block = 17 rows
+  var P2_BASE = 30;
+  var b2 = P2_BASE + mesIdx * 17;
+
+  // UTI-1 = offset 3, UTI-2 = offset 4
+  var r1 = d2[b2 + 3] || [];
+  var r2 = d2[b2 + 4] || [];
+
+  // Cols (0-indexed): B=1 C=2 D=3 E=4 F=5 G=6 H=7 / J=9 K=10 L=11
+  var u1 = {
+    pn:      safeN(r1[1]),  ipcs_lab: safeN(r1[2]),  iu:      safeN(r1[3]),
+    vm:      safeN(r1[4]),  ct:       safeN(r1[5]),   sv:      safeN(r1[6]),
+    pac_dia: safeN(r1[7]),
+    cvc_ins: safeN(r1[9]), chk_apl: safeN(r1[10]), chk_100: safeN(r1[11])
+  };
+  var u2 = {
+    pn:      safeN(r2[1]),  ipcs_lab: safeN(r2[2]),  iu:      safeN(r2[3]),
+    vm:      safeN(r2[4]),  ct:       safeN(r2[5]),   sv:      safeN(r2[6]),
+    pac_dia: safeN(r2[7]),
+    cvc_ins: safeN(r2[9]), chk_apl: safeN(r2[10]), chk_100: safeN(r2[11])
+  };
+
+  // ── Plan3 - UTINeo ───────────────────────────────────────────────
+  var ws3 = wb.Sheets['Plan3 - UTINeo'];
+  var d3  = XLSX.utils.sheet_to_json(ws3, {header:1, defval:null, raw:true});
+
+  // January block header at row 17 (1-indexed) = index 16 (0-indexed), block = 15 rows
+  var P3_BASE = 16;
+  var b3 = P3_BASE + mesIdx * 15;
+
+  // Weight bands at offsets 3-7 (A=3, B=4, C=5, D=6, E=7)
+  var neo = {pn:0, ipcs_lab:0, ipcs_clin:0, vm:0, ct:0, pac_dia:0};
+  for (var off = 3; off <= 7; off++) {
+    var nr = d3[b3 + off] || [];
+    // Cols: B=1 C=2 D=3 E=4 F=5 G=6
+    var fields = ['pn','ipcs_lab','ipcs_clin','vm','ct','pac_dia'];
+    var cols   = [1, 2, 3, 4, 5, 6];
+    fields.forEach(function(f, i) {
+      var v = safeN(nr[cols[i]]);
+      if (v !== null) neo[f] += v;
+    });
+  }
+
+  // ── Plan4 - Álcool e Sabonete ────────────────────────────────────
+  var ws4 = wb.Sheets['Plan4 - P.alcoolico e sabonete'];
+  var d4  = XLSX.utils.sheet_to_json(ws4, {header:1, defval:null, raw:true});
+
+  // UTI Adulto + UCO: rows 16-27 (1-indexed) = index 15-26
+  var ra = d4[15 + mesIdx] || [];
+  var alcool_adu = safeN(ra[1]);  // col B
+  var pd_adu     = safeN(ra[3]);  // col D (auto from Plan2 = UTI-1 + UTI-2)
+  var alcool_uco = safeN(ra[6]);  // col G
+  var pd_uco     = safeN(ra[8]);  // col I
+
+  // UTI Neonatal: rows 32-43 (1-indexed) = index 31-42
+  var rn = d4[31 + mesIdx] || [];
+  var alcool_neo = safeN(rn[6]); // col G
+  var pd_neo     = safeN(rn[8]); // col I
+
+  // ── Plan6 - DDD ──────────────────────────────────────────────────
+  var ws6 = wb.Sheets['Plan6 - DDD'];
+  var d6  = XLSX.utils.sheet_to_json(ws6, {header:1, defval:null, raw:true});
+
+  // Block starts (0-indexed) for each month
+  var P6_STARTS = [14, 70, 125, 180, 235, 290, 345, 400, 455, 510, 565, 620];
+  var b6 = P6_STARTS[mesIdx];
+
+  // Computed section: ATBs start at offset 3, name at col 7, consumo UTIA at col 11, UTIC at col 17
+  var dddMap = {};
+  for (var i = 3; i <= 35; i++) {
+    var dr = d6[b6 + i];
+    if (!dr) break;
+    var nome = dr[7];
+    if (!nome || typeof nome !== 'string' || nome.trim() === '') continue;
+    var key = nome.trim();
+    var cUTIA = safeN(dr[11]);
+    var cUTIC = safeN(dr[17]);
+    if (!dddMap[key]) dddMap[key] = {utia:0, utic:0};
+    if (cUTIA !== null) dddMap[key].utia += cUTIA;
+    if (cUTIC !== null) dddMap[key].utic += cUTIC;
+  }
+
+  function dddSum(names, unit) {
+    var s = 0;
+    names.forEach(function(n) { if (dddMap[n]) s += dddMap[n][unit] || 0; });
+    return parseFloat(s.toFixed(1));
+  }
+
+  var PIP   = ['Piperacilina-tazobactam'];
+  var CARBA = ['Meropenem', 'Imipenem', 'Ertapenem'];
+  var GLICO = ['Vancomicina', 'Teicoplanina'];
+  var POLI  = ['Sulfato de Polimixina B', 'Sulfato de Polimixina E'];
+
+  // ── Assemble output ──────────────────────────────────────────────
+  var nc = function(v) { return (v === null || isNaN(v)) ? null : v; };
+
+  return {
+    // ─ UTI A/B (UTI-1) ─
+    ab_pav:    nc(calcDI(u1.pn,      u1.vm)),
+    ab_itu:    nc(calcDI(u1.iu,      u1.sv)),
+    ab_ipcs:   nc(calcDI(u1.ipcs_lab,u1.ct)),
+    ab_svd:    nc(calcTX(u1.sv,      u1.pac_dia)),
+    ab_cvc:    nc(calcTX(u1.ct,      u1.pac_dia)),
+    ab_tot:    nc(calcTX(u1.vm,      u1.pac_dia)),
+    ab_pip:    dddSum(PIP,   'utia'),
+    ab_carba:  dddSum(CARBA, 'utia'),
+    ab_glico:  dddSum(GLICO, 'utia'),
+    ab_poli:   dddSum(POLI,  'utia'),
+    // ab_pac_dia and uc_pac_dia — hidden, used by mdrMensal builder
+    ab_pac_dia: safeN(r1[7]),
+    uc_pac_dia: safeN(r2[7]),
+    ab_aud_ok: nc(u1.chk_100),
+    ab_aud_nc: nc((u1.chk_apl || 0) - (u1.chk_100 || 0)),
+
+    // ─ UTIC (UTI-2) ─
+    uc_pav:    nc(calcDI(u2.pn,      u2.vm)),
+    uc_itu:    nc(calcDI(u2.iu,      u2.sv)),
+    uc_ipcs:   nc(calcDI(u2.ipcs_lab,u2.ct)),
+    uc_svd:    nc(calcTX(u2.sv,      u2.pac_dia)),
+    uc_cvc:    nc(calcTX(u2.ct,      u2.pac_dia)),
+    uc_tot:    nc(calcTX(u2.vm,      u2.pac_dia)),
+    uc_pip:    dddSum(PIP,   'utic'),
+    uc_carba:  dddSum(CARBA, 'utic'),
+    uc_glico:  dddSum(GLICO, 'utic'),
+    uc_poli:   dddSum(POLI,  'utic'),
+    uc_hm:     (alcool_uco !== null && pd_uco) ? parseFloat((alcool_uco / pd_uco).toFixed(1)) : null,
+    uc_aud_ok: nc(u2.chk_100),
+    uc_aud_nc: nc((u2.chk_apl || 0) - (u2.chk_100 || 0)),
+
+    // ─ UTI Neonatal ─
+    // IPCS Neo = confirmação clínica + laboratorial (todas as faixas de peso somadas) / CVC-dias
+    neo_ipcs:  nc(calcDI((neo.ipcs_lab + neo.ipcs_clin), neo.ct)),
+  };
+}
+
+// ── Fill form fields from extracted data ──────────────────────────
+function doAutoFill() {
+  if (!cveWorkbook) return;
+  var mesIdx = getMesNum() - 1;
+  var data   = parseCVE(cveWorkbook, mesIdx);
+
+  var filled = 0, skipped = 0;
+  var log = [];
+
+  var LABELS = {
+    ab_pav:    'UTI A/B · PAV',        ab_itu:    'UTI A/B · ITU',
+    ab_ipcs:   'UTI A/B · IPCS',       ab_svd:    'UTI A/B · TX SVD',
+    ab_cvc:    'UTI A/B · TX CVC',     ab_tot:    'UTI A/B · TX VM',
+    ab_pip:    'UTI A/B · DDD Pip',    ab_carba:  'UTI A/B · DDD Carba',
+    ab_glico:  'UTI A/B · DDD Glico',  ab_poli:   'UTI A/B · DDD Poli',
+    ab_hm:     'UTI A/B · HM álcool',  ab_aud_ok: 'UTI A/B · CVC OK',
+    ab_aud_nc: 'UTI A/B · CVC NC',
+    uc_pav:    'UTIC · PAV',           uc_itu:    'UTIC · ITU',
+    uc_ipcs:   'UTIC · IPCS',          uc_svd:    'UTIC · TX SVD',
+    uc_cvc:    'UTIC · TX CVC',        uc_tot:    'UTIC · TX VM',
+    uc_pip:    'UTIC · DDD Pip',       uc_carba:  'UTIC · DDD Carba',
+    uc_glico:  'UTIC · DDD Glico',     uc_poli:   'UTIC · DDD Poli',
+    uc_hm:     'UTIC · HM álcool',     uc_aud_ok: 'UTIC · CVC OK',
+    uc_aud_nc: 'UTIC · CVC NC',
+    ab_pac_dia: 'UTI A/B · Pac-dia (hidden)',
+    uc_pac_dia: 'UTIC · Pac-dia (hidden)',
+  };
+
+  Object.keys(data).forEach(function(field) {
+    var el = document.getElementById(field);
+    var val = data[field];
+    if (!el) return;
+    if (val === null || val === undefined) {
+      skipped++;
+      return;
+    }
+    el.value = val;
+    // Flash highlight
+    el.style.transition = 'background .1s';
+    el.style.background = '#e3f2fd';
+    setTimeout(function(){ el.style.background = ''; el.style.transition = ''; }, 1200);
+    filled++;
+    log.push('✓ ' + (LABELS[field] || field) + ' = ' + val);
+  });
+
+  // Update pac-dia display spans
+  var abPdEl = document.getElementById('ab_pac_dia');
+  var ucPdEl = document.getElementById('uc_pac_dia');
+  var abDisp = document.getElementById('ab_pac_dia_display');
+  var ucDisp = document.getElementById('uc_pac_dia_display');
+  if (abDisp && abPdEl && abPdEl.value) abDisp.textContent = abPdEl.value;
+  if (ucDisp && ucPdEl && ucPdEl.value) ucDisp.textContent = ucPdEl.value;
+
+  // Recalculate MDR rates if counts already filled
+  ['ab','uc'].forEach(function(pfx) {
+    ['esbl','kpc','acin','pseu'].forEach(function(org) { calcMDRrate(pfx, org); });
+  });
+
+  var logEl = document.getElementById('autofillLog');
+  logEl.style.display = 'block';
+  logEl.innerHTML = log.join('<br>') +
+    '<br><strong>' + filled + ' campos preenchidos, ' + skipped + ' sem dados.</strong>';
+
+  var btn = document.getElementById('fillBtn');
+  btn.style.background = '#2e7d32';
+  btn.textContent = '✓ Preenchido (' + filled + ' campos)';
+  setTimeout(function(){
+    btn.style.background = '';
+    btn.innerHTML = '🔄 Re-preencher do CVE <span class="fill-badge" id="fillBadge">' + filled + ' campos</span>';
+  }, 2500);
+}
+
+// ── MDR rate auto-calculation ──────────────────────────────────────────────────
+function calcMDRrate(pfx, org) {
+  var pdEl  = document.getElementById(pfx + '_pac_dia');
+  var nEl   = document.getElementById(pfx + '_' + org + '_n');
+  var rateEl = document.getElementById(pfx + '_' + org);
+  if (!pdEl || !nEl || !rateEl) return;
+  var pd = parseFloat(pdEl.value);
+  var n  = parseFloat(nEl.value);
+  if (!pd || isNaN(n)) return;
+  var rate = parseFloat((n / pd * 1000).toFixed(2));
+  rateEl.value = rate;
+  // Brief green flash to signal auto-calculation
+  rateEl.style.transition = 'background .1s';
+  rateEl.style.background = '#e8f5e9';
+  setTimeout(function(){ rateEl.style.background = ''; rateEl.style.transition = ''; }, 900);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CVE UTI C — HM álcool UCO + DDDs UTIC calculados
+// ═══════════════════════════════════════════════════════════════════
+// Plan4 · UCO: linha 16+mesIdx (0-indexed 15+mesIdx), cols G=6, H=7, I=8
+// Plan6 · computed UTIC: col 18 = DDD/1000 pac-dia
+//   Block starts (0-indexed): [14,70,125,180,235,290,345,400,455,510,565,620]
+//   ATB offsets from block start (rows with UTIC computed values):
+//     Pip/Tazo offset 24, Meropenem offset 21, Teico offset 27,
+//     Vanco offset 28, Poli B offset 25
+
+var ucitcWorkbook = null;
+
+// P6 computed section: col 13=nome UTIC, col 18=consumo UTIC
+var UC_P6_BLOCK_STARTS = [14,70,125,180,235,290,345,400,455,510,565,620];
+
+// ATB name fragments → field mapping
+var UC_ATB_MAP = [
+  { frag: 'Piperacilina',  field: 'uc_pip'   },
+  { frag: 'Meropenem',     field: 'uc_carba' },
+  { frag: 'Imipenem',      field: 'uc_carba', add: true },  // sum with Meropenem
+  { frag: 'Ertapenem',     field: 'uc_carba', add: true },
+  { frag: 'Vancomicina',   field: 'uc_glico' },
+  { frag: 'Teicoplanina',  field: 'uc_glico', add: true },
+  { frag: 'Polimixina B',  field: 'uc_poli'  },
+];
+
+(function() {
+  var drop = document.getElementById('ucDrop');
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault(); drop.classList.remove('dragover');
+    var f = e.dataTransfer.files[0];
+    if (f) loadUTIC(f);
+  });
+})();
+
+function ucSafeN(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'object' && v.t === 'e') return null;
+  if (typeof v === 'string' && v.charAt(0) === '#') return null;
+  var n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+
+function parseUTIC(wb, mesIdx) {
+  var result = {};
+
+  // Plan4: HM álcool UCO (col G=6, col I=8 pac-dia)
+  var ws4 = wb.Sheets['Plan4 - P.alcoolico e sabonete'];
+  if (ws4) {
+    var d4 = XLSX.utils.sheet_to_json(ws4, { header:1, defval:null, raw:true });
+    var r4 = d4[15 + mesIdx] || [];
+    var alcool_uco = ucSafeN(r4[6]);
+    var pd_uco     = ucSafeN(r4[8]);
+    result.uc_hm = (alcool_uco !== null && pd_uco) ? parseFloat((alcool_uco / pd_uco).toFixed(1)) : null;
+  }
+
+  // Plan6: computed UTIC DDDs (col 18 = consumo /1000 pac-dia)
+  var ws6 = wb.Sheets['Plan6 - DDD'];
+  if (ws6) {
+    var d6 = XLSX.utils.sheet_to_json(ws6, { header:1, defval:null, raw:true });
+    var b6 = UC_P6_BLOCK_STARTS[mesIdx];
+    var accum = {};
+
+    for (var i = 3; i <= 40; i++) {
+      var row = d6[b6 + i];
+      if (!row) break;
+      var nome = row[13]; // col N = UTIC nome genérico
+      if (!nome || typeof nome !== 'string' || nome.trim() === '') continue;
+      var consumo = ucSafeN(row[18]); // col S = UTIC consumo
+      if (consumo === null) continue;
+
+      UC_ATB_MAP.forEach(function(m) {
+        if (nome.indexOf(m.frag) >= 0) {
+          if (m.add) {
+            accum[m.field] = (accum[m.field] || 0) + consumo;
+          } else {
+            accum[m.field] = consumo;
+          }
+        }
+      });
+    }
+    Object.assign(result, accum);
+  }
+  return result;
+}
+
+function loadUTIC(file) {
+  if (!file) return;
+  var drop   = document.getElementById('ucDrop');
+  var status = document.getElementById('ucStatus');
+  status.className = 'cve-status';
+  status.textContent = '⏳ Lendo…';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      ucitcWorkbook = XLSX.read(data, { type:'array', cellFormula:false, cellHTML:false });
+      var mes = getMesNum();
+      var preview = parseUTIC(ucitcWorkbook, mes - 1);
+      var count = Object.values(preview).filter(function(v){ return v !== null; }).length;
+      drop.classList.add('loaded'); drop.classList.remove('error');
+      status.className = 'cve-status ok';
+      status.textContent = '✓ ' + file.name + ' carregado';
+      document.getElementById('ucFillBadge').textContent = count + ' campos';
+      document.getElementById('ucFillBtn').style.display = 'block';
+    } catch(err) {
+      drop.classList.add('error'); drop.classList.remove('loaded');
+      status.className = 'cve-status err';
+      status.textContent = '✗ ' + err.message;
+      ucitcWorkbook = null;
+      document.getElementById('ucFillBtn').style.display = 'none';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function doUTICFill() {
+  if (!ucitcWorkbook) return;
+  var data = parseUTIC(ucitcWorkbook, getMesNum() - 1);
+  var log = [], filled = 0;
+
+  var LABELS = {
+    uc_hm:    'UTIC · HM álcool gel (ml/pac-dia)',
+    uc_pip:   'UTIC · DDD Pip/Tazo',
+    uc_carba: 'UTIC · DDD Carbapenêmico',
+    uc_glico: 'UTIC · DDD Glicopeptídeo',
+    uc_poli:  'UTIC · DDD Polimixina B',
+  };
+
+  Object.keys(data).forEach(function(field) {
+    var el  = document.getElementById(field);
+    var val = data[field];
+    if (!el || val === null) return;
+    el.value = parseFloat(val.toFixed(2));
+    el.style.transition = 'background .1s';
+    el.style.background = '#fff8e1';
+    setTimeout(function(){ el.style.background = ''; el.style.transition = ''; }, 1400);
+    log.push('✓ ' + (LABELS[field] || field) + ' = ' + val.toFixed(2));
+    filled++;
+  });
+
+  var logEl = document.getElementById('ucLog');
+  logEl.style.display = 'block';
+  logEl.innerHTML = log.join('<br>') + '<br><strong>' + filled + ' campos preenchidos</strong>';
+
+  var btn = document.getElementById('ucFillBtn');
+  btn.style.background = '#2e7d32';
+  btn.textContent = '✓ Preenchido (' + filled + ' campos)';
+  setTimeout(function(){
+    btn.style.background = '';
+    btn.innerHTML = '🏥 Re-preencher UTIC <span class="fill-badge">' + filled + ' campos</span>';
+  }, 2500);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CENSO DIARREIA — Incidência /1000 pac-dia (Tabela 3, aba Totais)
+// ═══════════════════════════════════════════════════════════════════
+// Totais structure:
+//   row 0: Tabela 1 header
+//   rows 1-13: Tabela 1 (prevalência)
+//   row 17: Tabela 2 header
+//   rows 18-30: Tabela 2 (contagens)
+//   row 34: Tabela 3 header
+//   row 35: col headers [Mês, CM, CC, EPM, Apto, UTIAB, UTIC, ...]
+//   rows 36-47: January-December
+// Columns: 0=Mês, 1=CM, 2=CC, 3=EPM, 4=Apto, 5=UTIAB, 6=UTIC
+var diarrWorkbook = null;
+
+var DIARR_MES_EN = ['January','February','March','April','May','June',
+  'July','August','September','October','November','December'];
+
+(function() {
+  var drop = document.getElementById('diarrDrop');
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault(); drop.classList.remove('dragover');
+    var f = e.dataTransfer.files[0]; if (f) loadDiarr(f);
+  });
+})();
+
+function parseDiarr(wb, mesIdx) {
+  var ws = wb.Sheets['Totais'];
+  if (!ws) return null;
+  var data = XLSX.utils.sheet_to_json(ws, { header:1, defval:null, raw:true });
+
+  // Find Table 3 header row (contains "Tabela 3")
+  var t3row = -1;
+  for (var i = 0; i < data.length; i++) {
+    if (data[i] && data[i][0] && String(data[i][0]).indexOf('Tabela 3') >= 0) {
+      t3row = i; break;
+    }
+  }
+  if (t3row < 0) return null;
+
+  // Next row is column header, then month rows
+  var headerRow = t3row + 1; // [Mês, CM, CC, EPM, Apto, UTIAB, UTIC, ...]
+  var dataStart = headerRow + 1;
+
+  // Find the month row
+  var mesNome = DIARR_MES_EN[mesIdx];
+  var row = null;
+  for (var j = dataStart; j < data.length; j++) {
+    if (data[j] && String(data[j][0]||'').toLowerCase() === mesNome.toLowerCase()) {
+      row = data[j]; break;
+    }
+  }
+  if (!row) return null;
+
+  function safeV(v) {
+    if (v == null) return null;
+    if (typeof v === 'string' && v.charAt(0) === '#') return null;
+    var n = parseFloat(v);
+    return isNaN(n) ? null : parseFloat(n.toFixed(2));
+  }
+
+  return {
+    diarr_cm:    safeV(row[1]),
+    diarr_cc:    safeV(row[2]),
+    diarr_epm:   safeV(row[3]),
+    // col 4 = Apto — skipped (not tracked separately in portal)
+    diarr_utiab: safeV(row[5]),
+    diarr_utic:  safeV(row[6]),
+  };
+}
+
+function loadDiarr(file) {
+  if (!file) return;
+  var drop   = document.getElementById('diarrDrop');
+  var status = document.getElementById('diarrStatus');
+  status.textContent = '⏳ Lendo…';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      diarrWorkbook = XLSX.read(data, { type:'array', cellFormula:false, cellHTML:false });
+      var mes = getMesNum();
+      var preview = parseDiarr(diarrWorkbook, mes - 1);
+      var count = preview ? Object.values(preview).filter(function(v){ return v !== null; }).length : 0;
+      drop.classList.add('loaded'); drop.classList.remove('error');
+      status.className = 'cve-status ok';
+      status.textContent = '✓ ' + file.name + ' carregado';
+      document.getElementById('diarrFillBadge').textContent = count + ' campos';
+      document.getElementById('diarrFillBtn').style.display = count > 0 ? 'block' : 'none';
+    } catch(err) {
+      drop.classList.add('error'); drop.classList.remove('loaded');
+      status.className = 'cve-status err';
+      status.textContent = '✗ ' + err.message;
+      diarrWorkbook = null;
+      document.getElementById('diarrFillBtn').style.display = 'none';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function doDiarrFill() {
+  if (!diarrWorkbook) return;
+  var data = parseDiarr(diarrWorkbook, getMesNum() - 1);
+  if (!data) return;
+  var log = [], filled = 0;
+  var LABELS = {
+    diarr_cm:'Diarreia · Cl. Médica', diarr_cc:'Diarreia · Cl. Cirúrgica',
+    diarr_epm:'Diarreia · EPM/Apto', diarr_utiab:'Diarreia · UTI A/B', diarr_utic:'Diarreia · UTI C'
+  };
+  Object.keys(data).forEach(function(field) {
+    var el = document.getElementById(field);
+    var val = data[field];
+    if (!el || val === null) return;
+    el.value = val;
+    el.style.transition = 'background .1s';
+    el.style.background = '#fce4ec';
+    setTimeout(function(){ el.style.background = ''; el.style.transition = ''; }, 1400);
+    log.push('✓ ' + LABELS[field] + ' = ' + val);
+    filled++;
+  });
+  var logEl = document.getElementById('diarrLog');
+  logEl.style.display = 'block';
+  logEl.innerHTML = log.join('<br>') + '<br><strong>' + filled + ' campos preenchidos</strong>';
+  var btn = document.getElementById('diarrFillBtn');
+  btn.style.background = '#2e7d32';
+  btn.textContent = '✓ Preenchido (' + filled + ' campos)';
+  setTimeout(function(){
+    btn.style.background = '';
+    btn.innerHTML = '🦠 Re-preencher Diarreia <span class="fill-badge">' + filled + ' campos</span>';
+  }, 2500);
+}
 </script>
-</body>
-</html>
+</body></html>
