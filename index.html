@@ -45,6 +45,19 @@
             margin: 0;
         }
         
+        /* ALERTA ATUALIZAÇÃO */
+        .alerta-atualizacao {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 8px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(231,76,60,0.3);
+        }
+        
         /* CARDS DE DECISÃO - PRIORIDADE MÁXIMA */
         .decisao-container {
             margin: 10px 0;
@@ -278,56 +291,61 @@
             <div class="header-title">
                 <i class="fas fa-hospital-alt"></i> HUSF - Vigilância Respiratória
             </div>
-            <small>SE 11/2026 &bull; 9-15 Março 2026 &bull; Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</small>
+            <small>SE 11/2026 &bull; 15-21 Março 2026 &bull; Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</small>
+        </div>
+        
+        <!-- ALERTA DADOS CORRETOS -->
+        <div class="alerta-atualizacao">
+            <i class="fas fa-sync-alt"></i> <strong>DADOS CORRIGIDOS:</strong> Sistema atualizado com dados reais do InfoGripe SE 11/2026
         </div>
 
         <!-- CARDS DE DECISÃO CLÍNICA - PRIORIDADE NO TOPO -->
         <div class="decisao-container">
             <!-- CARD COVID-19 -->
-            <div class="patogeno-card status-cautela">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">COVID-19</div>
-                    <div class="patogeno-vpn vpn-cautela">90%</div>
-                </div>
-                <div class="patogeno-decisao decisao-cautela">
-                    <i class="fas fa-exclamation-triangle"></i> AVALIAR CLINICAMENTE
-                </div>
-            </div>
-            <!-- CARD Influenza A -->
             <div class="patogeno-card status-liberar">
                 <div class="patogeno-header">
-                    <div class="patogeno-nome">Influenza A</div>
-                    <div class="patogeno-vpn vpn-liberar">98%</div>
+                    <div class="patogeno-nome">COVID-19</div>
+                    <div class="patogeno-vpn vpn-liberar">97%</div>
                 </div>
                 <div class="patogeno-decisao decisao-liberar">
                     <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+                </div>
+            </div>
+            <!-- CARD Influenza A -->
+            <div class="patogeno-card status-nao-liberar">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">Influenza A</div>
+                    <div class="patogeno-vpn vpn-nao-liberar">87%</div>
+                </div>
+                <div class="patogeno-decisao decisao-nao-liberar">
+                    <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
                 </div>
             </div>
             <!-- CARD Influenza B -->
             <div class="patogeno-card status-liberar">
                 <div class="patogeno-header">
                     <div class="patogeno-nome">Influenza B</div>
-                    <div class="patogeno-vpn vpn-liberar">100%</div>
+                    <div class="patogeno-vpn vpn-liberar">99%</div>
                 </div>
                 <div class="patogeno-decisao decisao-liberar">
                     <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
                 </div>
             </div>
             <!-- CARD VSR -->
-            <div class="patogeno-card status-nao-liberar">
+            <div class="patogeno-card status-liberar">
                 <div class="patogeno-header">
                     <div class="patogeno-nome">VSR</div>
-                    <div class="patogeno-vpn vpn-nao-liberar">90%</div>
+                    <div class="patogeno-vpn vpn-liberar">96%</div>
                 </div>
-                <div class="patogeno-decisao decisao-nao-liberar">
-                    <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
+                <div class="patogeno-decisao decisao-liberar">
+                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
                 </div>
             </div>
             <!-- CARD Rinovírus -->
             <div class="patogeno-card status-nao-liberar">
                 <div class="patogeno-header">
                     <div class="patogeno-nome">Rinovírus</div>
-                    <div class="patogeno-vpn vpn-nao-liberar">77%</div>
+                    <div class="patogeno-vpn vpn-nao-liberar">71%</div>
                 </div>
                 <div class="patogeno-decisao decisao-nao-liberar">
                     <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
@@ -373,11 +391,11 @@
             </div>
             <div class="stats-mobile">
                 <div class="stat-mobile">
-                    <span class="stat-mobile-value">21.498</span>
+                    <span class="stat-mobile-value">24.281</span>
                     <div class="stat-mobile-label">Casos SRAG</div>
                 </div>
                 <div class="stat-mobile">
-                    <span class="stat-mobile-value">36%</span>
+                    <span class="stat-mobile-value">39%</span>
                     <div class="stat-mobile-label">Positividade</div>
                 </div>
                 <div class="stat-mobile">
@@ -385,9 +403,19 @@
                     <div class="stat-mobile-label">Sem. Epidem.</div>
                 </div>
                 <div class="stat-mobile">
-                    <span class="stat-mobile-value">7.780</span>
+                    <span class="stat-mobile-value">9.443</span>
                     <div class="stat-mobile-label">Positivos</div>
                 </div>
+            </div>
+        </div>
+        <!-- ALERTA ESPECIAL INFLUENZA A -->
+        <div class="alerta-especial">
+            <div style="font-weight: 700; margin-bottom: 8px;">
+                <i class="fas fa-exclamation-triangle"></i> Atenção: Influenza A
+            </div>
+            <div style="font-size: 0.9rem;">
+                <strong>Crescimento explosivo antecipado (27.8%).</strong> VPN baixo exige RT-PCR para confirmação.
+                Aumento antes do outono - vacinação urgente.
             </div>
         </div>
         <!-- ALERTA ESPECIAL RINOVÍRUS -->
@@ -396,18 +424,18 @@
                 <i class="fas fa-exclamation-triangle"></i> Atenção: Rinovírus
             </div>
             <div style="font-size: 0.9rem;">
-                <strong>Principal patógeno circulante.</strong> Sensibilidade limitada (50%). 
+                <strong>Principal patógeno circulante (45.0%).</strong> Sensibilidade limitada (50%). 
                 Teste negativo + sintomas &rarr; RT-PCR recomendado.
             </div>
         </div>
         <!-- DETALHES: DISTRIBUIÇÃO DE PATÓGENOS -->
         <div class="detalhes-section">
             <button class="detalhes-toggle" onclick="toggleDetalhes('distribuicao')">
-                <span><i class="fas fa-chart-pie"></i> Distribuição dos Patógenos</span>
+                <span><i class="fas fa-chart-pie"></i> Distribuição dos Patógenos (SE 11/2026)</span>
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="detalhes-content" id="content-distribuicao">
-                <div class="patogenos-distribuicao"><span class="patogeno-badge-mobile badge-rinovirus">Rinovírus: 36.5%</span><span class="patogeno-badge-mobile badge-vsr">VSR: 30.5%</span><span class="patogeno-badge-mobile badge-covid">COVID-19: 26.5%</span><span class="patogeno-badge-mobile badge-influenza">Influenza A: 4.8%</span><span class="patogeno-badge-mobile badge-influenza">Influenza B: 1.1%</span><span class="patogeno-badge-mobile badge-outros">Outros: 0.6%</span>
+                <div class="patogenos-distribuicao"><span class="patogeno-badge-mobile badge-rinovirus">Rinovírus: 45.0%</span><span class="patogeno-badge-mobile badge-influenza">Influenza A: 27.8%</span><span class="patogeno-badge-mobile badge-vsr">VSR: 14.6%</span><span class="patogeno-badge-mobile badge-covid">COVID-19: 9.1%</span><span class="patogeno-badge-mobile badge-influenza">Influenza B: 1.4%</span><span class="patogeno-badge-mobile badge-outros">Outros: 1.1%</span>
             </div>
         </div>
         
@@ -443,7 +471,7 @@
                 Sistema HUSF - Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH
             </div>
             <div style="margin-top: 3px; font-size: 0.6rem; opacity: 0.8;">
-                Sistema baseado em evidências científicas • VPN >=95% = Liberação Segura
+                Sistema baseado em evidências científicas • VPN >=95% = Liberação Segura • Dados corretos SE 11/2026
             </div>
         </div>
     </div>
