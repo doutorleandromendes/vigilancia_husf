@@ -944,11 +944,6 @@ function App(){
           h('div',{className:'pulse',style:{width:5,height:5,borderRadius:'50%',background:'#4db6ac'}}),
           h('span',{style:{fontSize:8,color:'#4db6ac',fontWeight:600}},D.periodo)
         ),
-        h('a',{href:'./entrada_dados.html',style:{display:'block',marginTop:10,
-          background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.12)',
-          borderRadius:6,padding:'5px 10px',color:'#9ab0cc',fontSize:9,
-          textDecoration:'none',textAlign:'center',fontWeight:500}},
-          '⊕ Atualizar dados')
       ),
       h('div',{style:{flex:1,overflowY:'auto',padding:'6px 0',background:'#1a2744'}},
         groups.map(function(g){
@@ -991,13 +986,25 @@ function App(){
         h('a',{href:'https://doutorleandromendes.github.io/vigilancia_husf/atb_dots.html',
           target:'_blank',rel:'noopener',
           style:{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',
-            marginBottom:10,borderRadius:6,textDecoration:'none',
+            marginBottom:5,borderRadius:6,textDecoration:'none',
             background:'rgba(21,101,192,.10)',border:'1px solid rgba(21,101,192,.25)',
             color:'#90caf9',fontSize:10,fontWeight:500,transition:'background .15s'},
           onMouseEnter:function(e){e.currentTarget.style.background='rgba(21,101,192,.20)';},
           onMouseLeave:function(e){e.currentTarget.style.background='rgba(21,101,192,.10)';}},
           h('span',{style:{fontSize:11}},'◈'),
           h('span',{},'Uso de ATBs'),
+          h('span',{style:{marginLeft:'auto',fontSize:9,opacity:.6}},'↗')
+        ),
+        h('a',{href:'https://doutorleandromendes.github.io/vigilancia_husf/isc_v4.html',
+          target:'_blank',rel:'noopener',
+          style:{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',
+            marginBottom:10,borderRadius:6,textDecoration:'none',
+            background:'rgba(46,125,50,.10)',border:'1px solid rgba(46,125,50,.25)',
+            color:'#a5d6a7',fontSize:10,fontWeight:500,transition:'background .15s'},
+          onMouseEnter:function(e){e.currentTarget.style.background='rgba(46,125,50,.20)';},
+          onMouseLeave:function(e){e.currentTarget.style.background='rgba(46,125,50,.10)';}},
+          h('span',{style:{fontSize:11}},'✂'),
+          h('span',{},'Infecções Cirúrgicas'),
           h('span',{style:{marginLeft:'auto',fontSize:9,opacity:.6}},'↗')
         ),
         h('div',{style:{fontSize:8,color:'#5a7a9a',lineHeight:1.8}},
