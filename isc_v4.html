@@ -730,6 +730,9 @@ function mergeJsonSeries(fbArr, jsArr){
     // Normalise: JSON uses {p,isc,cl,taxa,proc,pd,c} → FB uses {m,...}
     var r=Object.assign({},pt,{m:pt.p,prev:false});
     delete r.p;
+    // limpas/cesar: JSON uses 'cl' or 'proc' as denominator; FB uses 'proc'
+    if(r.cl!=null && r.proc==null) r.proc=r.cl;
+    if(r.proc!=null && r.cl==null) r.cl=r.proc;
     return r;
   });
   return fbArr.concat(toAdd);
