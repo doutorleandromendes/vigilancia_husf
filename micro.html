@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCIH/HUSF — Microbiologia</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f2f5;font-family:'IBM Plex Sans',sans-serif;color:#1a2744;min-height:100vh;
+  background-image:radial-gradient(circle,rgba(75,156,245,0.03) 1px,transparent 1px);background-size:26px 26px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
+button{cursor:pointer;transition:all .12s}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.min.js"></script>
+<script>
+'use strict';
+var h=React.createElement,useState=React.useState,useMemo=React.useMemo;
+var RC=Recharts;
+var ComposedChart=RC.ComposedChart,BarChart=RC.BarChart,Bar=RC.Bar,Line=RC.Line;
+var PieChart=RC.PieChart,Pie=RC.Pie,Cell=RC.Cell;
+var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
+var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer,RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea;
+
+var C={
+  bg:'#f0f2f5',surf:'#fff',brdr:'#d0d7de',glow:'#b0bec5',
+  ti:'#1a2744',ts:'#4a5568',tm:'#8898aa',hist:'#9eaab8',
+  esbl:'#2e7d32',mrsa:'#1565c0',mrscn:'#6a1b9a',
+  cpe:'#c62828',acin:'#0277bd',pseu:'#00695c',mr:'#e65100',
+  gneg:'#1565c0',gpos:'#1a2744',fung:'#6a1b9a'
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// ATUALIZAÇÃO MENSAL — adicionar novo mês aos arrays abaixo
+//
+// 1. MESES_LABELS / IS_CURR: adicionar label (ex: 'abr/26') e false/true
+// 2. HEMO_POS / HEMO_COL: positivas e coletadas de hemoculturas do mês
+// 3. SWAB_POS / SWAB_COL: positivos e coletados de swabs do mês
+// 4. CONTAM_MES: contaminação — disponível somente se houver campo TTP na planilha
+//    {m:'abr/26', col:<coletadas>, pos:<positivas_hemo>, nc:<contaminações>, pct_col:<nc/col*100>, c:true}
+// 5. SER.*: taxas mensais — calcular com Python antes de adicionar:
+//    - utiAB / utiC: MDR / pac-dia setorial × 1000
+//    - esbl / mrsa / cpe / acin: idem por tipo MDR
+//    - acqAB_* / acqC_*: aquisição / pac-dia setorial × 1000
+//    - TEMPO_MENSAL: mediana do tempo de positividade das hemoculturas do mês
+// 6. Atualizar subtítulos '...–mar/26' para o novo mês final
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── DADOS ─────────────────────────────────────────────────────────────────────
+var ORGS_BY_MAT={
+  'Hemocultura':{n:1057,items:[['SCN',30.7],['S. aureus',27.1],['K. pneumoniae',8.1],['E. coli',7.7],['S. marcescens',3.2],['E. faecalis',2.9],['P. mirabilis',2.6],['P. aeruginosa',2.2],['Acinetobacter spp.',1.8],['E. cloacae',1.6]]},
+  'Urocultura':{n:1373,items:[['E. coli',55.4],['K. pneumoniae',13.3],['S. saprophyticus',5.6],['C. albicans',5.4],['P. mirabilis',4.7],['E. faecalis',3.2],['P. aeruginosa',3.1],['S. aureus',2.0],['Candida spp.',1.7],['K. aerogenes',0.9]]},
+  'Sec. Traqueal':{n:230,items:[['S. aureus',33.0],['K. pneumoniae',15.2],['P. aeruginosa',13.5],['Acinetobacter spp.',13.5],['E. coli',4.8],['P. mirabilis',3.9],['E. cloacae',3.9],['S. marcescens',3.0],['C. albicans',2.6],['K. aerogenes',1.3]]},
+  'Ortopédica':{n:475,items:[['S. aureus',20.2],['E. faecalis',15.6],['E. coli',13.5],['K. pneumoniae',11.4],['E. cloacae',9.9],['P. aeruginosa',6.7],['SCN',4.0],['Acinetobacter spp.',4.0],['C. freundii',2.3],['Enterococcus spp.',1.5]]},
+  'Outras Sec.':{n:555,items:[['S. aureus',22.2],['E. coli',16.4],['K. pneumoniae',10.6],['E. faecalis',6.8],['S. agalactiae',5.4],['P. aeruginosa',5.4],['SCN',5.0],['E. cloacae',4.3],['C. albicans',3.1],['Strep. viridans',2.7]]}
+};
+
+var MDR_DONUT=[
+  {name:'ESBL',         value:308,pct:30.4,color:C.esbl},
+  {name:'MR-SCN',       value:278,pct:27.5,color:C.mrscn},
+  {name:'MRSA',         value:250,pct:24.7,color:C.mrsa},
+  {name:'CPE (KPC+EPC)',value:83, pct:8.2, color:C.cpe},
+  {name:'Acinetobacter-MR',value:80,pct:7.9,color:C.acin},
+  {name:'Pseudomonas-MR',  value:13,pct:1.3,color:C.pseu}
+];
+
+var SETOR_RATE=[{s:'UTI-C',v:87.4,t:'UTI'},{s:'UTI-A/B',v:70.0,t:'UTI'},{s:'HD',v:33.4,t:'Enf'},{s:'P.S.',v:39.2,t:'Enf'},{s:'IPS',v:14.1,t:'Enf'},{s:'CC',v:22.4,t:'Enf'},{s:'CM',v:7.4,t:'Enf'}];
+var SETOR_PCT= [{s:'UTI-A/B',v:67.8,t:'UTI'},{s:'UTI-C',v:67.2,t:'UTI'},{s:'HD',v:48.5,t:'Enf'},{s:'IPS',v:36.8,t:'Enf'},{s:'CM',v:35.6,t:'Enf'},{s:'CC',v:32.4,t:'Enf'},{s:'P.S.',v:13.9,t:'Enf'}];
+
+var SAU_BY_MAT=[{g:'Ortopédica',n:96,mrsa:49,pct:51},{g:'Hemocultura',n:286,mrsa:122,pct:43},{g:'Outras Sec.',n:123,mrsa:51,pct:41},{g:'Urocultura',n:27,mrsa:8,pct:30},{g:'Sec. Traqueal',n:76,mrsa:18,pct:24}];
+var SAU_BY_SETOR=[{g:'CC',n:155,mrsa:73,pct:47},{g:'UTI-B',n:55,mrsa:25,pct:45},{g:'HD',n:76,mrsa:35,pct:46},{g:'UTI-A',n:64,mrsa:22,pct:34},{g:'P.S.',n:71,mrsa:22,pct:31},{g:'CM',n:45,mrsa:12,pct:27},{g:'UTI-C',n:53,mrsa:13,pct:25}];
+var SCN_BY_MAT=[{g:'Hemocultura',n:325,oxar:246,pct:76},{g:'Ortopédica',n:19,oxar:13,pct:68},{g:'Outras Sec.',n:28,oxar:17,pct:61},{g:'Urocultura',n:2,oxar:1,pct:50}];
+var SCN_BY_SETOR=[{g:'UTI-A',n:32,oxar:29,pct:91},{g:'UTI-B',n:43,oxar:38,pct:88},{g:'UTI-C',n:30,oxar:26,pct:87},{g:'CM',n:35,oxar:30,pct:86},{g:'CC',n:43,oxar:30,pct:70},{g:'HD',n:98,oxar:65,pct:66},{g:'P.S.',n:45,oxar:27,pct:60}];
+var MIC_VANCO=[{x:'0,5',sau:13,scn:0},{x:'1',sau:116,scn:47},{x:'2',sau:0,scn:140}];
+var MIC_POLI=[{x:'0,25',n:4,r:false},{x:'0,5',n:82,r:false},{x:'1',n:47,r:false},{x:'2',n:7,r:false},{x:'32',n:1,r:true},{x:'>64',n:19,r:true}];
+var AQ_RESUMO=[{tipo:'ESBL',adq:106,adm:67},{tipo:'CPE',adq:60,adm:21},{tipo:'Acinetobacter',adq:66,adm:7},{tipo:'MRSA',adq:43,adm:60}];
+
+// Tempo de positividade — hemoculturas (dados disponíveis jul/25–mar/26, n=660)
+var TEMPO_DIST=[
+  {bin:'0–12h',n:36},{bin:'12–24h',n:223},{bin:'24–36h',n:152},
+  {bin:'36–48h',n:116},{bin:'48–72h',n:97},{bin:'72–96h',n:29},{bin:'>96h',n:7}
+];
+// sorted by median, gram classification, n>=8
+var TEMPO_ORG=[
+  {org:'E. coli',         med:13.6,p25:11.7,p75:36.4,n:47, gram:'neg'},
+  {org:'S. pneumoniae',   med:14.6,p25:13.7,p75:15.4,n:9,  gram:'pos'},
+  {org:'E. faecalis',     med:15.5,p25:14.8,p75:16.9,n:19, gram:'pos'},
+  {org:'Morganella m.',   med:15.6,p25:14.2,p75:35.6,n:10, gram:'neg'},
+  {org:'E. cloacae',      med:15.7,p25:10.2,p75:22.9,n:12, gram:'neg'},
+  {org:'Acinetobacter sp.',med:18.9,p25:12.7,p75:20.4,n:10,gram:'neg'},
+  {org:'S. marcescens',   med:19.0,p25:17.6,p75:37.0,n:8,  gram:'neg'},
+  {org:'P. mirabilis',    med:20.6,p25:17.5,p75:34.4,n:21, gram:'neg'},
+  {org:'S. aureus',       med:28.7,p25:19.9,p75:38.1,n:183,gram:'pos'},
+  {org:'K. pneumoniae',   med:30.3,p25:15.3,p75:47.9,n:60, gram:'neg'},
+  {org:'SCN',             med:34.0,p25:25.0,p75:47.9,n:216,gram:'pos'},
+  {org:'P. aeruginosa',   med:40.1,p25:37.0,p75:51.5,n:11, gram:'neg'},
+  {org:'C. albicans',     med:46.0,p25:39.6,p75:57.9,n:8,  gram:'fung'}
+];
+// Monthly median (jul/25–mar/26 only)
+var TEMPO_MENSAL=[
+  {m:'jul/25',med:28.2,n:82},{m:'ago/25',med:25.4,n:75},{m:'set/25',med:32.7,n:73},
+  {m:'out/25',med:34.6,n:71},{m:'nov/25',med:25.7,n:68},{m:'dez/25',med:34.4,n:65},
+  {m:'jan/26',med:29.9,n:79},{m:'fev/26',med:28.9,n:56},{m:'mar/26',med:29.3,n:87}
+];
+
+// ── SÉRIES TEMPORAIS ─────────────────────────────────────────────────────────
+function mkSer(r25,r26){
+  var l25=['jan/25','fev/25','mar/25','abr/25','mai/25','jun/25','jul/25','ago/25','set/25','out/25','nov/25','dez/25'];
+  var l26=['jan/26','fev/26','mar/26'];
+  var s=[];
+  r25.forEach(function(v,i){if(v!=null)s.push({p:l25[i],v:v,c:false});});
+  r26.forEach(function(v,i){if(v!=null)s.push({p:l26[i],v:v,c:true});});
+  return s;
+}
+var SER={
+  utiAB: mkSer([83.6,75.1,42.6,40.1,78.6,69.5,54.9,96.8,102.7,80.5,60.2,55.2],[58.8,80.5,55.3]),
+  utiC:  mkSer([42.76,81.08,56.91,57.76,102.19,154.14,57.97,102.04,89.04,86.81,118.64,99.32],[83.61,32.52,69.31]),
+  esbl:  mkSer([11.44,14.34,9.43,8.88,13.93,9.83,11.01,7.15,9.36,10.24,10.00,5.06],[8.46,5.04,8.99]),
+  mrsa:  mkSer([4.53,7.17,4.60,4.44,9.95,5.81,4.04,5.53,6.46,6.90,5.00,5.30],[5.56,6.81,4.50]),
+  cpe:   mkSer([2.62,0.80,3.91,0.67,0.22,3.80,1.35,6.92,2.45,6.46,4.32,7.47],[6.29,2.52,4.71]),
+  acin:  mkSer([2.86,1.33,0.46,0.44,1.33,0.67,null,0.92,1.78,1.78,0.91,0.48],[2.66,2.27,null]),
+  acqAB_tot:  mkSer([24.59,14.08,12.17,14.57,23.21,23.77,15.93,23.30,28.32,20.55,10.95,17.24],[17.83,20.12,19.0]),
+  acqAB_esbl: mkSer([9.84,7.04,8.11,14.57,14.29,9.14,14.16,5.38,14.16,10.27,3.65,8.62],[5.35,4.02,10.36]),
+  acqAB_cpe:  mkSer([6.56,null,2.03,null,null,5.48,1.77,8.96,1.77,3.42,7.30,6.90],[5.35,8.05,5.18]),
+  acqAB_acin: mkSer([8.20,7.04,2.03,null,3.57,5.48,null,5.38,10.62,8.56,1.82,1.72],[5.35,8.05,1.73]),
+  acqC_tot:   mkSer([6.58,22.52,20.33,14.44,25.55,48.87,10.87,23.81,20.55,41.67,20.34,44.52],[16.72,12.20,16.50]),
+  acqC_esbl:  mkSer([6.58,13.51,12.20,7.22,14.60,26.32,7.25,3.40,null,17.36,13.56,3.42],[3.34,4.07,9.90]),
+  acqC_cpe:   mkSer([null,null,4.07,null,null,7.52,7.25,23.81,6.85,10.42,null,23.97],[13.38,null,6.60]),
+  acqC_acin:  mkSer([6.58,null,null,3.61,10.95,15.04,null,6.80,20.55,13.89,6.78,13.70],[null,4.07,null])
+};
+
+// ── PRIMITIVOS ────────────────────────────────────────────────────────────────
+function Card(p){return h('div',{style:{background:C.surf,borderRadius:10,border:'0.5px solid '+C.brdr,padding:'14px 16px',marginBottom:12,boxShadow:'0 1px 4px rgba(0,0,0,.05)'}},p.children);}
+function SH(p){return h('div',{style:{fontSize:8,color:C.ts,letterSpacing:2,fontWeight:700,textTransform:'uppercase',marginBottom:10,paddingBottom:6,borderBottom:'0.5px solid '+C.brdr}},p.t);}
+function Metric(p){
+  return h('div',{style:{background:p.dark?C.ti:C.surf,border:'0.5px solid '+(p.dark?'transparent':C.brdr),borderRadius:8,padding:'11px 13px',flex:1,minWidth:100}},
+    h('div',{style:{fontSize:8,color:p.dark?'rgba(158,170,184,.8)':C.tm,letterSpacing:.5,marginBottom:3,textTransform:'uppercase',fontWeight:600}},p.label),
+    h('div',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:20,fontWeight:700,lineHeight:1,color:p.dark?'#fff':p.vc||C.ti}},p.value),
+    p.sub?h('div',{style:{fontSize:9,color:p.dark?'rgba(158,170,184,.6)':C.tm,marginTop:3}},p.sub):null
+  );
+}
+function Pill(p){return h('button',{onClick:p.onClick,style:{padding:'4px 11px',borderRadius:20,border:'none',background:p.active?C.ti:'#e9ecef',color:p.active?'#fff':C.ts,fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:p.active?600:400,marginRight:4,marginBottom:4,lineHeight:1.4}},p.label);}
+function LegRow(p){
+  return h('div',{style:{display:'flex',flexWrap:'wrap',gap:10,marginBottom:8}},
+    p.items.map(function(it,i){
+      return h('span',{key:i,style:{display:'flex',alignItems:'center',gap:5,fontSize:10,color:C.ts}},
+        h('span',{style:{width:10,height:10,borderRadius:2,background:it.c,display:'inline-block',flexShrink:0}}),it.l);
+    })
+  );
+}
+function Note(p){return h('div',{style:{background:p.bg||'#f0f4ff',border:'0.5px solid '+(p.bc||'#c7d2fe'),borderRadius:8,padding:'9px 13px',fontSize:11,color:p.tc||'#312e81',lineHeight:1.6,marginBottom:12}},p.children);}
+
+// ── TOOLTIPS ──────────────────────────────────────────────────────────────────
+function TipBase(p){
+  if(!p.active||!p.payload||!p.payload.length) return null;
+  var items=p.payload.filter(function(x){return x.value!=null&&x.value!==0;});
+  if(!items.length) return null;
+  return h('div',{style:{background:'#fff',border:'1px solid '+C.glow,borderRadius:6,padding:'8px 12px',fontSize:11,minWidth:130}},
+    h('div',{style:{fontWeight:600,marginBottom:4,color:C.ts,fontSize:10}},p.label),
+    items.map(function(it,i){
+      return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',gap:12}},
+        h('span',{style:{color:it.color||C.ts}},it.name),
+        h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontWeight:700}},typeof it.value==='number'?it.value.toFixed(1):it.value)
+      );
+    })
+  );
+}
+function TipTempo(p){
+  if(!p.active||!p.payload||!p.payload.length) return null;
+  var d=p.payload[0]&&p.payload[0].payload;
+  if(!d) return null;
+  return h('div',{style:{background:'#fff',border:'1px solid '+C.glow,borderRadius:6,padding:'8px 12px',fontSize:11}},
+    h('div',{style:{fontWeight:600,marginBottom:4}},d.org),
+    h('div',null,'Mediana: '+d.med+'h'),
+    h('div',{style:{color:C.tm}},'IQR: '+d.p25+'h – '+d.p75+'h'),
+    h('div',{style:{color:C.tm}},'n = '+d.n)
+  );
+}
+function TipStaph(p){
+  if(!p.active||!p.payload||!p.payload.length) return null;
+  var d=p.payload[0]&&p.payload[0].payload;
+  if(!d) return null;
+  var mr=d.mrsa!=null?d.mrsa:d.oxar;
+  var lbl=d.mrsa!=null?'MRSA':'MR-SCN';
+  return h('div',{style:{background:'#fff',border:'1px solid '+C.glow,borderRadius:6,padding:'8px 12px',fontSize:11}},
+    h('div',{style:{fontWeight:600,marginBottom:4}},d.g),
+    h('div',null,'n = '+d.n),
+    h('div',null,lbl+': '+mr+' ('+d.pct+'%)'),
+    h('div',{style:{color:C.tm}},'Sensível: '+(d.n-mr)+' ('+(100-d.pct)+'%)')
+  );
+}
+
+// ── GRÁFICO TEMPORAL ──────────────────────────────────────────────────────────
+function buildTempData(lines){
+  var ref=lines[0].ser;
+  var last=ref.slice(-13);
+  var yr=(last[last.length-1]||{p:''}).p.split('/')[1];
+  return last.map(function(pt,i){
+    var prev=pt.p.split('/')[1]!==yr;
+    var first=!prev&&i>0&&last[i-1].p.split('/')[1]!==yr;
+    var row={m:pt.p,prev:prev};
+    lines.forEach(function(l){
+      var sp=l.ser.find(function(x){return x.p===pt.p;});
+      var v=sp?sp.v:null;
+      row[l.k+'_p']=prev||first?v:null;
+      row[l.k+'_c']=!prev?v:null;
+    });
+    return row;
+  });
+}
+function TempChart(p){
+  var lines=p.lines,ht=p.h||220;
+  var data=buildTempData(lines);
+  var pvF=null,pvL=null;
+  data.forEach(function(d){if(d.prev){if(!pvF)pvF=d.m;pvL=d.m;}});
+  return h(RCont,{width:'100%',height:ht},
+    h(ComposedChart,{data:data,margin:{top:6,right:12,left:-16,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+      pvF?h(RefArea,{x1:pvF,x2:pvL,fill:'#f0f2f5',fillOpacity:0.85,stroke:'none'}):null,
+      pvL?h(RefLine,{x:pvL,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1}):null,
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,interval:0}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(RCTip,{content:h(TipBase,{})}),
+      lines.map(function(l){
+        return [
+          h(Line,{key:l.k+'_p',type:'monotone',dataKey:l.k+'_p',stroke:l.c,strokeWidth:l.w||1.5,strokeOpacity:0.18,dot:false,connectNulls:true,legendType:'none',name:undefined}),
+          h(Line,{key:l.k+'_c',type:'monotone',dataKey:l.k+'_c',stroke:l.c,strokeWidth:l.w||1.5,strokeOpacity:1,name:l.l,dot:{r:l.dot||3,fill:l.c,stroke:'#fff',strokeWidth:1.2},connectNulls:true,legendType:'none',activeDot:{r:5,fill:l.c,stroke:'#fff',strokeWidth:2}})
+        ];
+      }).reduce(function(a,b){return a.concat(b);})
+    )
+  );
+}
+
+// ── BARRA HORIZONTAL GENÉRICA — altura dinâmica, interval:0 ──────────────────
+function HBar(p){
+  var data=p.data,yKey=p.yKey||'name',xKey=p.xKey||'v';
+  var ht=data.length*36+48;
+  return h(RCont,{width:'100%',height:ht},
+    h(BarChart,{data:data,layout:'vertical',margin:{top:4,right:58,left:4,bottom:4},barCategoryGap:'22%'},
+      h(YAxis,{type:'category',dataKey:yKey,interval:0,tick:{fontSize:10,fill:C.ts,fontFamily:"'IBM Plex Sans',sans-serif"},width:148,axisLine:false,tickLine:false}),
+      h(XAxis,{type:'number',tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false,tickFormatter:p.fmt||undefined}),
+      h(RCTip,{content:h(TipBase,{})}),
+      h(Bar,{dataKey:xKey,name:p.barName||xKey,radius:[0,3,3,0],maxBarSize:18,
+        label:{position:'right',fontSize:9,fill:C.ts,formatter:p.labelFmt||(function(v){return v.toFixed(1);})}},
+        data.map(function(d,i){return h(Cell,{key:i,fill:p.colorFn?p.colorFn(d):C.ti,opacity:p.opFn?p.opFn(d):1});})
+      )
+    )
+  );
+}
+
+// ── SEÇÃO 1: VISÃO GERAL ──────────────────────────────────────────────────────
+function VisaoGeral(){
+  var mKeys=Object.keys(ORGS_BY_MAT);
+  var ss=useState('Hemocultura');
+  var sel=ss[0],setSel=ss[1];
+  var cur=ORGS_BY_MAT[sel];
+  var orgData=cur.items.map(function(it){return {name:it[0],v:it[1]};});
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:12}},
+      h(Metric,{label:'Culturas clínicas',value:'3.690',sub:'jan/25 – mar/26',dark:true}),
+      h(Metric,{label:'MDR clínico',value:'27,4%',sub:'1.012 / 3.690',vc:C.cpe}),
+      h(Metric,{label:'CPE (KPC+EPC)',value:'83',sub:'8,2% dos MDR clínicos',vc:C.cpe}),
+      h(Metric,{label:'Acinetobacter-MR',value:'80',sub:'7,9% dos MDR clínicos',vc:C.acin})
+    ),
+
+    h('div',{style:{display:'grid',gridTemplateColumns:'260px 1fr',gap:12}},
+      h(Card,null,
+        h(SH,{t:'MDR clínico — composição (n=1.012)'}),
+        h(RCont,{width:'100%',height:140},
+          h(PieChart,null,
+            h(Pie,{data:MDR_DONUT,cx:'50%',cy:'50%',innerRadius:38,outerRadius:62,dataKey:'value',paddingAngle:2,startAngle:90,endAngle:-270},
+              MDR_DONUT.map(function(d,i){return h(Cell,{key:i,fill:d.color});})))),
+        MDR_DONUT.map(function(d,i){
+          return h('div',{key:i,style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'3px 0',borderBottom:'0.5px solid '+C.brdr}},
+            h('div',{style:{display:'flex',alignItems:'center',gap:6}},
+              h('div',{style:{width:7,height:7,borderRadius:1,background:d.color,flexShrink:0}}),
+              h('span',{style:{fontSize:10,color:C.ts}},d.name)),
+            h('span',{style:{fontSize:10,fontFamily:"'IBM Plex Mono',monospace",fontWeight:600,color:C.ti}},d.value+' · '+d.pct+'%'));
+        })
+      ),
+      h(Card,null,
+        h(SH,{t:'Microrganismos mais frequentes'}),
+        h('div',{style:{display:'flex',flexWrap:'wrap',marginBottom:8}},
+          mKeys.map(function(m){return h(Pill,{key:m,label:m,active:sel===m,onClick:function(){setSel(m);}});})),
+        h('div',{style:{fontSize:10,color:C.tm,marginBottom:6}},'n = '+cur.n.toLocaleString('pt-BR')+' culturas positivas'),
+        h(HBar,{data:orgData,yKey:'name',xKey:'v',barName:'Frequência',
+          fmt:function(v){return v+'%';},
+          labelFmt:function(v){return v.toFixed(1)+'%';},
+          colorFn:function(){return C.ti;}})
+      )
+    ),
+    h(Card,null,
+      h(SH,{t:'% MDR — culturas clínicas por tipo de amostra'}),
+      h(RCont,{width:'100%',height:90},
+        h(BarChart,{data:[{mat:'Hemocultura',v:45.0},{mat:'Sec. Traqueal',v:30.4},{mat:'Ortopédica',v:26.9},{mat:'Outras Sec.',v:26.5},{mat:'Urocultura',v:13.9}],margin:{top:6,right:8,left:-8,bottom:0},barCategoryGap:'35%'},
+          h(XAxis,{dataKey:'mat',tick:{fontSize:9,fill:C.ts},axisLine:false,tickLine:false}),
+          h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%';},domain:[0,60]}),
+          h(RCTip,{formatter:function(v){return [v.toFixed(1)+'%','MDR'];}}),
+          h(Bar,{dataKey:'v',fill:C.ti,radius:[3,3,0,0],maxBarSize:60,label:{position:'top',fontSize:9,fill:C.ts,formatter:function(v){return v+'%';}}})
+        )
+      )
+    )
+  );
+}
+
+// ── SEÇÃO 2: MDR POR SETOR ────────────────────────────────────────────────────
+function MdrSetor(){
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+      h(Card,null,
+        h(SH,{t:'Taxa MDR ‰/1000 pac-dia — 2025'}),
+        h(HBar,{data:SETOR_RATE,yKey:'s',xKey:'v',barName:'Taxa MDR ‰',labelFmt:function(v){return v.toFixed(1)+'‰';},
+          colorFn:function(d){return d.t==='UTI'?C.cpe:C.ti;},opFn:function(d){return d.t==='UTI'?1:0.65;}})),
+      h(Card,null,
+        h(SH,{t:'% MDR de culturas por setor'}),
+        h(HBar,{data:SETOR_PCT,yKey:'s',xKey:'v',barName:'% MDR',labelFmt:function(v){return v+'%';},fmt:function(v){return v+'%';},
+          colorFn:function(d){return d.t==='UTI'?C.mr:C.ti;},opFn:function(d){return d.t==='UTI'?1:0.65;}}))
+    ),
+    h(Card,null,
+      h(SH,{t:'UTI A/B · UTI C — taxa MDR ‰/1000 pac-dia (jan/25–mar/26)'}),
+      h(LegRow,{items:[{l:'UTI A/B',c:C.cpe},{l:'UTI-C',c:'#880e4f'}]}),
+      h(TempChart,{lines:[{k:'ab',l:'UTI A/B',ser:SER.utiAB,c:C.cpe,w:2,dot:3},{k:'c',l:'UTI-C',ser:SER.utiC,c:'#880e4f',w:2.5,dot:4}],h:230})
+    ),
+    h(Card,null,
+      h(SH,{t:'ESBL · MRSA · CPE · Acinetobacter-MR — taxa ‰/1000 pac-dia global'}),
+      h(LegRow,{items:[{l:'ESBL',c:C.esbl},{l:'MRSA',c:C.mrsa},{l:'CPE',c:C.cpe},{l:'Acinetobacter-MR',c:C.acin}]}),
+      h(TempChart,{lines:[{k:'e',l:'ESBL',ser:SER.esbl,c:C.esbl,w:1.5,dot:2.5},{k:'m',l:'MRSA',ser:SER.mrsa,c:C.mrsa,w:1.5,dot:2.5},{k:'c',l:'CPE',ser:SER.cpe,c:C.cpe,w:2,dot:3.5},{k:'a',l:'Acinetobacter-MR',ser:SER.acin,c:C.acin,w:1.5,dot:2.5}],h:220})
+    )
+  );
+}
+
+// ── SEÇÃO 3: ESTAFILOCOCOS ────────────────────────────────────────────────────
+function Staph(){
+  var vs=useState('mat');
+  var view=vs[0],setView=vs[1];
+  var sauD=view==='mat'?SAU_BY_MAT:SAU_BY_SETOR;
+  var scnD=view==='mat'?SCN_BY_MAT:SCN_BY_SETOR;
+  function PhenoBar(props){
+    var data=props.data;
+    var bdata=data.map(function(d){return Object.assign({},d,{mrPct:d.pct,sensPct:100-d.pct});});
+    var ht=data.length*38+46;
+    return h(RCont,{width:'100%',height:ht},
+      h(BarChart,{data:bdata,layout:'vertical',margin:{top:4,right:50,left:4,bottom:4},barCategoryGap:'22%'},
+        h(YAxis,{type:'category',dataKey:'g',interval:0,tick:{fontSize:10,fill:C.ts,fontFamily:"'IBM Plex Sans',sans-serif"},width:100,axisLine:false,tickLine:false}),
+        h(XAxis,{type:'number',tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false,domain:[0,100],tickFormatter:function(v){return v+'%';}}),
+        h(RCTip,{content:h(TipStaph,{})}),
+        h(Bar,{dataKey:'mrPct',name:props.mrLabel,fill:props.mrColor,stackId:'s',maxBarSize:20,label:{position:'insideLeft',fontSize:9,fill:'#fff',formatter:function(v){return v>=12?v+'%':'';} }}),
+        h(Bar,{dataKey:'sensPct',name:'Sensível',fill:C.hist,stackId:'s',radius:[0,3,3,0],maxBarSize:20,label:{position:'right',fontSize:9,fill:C.tm,formatter:function(v,p){var d=p&&p.payload;return d?'n='+d.n:'';}}}))
+    );
+  }
+  return h('div',null,
+    h('div',{style:{display:'flex',gap:4,marginBottom:12}},
+      h(Pill,{label:'Por tipo de amostra',active:view==='mat',onClick:function(){setView('mat');}}),
+      h(Pill,{label:'Por setor',active:view==='setor',onClick:function(){setView('setor');}})),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+      h(Card,null,h(SH,{t:'S. aureus — MRSA vs MSSA (excl. swab vig.)'}),h(LegRow,{items:[{l:'MRSA',c:C.mrsa},{l:'MSSA',c:C.hist}]}),h(PhenoBar,{data:sauD,mrColor:C.mrsa,mrLabel:'MRSA'})),
+      h(Card,null,h(SH,{t:'SCN — Oxacilina-R vs Sensível (clínico)'}),h(LegRow,{items:[{l:'MR-SCN (OXA-R)',c:C.mrscn},{l:'MS-SCN',c:C.hist}]}),h(PhenoBar,{data:scnD,mrColor:C.mrscn,mrLabel:'MR-SCN'}))
+    ),
+    
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+      h(Card,null,h(SH,{t:'MIC Vancomicina — S. aureus (n=129) · máx 1 µg/mL'}),
+        h(RCont,{width:'100%',height:130},
+          h(BarChart,{data:MIC_VANCO,margin:{top:4,right:8,left:-20,bottom:0},barCategoryGap:'30%'},
+            h(XAxis,{dataKey:'x',tick:{fontSize:10,fill:C.ts},axisLine:false,tickLine:false}),
+            h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false}),
+            h(RCTip,{formatter:function(v){return [v,'S. aureus n'];}}),
+            h(Bar,{dataKey:'sau',fill:C.mrsa,radius:[3,3,0,0],maxBarSize:44,label:{position:'top',fontSize:10,fill:C.ts}})))),
+      h(Card,null,h(SH,{t:'MIC Vancomicina — SCN (n=187) · 75% MIC 2 µg/mL'}),
+        h(RCont,{width:'100%',height:130},
+          h(BarChart,{data:MIC_VANCO,margin:{top:4,right:8,left:-20,bottom:0},barCategoryGap:'30%'},
+            h(XAxis,{dataKey:'x',tick:{fontSize:10,fill:C.ts},axisLine:false,tickLine:false}),
+            h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false}),
+            h(RCTip,{formatter:function(v){return [v,'SCN n'];}}),
+            h(Bar,{dataKey:'scn',radius:[3,3,0,0],maxBarSize:44,label:{position:'top',fontSize:10,fill:C.ts}},
+              MIC_VANCO.map(function(d,i){return h(Cell,{key:i,fill:d.x==='2'?C.mr:C.mrscn});}))
+          )))
+    )
+  );
+}
+
+// ── SEÇÃO 4: VIGILÂNCIA ───────────────────────────────────────────────────────
+function Vigilancia(){
+  var vs=useState('tot');
+  var view=vs[0],setView=vs[1];
+  var VIEWS=[
+    {k:'tot', l:'Total'},
+    {k:'esbl',l:'ESBL'},
+    {k:'cpe', l:'CPE (KPC+EPC)'},
+    {k:'acin',l:'Acinetobacter'}
+  ];
+  var LINE_MAP={
+    tot:  [{k:'ab',l:'UTI A/B',ser:SER.acqAB_tot, c:C.cpe,    w:2,dot:3},{k:'c',l:'UTI-C',ser:SER.acqC_tot,  c:'#880e4f',w:2,dot:3}],
+    esbl: [{k:'ab',l:'UTI A/B',ser:SER.acqAB_esbl,c:C.esbl,   w:2,dot:3},{k:'c',l:'UTI-C',ser:SER.acqC_esbl, c:'#1b5e20',w:2,dot:3}],
+    cpe:  [{k:'ab',l:'UTI A/B',ser:SER.acqAB_cpe, c:C.cpe,    w:2,dot:3},{k:'c',l:'UTI-C',ser:SER.acqC_cpe,  c:'#880e4f',w:2,dot:3}],
+    acin: [{k:'ab',l:'UTI A/B',ser:SER.acqAB_acin,c:C.acin,   w:2,dot:3},{k:'c',l:'UTI-C',ser:SER.acqC_acin, c:'#01579b',w:2,dot:3}]
+  };
+  var curLines=LINE_MAP[view]||LINE_MAP.tot;
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:12}},
+      h(Metric,{label:'Rastreados (UTIs)',value:'367',sub:'atendimentos com swab+'}),
+      h(Metric,{label:'MDR na admissão',value:'150',sub:'41% dos rastreados'}),
+      h(Metric,{label:'MDR adquirido',value:'217',sub:'59% dos rastreados',vc:C.cpe,dark:true}),
+      h(Metric,{label:'Acinetobacter adq.',value:'66',sub:'vs 7 na admissão',vc:C.acin})
+    ),
+
+    h(Card,null,
+      h(SH,{t:'Admissão vs aquisição — por tipo de MDR (período completo, UTIs)'}),
+      h(RCont,{width:'100%',height:140},
+        h(BarChart,{data:AQ_RESUMO,margin:{top:4,right:8,left:-16,bottom:0},barCategoryGap:'30%'},
+          h(XAxis,{dataKey:'tipo',tick:{fontSize:10,fill:C.ts},axisLine:false,tickLine:false}),
+          h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false}),
+          h(RCTip,{content:h(TipBase,{})}),
+          h(Bar,{dataKey:'adq',name:'Adquirido (UTI)',fill:C.cpe,radius:[3,3,0,0],maxBarSize:28,label:{position:'top',fontSize:9,fill:C.ts}}),
+          h(Bar,{dataKey:'adm',name:'Na admissão',fill:C.hist,radius:[3,3,0,0],maxBarSize:28,label:{position:'top',fontSize:9,fill:C.tm}})
+        )
+      ),
+      h(LegRow,{items:[{l:'Adquirido na UTI',c:C.cpe},{l:'Presente na admissão',c:C.hist}]})
+    ),
+    h(Card,null,
+      h(SH,{t:'Taxa de aquisição ‰/1000 pac-dia setorial — UTI A/B vs UTI C'}),
+      h('div',{style:{display:'flex',flexWrap:'wrap',marginBottom:10}},
+        VIEWS.map(function(o){return h(Pill,{key:o.k,label:o.l,active:view===o.k,onClick:function(){setView(o.k);}});})),
+      h(LegRow,{items:curLines.map(function(l){return {l:l.l,c:l.c};})}),
+      h(TempChart,{key:view,lines:curLines,h:220})
+    )
+  );
+}
+
+// ── SEÇÃO 5: MICs ─────────────────────────────────────────────────────────────
+function Mics(){
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:12}},
+      h(Metric,{label:'MIC Vanco testado',value:'317',sub:'MRSA e MR-SCN'}),
+      h(Metric,{label:'SCN MIC = 2 µg/mL',value:'75%',sub:'140/187 amostras',vc:C.mr}),
+      h(Metric,{label:'MIC Poli B testado',value:'160',sub:'gram-negativos MDR'}),
+      h(Metric,{label:'Resistente Poli B',value:'12,5%',sub:'20/160 MIC >2',vc:C.cpe,dark:true})
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+      h(Card,null,h(SH,{t:'MIC Vancomicina — S. aureus vs SCN (µg/mL)'}),
+        h('div',{style:{fontSize:10,color:C.tm,marginBottom:8}},'S. aureus: todos ≤1 · SCN: 75% MIC=2 (limiar alerta)'),
+        h(RCont,{width:'100%',height:180},
+          h(BarChart,{data:MIC_VANCO,margin:{top:4,right:8,left:-16,bottom:0},barCategoryGap:'22%'},
+            h(XAxis,{dataKey:'x',tick:{fontSize:10,fill:C.ts},axisLine:false,tickLine:false}),
+            h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false}),
+            h(RCTip,{content:h(TipBase,{})}),
+            h(Bar,{dataKey:'sau',name:'S. aureus',fill:C.mrsa,radius:[3,3,0,0],maxBarSize:32}),
+            h(Bar,{dataKey:'scn',name:'SCN',fill:C.mrscn,radius:[3,3,0,0],maxBarSize:32})
+          )
+        ),h(LegRow,{items:[{l:'S. aureus (MRSA)',c:C.mrsa},{l:'SCN (MR-SCN)',c:C.mrscn}]})),
+      h(Card,null,h(SH,{t:'MIC Polimixina B (n=160, µg/mL)'}),
+        h('div',{style:{fontSize:10,color:C.tm,marginBottom:8}},'20 resistentes (>2 µg/mL) = 12,5%'),
+        h(RCont,{width:'100%',height:180},
+          h(BarChart,{data:MIC_POLI,margin:{top:4,right:8,left:-16,bottom:0},barCategoryGap:'22%'},
+            h(XAxis,{dataKey:'x',tick:{fontSize:10,fill:C.ts},axisLine:false,tickLine:false}),
+            h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false}),
+            h(RCTip,{formatter:function(v,n,p){var d=p&&p.payload;return [v+' ('+(100*v/160).toFixed(1)+'%)',d&&d.r?'⚠ Resistente':'Sensível'];}}),
+            h(Bar,{dataKey:'n',radius:[3,3,0,0],maxBarSize:36,label:{position:'top',fontSize:9,fill:C.ts}},
+              MIC_POLI.map(function(d,i){return h(Cell,{key:i,fill:d.r?C.cpe:C.pseu});}))
+          )
+        ),h(LegRow,{items:[{l:'Sensível ≤2',c:C.pseu},{l:'Resistente >2',c:C.cpe}]}))
+    ),
+
+  );
+}
+
+// ── SEÇÃO 6: TAXA DE POSITIVIDADE ────────────────────────────────────────────
+var MESES_LABELS=['jan/25','fev/25','mar/25','abr/25','mai/25','jun/25','jul/25','ago/25','set/25','out/25','nov/25','dez/25','jan/26','fev/26','mar/26'];
+var IS_CURR=[false,false,false,false,false,false,false,false,false,false,false,false,true,true,true];
+var HEMO_POS=[83,68,48,71,54,49,82,76,76,79,69,66,80,56,90];
+var HEMO_COL=[608,496,500,524,580,531,556,496,595,545,606,579,503,419,553];
+var SWAB_POS=[48,43,33,27,63,66,35,59,71,61,46,56,42,31,42];
+var SWAB_COL=[899,773,972,953,930,1027,973,979,926,870,861,901,835,796,1144];
+var HEMO_MES=MESES_LABELS.map(function(m,i){return {m:m,col:HEMO_COL[i],pos:HEMO_POS[i],pct:Math.round(1000*HEMO_POS[i]/HEMO_COL[i])/10,c:IS_CURR[i]};});
+var SWAB_MES=MESES_LABELS.map(function(m,i){return {m:m,col:SWAB_COL[i],pos:SWAB_POS[i],pct:Math.round(1000*SWAB_POS[i]/SWAB_COL[i])/10,c:IS_CURR[i]};});
+// Contaminação: SCN TTP>30h OU não-levedura TTP>60h (disponível jul/25–mar/26)
+var CONTAM_MES=[
+  {m:'jul/25',col:556,pos:82,nc:24,pct_col:4.3,c:false},{m:'ago/25',col:496,pos:75,nc:17,pct_col:3.4,c:false},
+  {m:'set/25',col:595,pos:73,nc:17,pct_col:2.9,c:false},{m:'out/25',col:545,pos:71,nc:19,pct_col:3.5,c:false},
+  {m:'nov/25',col:606,pos:68,nc:17,pct_col:2.8,c:false},{m:'dez/25',col:579,pos:65,nc:19,pct_col:3.3,c:false},
+  {m:'jan/26',col:503,pos:79,nc:27,pct_col:5.4,c:true}, {m:'fev/26',col:419,pos:56,nc:7, pct_col:1.7,c:true},
+  {m:'mar/26',col:553,pos:87,nc:22,pct_col:4.0,c:true}
+];
+function TaxaPosit(){
+  var hTotCol=HEMO_COL.reduce(function(a,b){return a+b;},0);
+  var hTotPos=HEMO_POS.reduce(function(a,b){return a+b;},0);
+  var sTotCol=SWAB_COL.reduce(function(a,b){return a+b;},0);
+  var sTotPos=SWAB_POS.reduce(function(a,b){return a+b;},0);
+  var cColTot=CONTAM_MES.reduce(function(a,d){return a+d.col;},0);
+  var cNcTot=CONTAM_MES.reduce(function(a,d){return a+d.nc;},0);
+  function PctBar(props){
+    var data=props.data,color=props.color,ht=props.h||180;
+    var pvF=null,pvL=null;
+    data.forEach(function(d){if(!d.c){if(!pvF)pvF=d.m;pvL=d.m;}});
+    return h(RCont,{width:'100%',height:ht},
+      h(ComposedChart,{data:data,margin:{top:16,right:12,left:-16,bottom:0}},
+        h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+        pvF?h(RefArea,{x1:pvF,x2:pvL,fill:'#f0f2f5',fillOpacity:0.85,stroke:'none'}):null,
+        pvL?h(RefLine,{x:pvL,stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1}):null,
+        h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,interval:0}),
+        h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%';},domain:[0,props.maxY||25]}),
+        h(RCTip,{formatter:function(v,n,p){var d=p&&p.payload;if(!d)return [v+'%',n];return [v.toFixed(1)+'%  ('+d.pos+'/'+d.col+')',n];}}),
+        h(Bar,{dataKey:'pct',name:'% positividade',radius:[3,3,0,0],maxBarSize:30,
+          label:{position:'top',fontSize:9,fill:C.ts,formatter:function(v){return v.toFixed(1)+'%';}}},
+          data.map(function(d,i){return h(Cell,{key:i,fill:color,opacity:d.c?1:0.45});}))
+      )
+    );
+  }
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(108px,1fr))',gap:10,marginBottom:12}},
+      h(Metric,{label:'Hemocult. coletadas',value:hTotCol.toLocaleString('pt-BR'),sub:'jan/25–mar/26',dark:true}),
+      h(Metric,{label:'Positividade hemo',value:'12,9%',sub:hTotPos+' / '+hTotCol.toLocaleString('pt-BR')}),
+      h(Metric,{label:'Swabs coletados',value:sTotCol.toLocaleString('pt-BR'),sub:'jan/25–mar/26'}),
+      h(Metric,{label:'Positividade swab',value:'5,2%',sub:sTotPos+' / '+sTotCol.toLocaleString('pt-BR'),vc:C.acin}),
+      h(Metric,{label:'Contaminação hemo',value:(100*cNcTot/cColTot).toFixed(1)+'%',sub:cNcTot+' / '+cColTot.toLocaleString('pt-BR')+' · jul/25–mar/26',vc:C.mr})
+    ),
+    h(Card,null,
+      h(SH,{t:'Hemoculturas — % positividade mensal (jan/25–mar/26)'}),
+      h('div',{style:{fontSize:10,color:C.tm,marginBottom:8}},'Total: '+hTotPos+' positivas / '+hTotCol.toLocaleString('pt-BR')+' coletadas = ',h('strong',null,(100*hTotPos/hTotCol).toFixed(1)+'%')),
+      h(PctBar,{data:HEMO_MES,color:C.ti,h:195,maxY:20})
+    ),
+    h(Card,null,
+      h(SH,{t:'Hemoculturas — % contaminação de coleta mensal (jul/25–mar/26)'}),
+      h('div',{style:{fontSize:10,color:C.tm,marginBottom:8}},
+        'Critério: SCN TTP >30h OU não-levedura TTP >60h · ',
+        h('strong',null,cNcTot+' contaminações / '+cColTot.toLocaleString('pt-BR')+' coletadas = '+(100*cNcTot/cColTot).toFixed(1)+'%'),
+        ' · jan–jun/25 sem dado de tempo'),
+      h(RCont,{width:'100%',height:195},
+        h(ComposedChart,{data:CONTAM_MES,margin:{top:20,right:12,left:-16,bottom:0}},
+          h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+          h(RefArea,{x1:'jul/25',x2:'dez/25',fill:'#f0f2f5',fillOpacity:0.85,stroke:'none'}),
+          h(RefLine,{x:'dez/25',stroke:'#9eaab8',strokeDasharray:'4 3',strokeWidth:1}),
+          h(RefLine,{y:3,stroke:C.mr,strokeDasharray:'6 3',strokeWidth:1.2,label:{value:'benchmark <3%',position:'insideTopRight',fontSize:9,fill:C.mr,offset:4}}),
+          h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,interval:0}),
+          h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,tickFormatter:function(v){return v+'%';},domain:[0,7]}),
+          h(RCTip,{formatter:function(v,n,p){var d=p&&p.payload;if(!d)return [v,n];return [v.toFixed(1)+'%  ('+d.nc+' de '+d.pos+' positivas)',n];}}),
+          h(Bar,{dataKey:'pct_col',name:'% das coletadas',radius:[3,3,0,0],maxBarSize:32,
+            label:{position:'top',fontSize:9,fill:C.ts,formatter:function(v){return v.toFixed(1)+'%';}}},
+            CONTAM_MES.map(function(d,i){return h(Cell,{key:i,fill:d.pct_col>3?C.cpe:C.mr,opacity:d.c?1:0.5});})
+          )
+        )
+      ),
+
+    ),
+    h(Card,null,
+      h(SH,{t:'Swabs de vigilância (UTI A/B + C) — % positividade mensal'}),
+      h('div',{style:{fontSize:10,color:C.tm,marginBottom:8}},'Total: '+sTotPos+' positivos / '+sTotCol.toLocaleString('pt-BR')+' coletados = ',h('strong',null,(100*sTotPos/sTotCol).toFixed(1)+'%')),
+      h(PctBar,{data:SWAB_MES,color:C.acin,h:195,maxY:12})
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+      h(Card,null,
+        h(SH,{t:'Contexto — hemoculturas 12,9%'}),
+        h('div',{style:{fontSize:11,color:C.ts,lineHeight:1.8}},
+          h('p',{style:{marginBottom:6}},'Taxa de 12,9% alinhada com ',h('strong',null,'benchmarks para UTIs'),' (10–20%). Meses >14%: jul, ago, out/25 e jan–mar/26.'),
+          h('p',null,'Meses <10% (mar e mai–jun/25) merecem revisão de critério de coleta.')
+        )
+      ),
+      h(Card,null,
+        h(SH,{t:'Contexto — swabs de vigilância 5,2%'}),
+        h('div',{style:{fontSize:11,color:C.ts,lineHeight:1.8}},
+          h('p',{style:{marginBottom:6}},'5,2% coerente com ',h('strong',null,'rastreamento de portadores assintomáticos'),'. Reflete colonização, não infecção.'),
+          h('p',null,'Picos mai–jun/25 e set–out/25 coincidem com maior aquisição de MDR (aba Vigilância).')
+        )
+      )
+    )
+  );
+}
+// ── SEÇÃO 7: TEMPO DE POSITIVIDADE ────────────────────────────────────────────
+function Tempo(){
+  var GRAM_C={neg:C.acin,pos:C.ti,fung:C.mrscn};
+  var orgData=TEMPO_ORG.map(function(d){
+    return Object.assign({},d,{
+      p25_h:d.p25, iqr:d.p75-d.p25
+    });
+  });
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:12}},
+      h(Metric,{label:'Hemoculturas c/ dado',value:'660',sub:'jul/25 – mar/26',dark:true}),
+      h(Metric,{label:'Mediana global',value:'30,1h',sub:'IQR 18,9 – 43,2h'}),
+      h(Metric,{label:'Maioria em 12–36h',value:'59%',sub:'375/660 amostras'}),
+      h(Metric,{label:'Detecção >72h',value:'5,5%',sub:'36/660 — atenção fungemia',vc:C.mrscn})
+    ),
+
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+      h(Card,null,
+        h(SH,{t:'Distribuição — tempo até positividade (hemoculturas)'}),
+        h(RCont,{width:'100%',height:170},
+          h(BarChart,{data:TEMPO_DIST,margin:{top:4,right:8,left:-16,bottom:0},barCategoryGap:'18%'},
+            h(XAxis,{dataKey:'bin',tick:{fontSize:9,fill:C.ts},axisLine:false,tickLine:false}),
+            h(YAxis,{tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false}),
+            h(RCTip,{formatter:function(v){return [v,'n amostras'];}}),
+            h(Bar,{dataKey:'n',radius:[3,3,0,0],maxBarSize:42,
+              label:{position:'top',fontSize:9,fill:C.ts}},
+              TEMPO_DIST.map(function(d,i){
+                return h(Cell,{key:i,fill:i<2?C.esbl:i<4?C.ti:i<6?C.mr:C.mrscn});
+              })
+            )
+          )
+        ),
+        h(LegRow,{items:[{l:'<24h: BGN rápidos',c:C.esbl},{l:'24–48h: S. aureus / Kleb',c:C.ti},{l:'48–96h: SCN / tardios',c:C.mr},{l:'>96h: Candida/contaminação',c:C.mrscn}]})
+      ),
+      h(Card,null,
+        h(SH,{t:'Mediana mensal — hemoculturas (jul/25–mar/26)'}),
+        h(RCont,{width:'100%',height:170},
+          h(BarChart,{data:TEMPO_MENSAL,margin:{top:6,right:12,left:-16,bottom:0},barCategoryGap:'22%'},
+            h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+            h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,interval:0}),
+            h(YAxis,{tick:{fill:'#6b7280',fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,domain:[0,50]}),
+            h(RCTip,{formatter:function(v,n,p){var d=p&&p.payload;return [v.toFixed(1)+'h'+(d?' (n='+d.n+')':''),'Mediana'];}}),
+            h(Bar,{dataKey:'med',name:'Mediana',radius:[3,3,0,0],maxBarSize:28,
+              label:{position:'top',fontSize:9,fill:C.ts,formatter:function(v){return v+'h';}}},
+              TEMPO_MENSAL.map(function(d,i){
+                return h(Cell,{key:i,fill:d.m.includes('/26')?C.mrsa:C.ti});
+              })
+            )
+          )
+        ),
+        h('div',{style:{fontSize:10,color:C.tm,marginTop:4}},'Linha tracejada = virada de ano. Dado disponível somente a partir de jul/25.')
+      )
+    ),
+    // Main organism chart — sorted horizontal bars with IQR in tooltip
+    h(Card,null,
+      h(SH,{t:'Mediana de tempo até positividade por organismo — hemoculturas (IQR no tooltip)'}),
+      h(LegRow,{items:[{l:'Gram-negativo',c:C.acin},{l:'Gram-positivo',c:C.ti},{l:'Fungo',c:C.mrscn}]}),
+      h(RCont,{width:'100%',height:TEMPO_ORG.length*36+48},
+        h(BarChart,{data:orgData,layout:'vertical',margin:{top:4,right:80,left:4,bottom:4},barCategoryGap:'20%'},
+          h(YAxis,{type:'category',dataKey:'org',interval:0,tick:{fontSize:10,fill:C.ts,fontFamily:"'IBM Plex Sans',sans-serif"},width:140,axisLine:false,tickLine:false}),
+          h(XAxis,{type:'number',tick:{fontSize:8,fill:C.tm},axisLine:false,tickLine:false,domain:[0,60],tickFormatter:function(v){return v+'h';}}),
+          h(RCTip,{content:h(TipTempo,{})}),
+          h(Bar,{dataKey:'med',name:'Mediana',radius:[0,3,3,0],maxBarSize:16,
+            label:{position:'right',fontSize:9,fill:C.ts,formatter:function(v,p){
+              var d=p&&p.payload;
+              if(!d||d.p25==null) return v.toFixed(1)+'h';
+              return v.toFixed(1)+'h  ['+d.p25+'–'+d.p75+']';
+            }}},
+            orgData.map(function(d,i){return h(Cell,{key:i,fill:GRAM_C[d.gram]||C.ti});})
+          )
+        )
+      ),
+
+    )
+  );
+}
+
+// ── RAIZ ──────────────────────────────────────────────────────────────────────
+var TABS=[
+  {k:'geral',l:'Visão Geral'},{k:'setor',l:'MDR por Setor'},
+  {k:'staph',l:'Estafilococos'},{k:'vig',l:'Vigilância'},
+  {k:'mic',l:'MICs'},{k:'posit',l:'Positividade'},{k:'tempo',l:'Tempo Posit.'}
+];
+function App(){
+  var ts=useState('geral');
+  var tab=ts[0],setTab=ts[1];
+  return h('div',{style:{minHeight:'100vh'}},
+    h('div',{style:{background:'#1a2744',display:'flex',alignItems:'stretch',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 8px rgba(0,0,0,.22)',paddingLeft:16,paddingRight:16,overflowX:'auto'}},
+      h('div',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:10,fontWeight:700,color:'#9eaab8',letterSpacing:2,display:'flex',alignItems:'center',paddingRight:16,marginRight:4,borderRight:'1px solid rgba(255,255,255,.08)',flexShrink:0}},'CCIH · HUSF'),
+      TABS.map(function(t){
+        var a=tab===t.k;
+        return h('button',{key:t.k,onClick:function(){setTab(t.k);},style:{background:'none',border:'none',color:a?'#fff':'#9eaab8',fontFamily:"'IBM Plex Sans',sans-serif",fontSize:12,fontWeight:a?600:400,padding:'0 14px',height:46,borderBottom:a?'2px solid #4b9cf5':'2px solid transparent',cursor:'pointer',flexShrink:0,whiteSpace:'nowrap'}},t.l);
+      }),
+      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',flexShrink:0,fontSize:9,color:'rgba(158,170,184,.5)',fontFamily:"'IBM Plex Mono',monospace",paddingLeft:12}},'jan/25–mar/26')
+    ),
+    h('div',{style:{padding:'16px 18px',maxWidth:1060,width:'100%',margin:'0 auto'}},
+      tab==='geral'?h(VisaoGeral,{}):null,
+      tab==='setor'?h(MdrSetor,{}):null,
+      tab==='staph'?h(Staph,{}):null,
+      tab==='vig'?h(Vigilancia,{}):null,
+      tab==='mic'?h(Mics,{}):null,
+      tab==='posit'?h(TaxaPosit,{}):null,
+      tab==='tempo'?h(Tempo,{}):null
+    ),
+    h('div',{style:{textAlign:'center',padding:'8px',fontSize:9,color:'#9eaab8',borderTop:'0.5px solid #d0d7de',background:'#fff',marginTop:8}},
+h('span',null,'Coleta e tabulação de dados: ',h('strong',null,'Jéssica Mariana Lopes')),
+        h('span',{style:{margin:'0 12px',color:'#d0d7de'}},'·'),
+        h('span',null,'Análise e desenvolvimento: ',h('strong',null,'Dr. Leandro Mendes')),
+        h('span',{style:{margin:'0 12px',color:'#d0d7de'}},'·'),
+        h('span',null,'CCIH / HUSF · jan/25–mar/26'))
+  );
+}
+ReactDOM.render(h(App,{}),document.getElementById('root'));
+</script>
+</body>
+</html>
