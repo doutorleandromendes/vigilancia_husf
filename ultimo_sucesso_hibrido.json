@@ -1,0 +1,24 @@
+{
+  "estrategia": "Scraping Din\u00e2mico",
+  "timestamp": "2026-04-13T18:50:10.828960",
+  "se_obtida": 13,
+  "dados": {
+    "semana_epidemiologica": 13,
+    "periodo": "30/03-05/04/2026",
+    "total_casos_srag": 2025,
+    "fonte": "InfoGripe PDF - Parser h\u00edbrido",
+    "RINOVIRUS": 0.15513126491646778,
+    "INFLUENZA_A": 0.09546539379474941,
+    "VSR": 0.48687350835322196,
+    "COVID19": 0.22673031026252985,
+    "INFLUENZA_B": 0.023866348448687354,
+    "OUTROS": 0.011933174224343677,
+    "casos_positivos": 850,
+    "taxa_positividade_geral": 0.42,
+    "url_fonte": "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_13_0.pdf",
+    "metodo_obtencao": "H\u00edbrido - Not\u00edcia https://agencia.fiocruz.br/infogripe-casos-de-infl...",
+    "confiabilidade": 8,
+    "estrategia_usada": "Scraping Din\u00e2mico",
+    "timestamp_busca": "2026-04-13T18:50:10.828956"
+  }
+}
