@@ -79,6 +79,72 @@
             margin: 15px 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+
+        /* DETALHES COLAPSÍVEIS */
+        .detalhes-section {
+            background: white;
+            margin: 8px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .detalhes-toggle {
+            width: 100%;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: none;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .detalhes-toggle:hover {
+            background: #e9ecef;
+        }
+        
+        .detalhes-content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            background: white;
+            transition: all 0.4s ease;
+            opacity: 0;
+        }
+        
+        .detalhes-content.show {
+            max-height: 400px;
+            padding: 15px;
+            opacity: 1;
+        }
+        
+        .patogenos-distribuicao {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .patogeno-badge-mobile {
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .badge-rinovirus { background: linear-gradient(135deg, #9c88ff, #6c5ce7); }
+        .badge-influenza { background: linear-gradient(135deg, #fd79a8, #e84393); }
+        .badge-vsr { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+        .badge-covid { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+        .badge-outros { background: linear-gradient(135deg, #81ecec, #00b894); }
         
         @media (max-width: 576px) {
             .patogeno-header { flex-direction: column; gap: 10px; }
@@ -88,89 +154,76 @@
 </head>
 
 <body>
-
     <div class="container-fluid">
-
         <div class="header-automatico">
-
             <h1 style="margin: 0; font-size: 1.4rem;">
-
                 HUSF - Vigilância de SG/SRAG
-
             </h1>
-
             <small>Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</small>
-
         </div>
-
         
-
         <div class="alert-success" style="margin: 10px 0; padding: 15px; border-radius: 10px;">
-
             <strong>✅ SISTEMA ONLINE - SE 13/2026</strong>
-
         </div>
-
         
-
         <div class='alert alert-info'><strong>Dinâmico:</strong> Fontes Nacionais + Dados Institucionais</div>
         
         <!-- ORIENTAÇÕES -->
         <div class="orientacoes">
-        <div class="card-patogeno cautela">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">COVID-19</div>
-                <div class="vpn-badge vpn-amarelo">VPN 92%</div>
+            <div class="card-patogeno cautela">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">COVID-19</div>
+                    <div class="vpn-badge vpn-amarelo">VPN 92%</div>
+                </div>
+                <div class="orientacao orientacao-amarelo">
+                    <i class="fas fa-exclamation-triangle"></i> CAUTELA - AVALIAR CLINICAMENTE
+                </div>
             </div>
-            <div class="orientacao orientacao-amarelo">
-                <i class="fas fa-exclamation-triangle"></i> CAUTELA - AVALIAR CLINICAMENTE
+            <div class="card-patogeno liberar">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">Influenza A</div>
+                    <div class="vpn-badge vpn-verde">VPN 96%</div>
+                </div>
+                <div class="orientacao orientacao-verde">
+                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+                </div>
             </div>
-        </div>
-        <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Influenza A</div>
-                <div class="vpn-badge vpn-verde">VPN 96%</div>
+            <div class="card-patogeno liberar">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">Influenza B</div>
+                    <div class="vpn-badge vpn-verde">VPN 99%</div>
+                </div>
+                <div class="orientacao orientacao-verde">
+                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+                </div>
             </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+            <div class="card-patogeno rtpcr">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">VSR</div>
+                    <div class="vpn-badge vpn-vermelho">VPN 81%</div>
+                </div>
+                <div class="orientacao orientacao-vermelho">
+                    <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
+                </div>
             </div>
-        </div>
-        <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Influenza B</div>
-                <div class="vpn-badge vpn-verde">VPN 99%</div>
+            <div class="card-patogeno cautela">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">Rinovírus</div>
+                    <div class="vpn-badge vpn-amarelo">VPN 91%</div>
+                </div>
+                <div class="orientacao orientacao-amarelo">
+                    <i class="fas fa-exclamation-triangle"></i> CAUTELA - AVALIAR CLINICAMENTE
+                </div>
             </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+            <div class="card-patogeno liberar">
+                <div class="patogeno-header">
+                    <div class="patogeno-nome">Outros</div>
+                    <div class="vpn-badge vpn-verde">VPN 100%</div>
+                </div>
+                <div class="orientacao orientacao-verde">
+                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+                </div>
             </div>
-        </div>
-        <div class="card-patogeno rtpcr">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">VSR</div>
-                <div class="vpn-badge vpn-vermelho">VPN 81%</div>
-            </div>
-            <div class="orientacao orientacao-vermelho">
-                <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
-            </div>
-        </div>
-        <div class="card-patogeno cautela">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Rinovírus</div>
-                <div class="vpn-badge vpn-amarelo">VPN 91%</div>
-            </div>
-            <div class="orientacao orientacao-amarelo">
-                <i class="fas fa-exclamation-triangle"></i> CAUTELA - AVALIAR CLINICAMENTE
-            </div>
-        </div>
-        <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Outros</div>
-                <div class="vpn-badge vpn-verde">VPN 100%</div>
-            </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-            </div>
-        </div>
         </div>
         
         <!-- RESUMO -->
@@ -197,11 +250,76 @@
             </div>
         </div>
         
+        <!-- DETALHES: DISTRIBUIÇÃO DE PATÓGENOS (RESGATADO) -->
+        <div class="detalhes-section">
+            <button class="detalhes-toggle" onclick="toggleDetalhes('distribuicao')">
+                <span><i class="fas fa-chart-pie"></i> Taxa de Positividade por Patógeno (SE 13/2026)</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="detalhes-content" id="content-distribuicao">
+                <div class="patogenos-distribuicao">
+                    <span class="patogeno-badge-mobile badge-rinovirus">Rinovírus: 40.8%</span>
+                    <span class="patogeno-badge-mobile badge-influenza">Influenza A: 30.7%</span>
+                    <span class="patogeno-badge-mobile badge-vsr">VSR: 19.9%</span>
+                    <span class="patogeno-badge-mobile badge-covid">COVID-19: 6.2%</span>
+                    <span class="patogeno-badge-mobile badge-influenza">Influenza B: 2.0%</span>
+                    <span class="patogeno-badge-mobile badge-outros">Outros: 0.4%</span>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: #6c757d; text-align: center;">
+                    <i class="fas fa-info-circle"></i> Dados epidemiológicos nacionais (InfoGripe/Fiocruz)
+                </div>
+            </div>
+        </div>
+        
+        <!-- DETALHES: BASE CIENTÍFICA (RESGATADO) -->
+        <div class="detalhes-section">
+            <button class="detalhes-toggle" onclick="toggleDetalhes('cientifica')">
+                <span><i class="fas fa-microscope"></i> Base Científica e Parâmetros</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="detalhes-content" id="content-cientifica">
+                <div style="margin-bottom: 15px;">
+                    <strong>Sensibilidades dos Testes (Meta-análises):</strong><br>
+                    • <strong>COVID-19:</strong> 70% (Arshadi et al., 2022 - 60 estudos)<br>
+                    • <strong>Influenza A:</strong> 62% (Chartrand et al., 2012 - 159 estudos)<br>  
+                    • <strong>Influenza B:</strong> 58% (Chartrand et al., 2012 - 159 estudos)<br>
+                    • <strong>VSR:</strong> 75% (literatura científica)<br>
+                    • <strong>Rinovírus:</strong> 50% (estimativa conservadora)
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Parâmetros do Sistema HUSF:</strong><br>
+                    • <strong>Especificidade:</strong> 98% (todos os testes de antígeno)<br>
+                    • <strong>Critério de liberação:</strong> VPN ≥ 95%<br>
+                    • <strong>Zona de cautela:</strong> VPN 90-95%<br>
+                    • <strong>Recomendação RT-PCR:</strong> VPN < 90%
+                </div>
+                <div style="font-size: 0.8rem; color: #6c757d;">
+                    <strong>Atualizações:</strong> Sistema automático quinzenal baseado em dados do InfoGripe/Fiocruz.<br>
+                    <strong>Responsável técnico:</strong> Dr. Leandro Mendes - SCIH HUSF
+                </div>
+            </div>
+        </div>
+        
         <!-- FOOTER AUTOMÁTICO -->
         <div style="text-align: center; color: white; font-size: 0.7rem; margin: 15px 0;">
             <i class="fas fa-sync-alt"></i> Sistema 100% Automático - Busca + Parse + VPN<br>
             Executado: 14/04/2026 09:03:31
         </div>
     </div>
+
+    <script>
+        function toggleDetalhes(secao) {
+            const content = document.getElementById('content-' + secao);
+            const icon = content.previousElementSibling.querySelector('.fa-chevron-down, .fa-chevron-up');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                content.classList.add('show');
+                icon.className = 'fas fa-chevron-up';
+            }
+        }
+    </script>
 </body>
 </html>
