@@ -1,6 +1,6 @@
 {
   "estrategia": "Scraping Din\u00e2mico",
-  "timestamp": "2026-04-13T18:50:10.828960",
+  "timestamp": "2026-04-14T08:51:25.574507",
   "se_obtida": 13,
   "dados": {
     "semana_epidemiologica": 13,
@@ -19,6 +19,6 @@
     "metodo_obtencao": "H\u00edbrido - Not\u00edcia https://agencia.fiocruz.br/infogripe-casos-de-infl...",
     "confiabilidade": 8,
     "estrategia_usada": "Scraping Din\u00e2mico",
-    "timestamp_busca": "2026-04-13T18:50:10.828956"
+    "timestamp_busca": "2026-04-14T08:51:25.574503"
   }
 }
