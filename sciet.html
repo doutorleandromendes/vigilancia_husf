@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Algoritmo Antimicrobiano Empírico · SCIH/HUSF</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #f1f5f9;
+      --card:          #ffffff;
+      --border:        #e2e8f0;
+      --border-mid:    #cbd5e1;
+      --text:          #0f172a;
+      --text-sec:      #475569;
+      --text-muted:    #94a3b8;
+
+      --navy:          #0f2d52;
+      --navy-mid:      #1e4070;
+
+      --green:         #15803d;
+      --green-bg:      #f0fdf4;
+      --green-border:  #86efac;
+      --green-mid:     #16a34a;
+
+      --red:           #b91c1c;
+      --red-bg:        #fef2f2;
+      --red-border:    #fca5a5;
+
+      --amber:         #92400e;
+      --amber-bg:      #fffbeb;
+      --amber-border:  #fde68a;
+
+      --blue:          #1d4ed8;
+      --blue-bg:       #eff6ff;
+      --blue-border:   #93c5fd;
+    }
+
+    html, body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; min-height: 100%; }
+    body { padding-bottom: 48px; }
+
+    /* ── HEADER ── */
+    .top-bar {
+      background: var(--navy);
+      padding: 14px 20px;
+    }
+    .top-bar-inner { max-width: 560px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+    .top-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; font-weight: 700;
+      color: #93c5fd; border: 1px solid #3b82f6;
+      padding: 2px 8px; border-radius: 3px; white-space: nowrap;
+    }
+    .top-title { color: #f8fafc; font-size: 13px; font-weight: 500; line-height: 1.3; }
+    .top-sub   { color: #94a3b8; font-size: 11px; font-weight: 300; }
+
+    /* ── CP STATUS BAR ── */
+    #cp-bar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+    }
+    .cp-inner { max-width: 560px; margin: 0 auto; }
+    .cp-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; color: var(--text-muted);
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .cp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .cp-chip {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 4px; padding: 4px 10px;
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    }
+    .cp-name { color: var(--text-sec); }
+    .cp-val-ok   { color: var(--green); font-weight: 700; }
+    .cp-val-high { color: var(--red);   font-weight: 700; }
+    .cp-val-nd   { color: var(--text-muted); font-weight: 700; }
+    .cp-meta { font-size: 10px; color: var(--text-muted); margin-top: 5px; }
+    .cp-error { font-size: 11px; color: var(--amber); }
+
+    /* ── MAIN ── */
+    main { padding: 20px; max-width: 560px; margin: 0 auto; }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 22px; }
+    .step-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; color: var(--text-muted);
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .step-q { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.4; }
+
+    /* ── SOFA BUTTONS ── */
+    .sofa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sofa-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 16px 10px; cursor: pointer;
+      transition: all .15s; min-height: 76px;
+    }
+    .sofa-btn:hover { border-color: var(--border-mid); box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+    .sofa-val {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 24px; font-weight: 700; color: var(--text-sec); margin-bottom: 3px;
+    }
+    .sofa-sub { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
+    .sofa-btn.sel-low  { border-color: var(--green-border); background: var(--green-bg); }
+    .sofa-btn.sel-low  .sofa-val { color: var(--green); }
+    .sofa-btn.sel-high { border-color: var(--red-border);   background: var(--red-bg); }
+    .sofa-btn.sel-high .sofa-val { color: var(--red); }
+
+    /* ── SWAB OPTIONS (radio-style) ── */
+    .swab-options { display: flex; flex-direction: column; gap: 7px; }
+    .swab-opt {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 12px 14px; cursor: pointer;
+      transition: all .15s;
+    }
+    .swab-opt:hover { border-color: var(--border-mid); }
+    .radio-circle {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border-mid); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .radio-dot { width: 8px; height: 8px; border-radius: 50%; display: none; }
+    .swab-opt-text { flex: 1; }
+    .swab-opt-main { font-size: 13px; font-weight: 500; color: var(--text); }
+    .swab-opt-sub  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    /* Selected states */
+    .swab-opt.sel-neg { border-color: var(--green-border); background: var(--green-bg); }
+    .swab-opt.sel-neg .radio-circle { border-color: var(--green-mid); background: var(--green-mid); }
+    .swab-opt.sel-neg .radio-dot { display: block; background: #fff; }
+    .swab-opt.sel-neg .swab-opt-main { color: var(--green); }
+
+    .swab-opt.sel-pos { border-color: var(--red-border); background: var(--red-bg); }
+    .swab-opt.sel-pos .radio-circle { border-color: var(--red); background: var(--red); }
+    .swab-opt.sel-pos .radio-dot { display: block; background: #fff; }
+    .swab-opt.sel-pos .swab-opt-main { color: var(--red); }
+
+    .swab-opt.sel-nd { border-color: var(--amber-border); background: var(--amber-bg); }
+    .swab-opt.sel-nd .radio-circle { border-color: var(--amber); background: var(--amber); }
+    .swab-opt.sel-nd .radio-dot { display: block; background: #fff; }
+    .swab-opt.sel-nd .swab-opt-main { color: var(--amber); }
+
+    /* ── SOURCE QUESTION ── */
+    .source-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 8px; padding: 14px 16px; margin-top: 14px;
+    }
+    .source-q { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 10px; }
+    .source-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .source-btn {
+      padding: 10px; border-radius: 6px; cursor: pointer;
+      border: 1.5px solid var(--blue-border); background: #fff;
+      color: var(--text-sec); font-size: 13px; font-weight: 500;
+      transition: all .15s;
+    }
+    .source-btn:hover { border-color: var(--blue); }
+    .source-btn.sel { border-color: var(--blue); background: var(--blue); color: #fff; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ── RESULT CARDS ── */
+    #results { margin-top: 4px; }
+    .result-section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; color: var(--text-muted);
+      text-transform: uppercase; margin: 16px 0 8px;
+    }
+    .result-card {
+      border-radius: 8px; padding: 16px;
+      margin-bottom: 10px; border-width: 1px; border-style: solid;
+      animation: fadeUp .25s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+
+    .result-card.ok     { background: var(--green-bg); border-color: var(--green-border); }
+    .result-card.alert  { background: var(--red-bg);   border-color: var(--red-border); }
+    .result-card.warn   { background: var(--amber-bg); border-color: var(--amber-border); }
+    .result-card.info   { background: var(--blue-bg);  border-color: var(--blue-border); }
+
+    .result-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .result-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .result-verb { font-size: 13px; font-weight: 700; letter-spacing: .3px; }
+    .result-reason { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+
+    .result-card.ok    .result-verb { color: var(--green); }
+    .result-card.alert .result-verb { color: var(--red); }
+    .result-card.warn  .result-verb { color: var(--amber); }
+    .result-card.info  .result-verb { color: var(--blue); }
+
+    .regimen-box {
+      background: rgba(255,255,255,.7); border-radius: 5px;
+      padding: 10px 12px; margin-bottom: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; color: var(--text); line-height: 1.7;
+      white-space: pre-line;
+    }
+    .result-note {
+      font-size: 11px; color: var(--text-sec);
+      font-style: italic; font-family: Georgia, serif;
+      margin-bottom: 8px; line-height: 1.55;
+    }
+    .checkpoint {
+      font-size: 11px; color: var(--text-sec); line-height: 1.55;
+      padding: 8px 10px;
+      border-radius: 4px; background: rgba(255,255,255,.5);
+      border-left: 2px solid var(--border-mid);
+    }
+    .checkpoint::before { content: '⏱ '; }
+
+    /* ── RESET ── */
+    #btn-reset {
+      display: none; width: 100%; margin-top: 20px;
+      padding: 13px; border-radius: 8px; cursor: pointer;
+      background: var(--card); border: 1px solid var(--border-mid);
+      color: var(--text-sec); font-size: 14px; font-weight: 500;
+      font-family: 'IBM Plex Sans', sans-serif;
+      transition: all .15s;
+    }
+    #btn-reset:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; margin-top: 28px;
+      font-size: 10px; color: var(--text-muted);
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: .3px; line-height: 1.9;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span class="top-badge">SCIH · HUSF</span>
+    <div>
+      <div class="top-title">Algoritmo de Esquema Antimicrobiano Empírico</div>
+      <div class="top-sub">UTI Adulto · Bragança Paulista</div>
+    </div>
+  </div>
+</div>
+
+<!-- CP STATUS BAR -->
+<div id="cp-bar">
+  <div class="cp-inner">
+    <div class="cp-label">Pressão de colonização · UTI AB + UTI C · últimos 15 dias</div>
+    <div class="cp-chips" id="cp-chips">
+      <div class="cp-chip"><span class="cp-name">Carregando...</span></div>
+    </div>
+    <div class="cp-meta" id="cp-meta"></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- STEP 1: SOFA -->
+  <div class="section" id="sec-sofa">
+    <div class="step-label">Passo 1 · Gravidade</div>
+    <div class="step-q">Qual o SOFA atual do paciente?</div>
+    <div class="sofa-grid">
+      <button class="sofa-btn" id="btn-sofa-low" onclick="selectSOFA('low')">
+        <span class="sofa-val">&lt; 7</span>
+        <span class="sofa-sub">baixo · moderado</span>
+      </button>
+      <button class="sofa-btn" id="btn-sofa-high" onclick="selectSOFA('high')">
+        <span class="sofa-val">≥ 7</span>
+        <span class="sofa-sub">elevado · crítico</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: SWAB -->
+  <div id="sec-swab" class="section hidden">
+    <hr class="divider">
+    <div class="step-label">Passo 2 · Vigilância microbiológica</div>
+    <div class="step-q">Resultado de swabs de vigilância dos últimos 7 dias</div>
+    <div class="swab-options" id="swab-opts">
+
+      <div class="swab-opt" id="opt-neg" onclick="selectSwab('negative','neg')">
+        <div class="radio-circle"><div class="radio-dot"></div></div>
+        <div class="swab-opt-text">
+          <div class="swab-opt-main">Negativo</div>
+          <div class="swab-opt-sub">Sem crescimento de MDR nos últimos 7 dias</div>
+        </div>
+      </div>
+
+      <div class="swab-opt" id="opt-esbl" onclick="selectSwab('pos_ESBL','pos')">
+        <div class="radio-circle"><div class="radio-dot"></div></div>
+        <div class="swab-opt-text">
+          <div class="swab-opt-main">Positivo para ESBL</div>
+          <div class="swab-opt-sub">Enterobacterales produtor de ESBL — swab retal</div>
+        </div>
+      </div>
+
+      <div class="swab-opt" id="opt-kpc" onclick="selectSwab('pos_KPC','pos')">
+        <div class="radio-circle"><div class="radio-dot"></div></div>
+        <div class="swab-opt-text">
+          <div class="swab-opt-main">Positivo para EPC</div>
+          <div class="swab-opt-sub">Enterobacterales produtor de carbapenemase (KPC/NDM) — swab retal + molecular</div>
+        </div>
+      </div>
+
+      <div class="swab-opt" id="opt-acin" onclick="selectSwab('pos_Acineto','pos')">
+        <div class="radio-circle"><div class="radio-dot"></div></div>
+        <div class="swab-opt-text">
+          <div class="swab-opt-main">Positivo para Acinetobacter</div>
+          <div class="swab-opt-sub">A. baumannii resistente a carbapenêmicos — aspirado traqueal ou swab</div>
+        </div>
+      </div>
+
+      <div class="swab-opt" id="opt-nd" onclick="selectSwab('no_result','nd')">
+        <div class="radio-circle"><div class="radio-dot"></div></div>
+        <div class="swab-opt-text">
+          <div class="swab-opt-main">Sem resultado disponível nos últimos 7 dias</div>
+          <div class="swab-opt-sub">Decisão baseada exclusivamente na pressão de colonização da unidade</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Source question (shown when narrow coverage likely) -->
+    <div id="source-block" class="hidden">
+      <div class="source-card">
+        <div class="source-q">Trata-se de infecção abdominal ou pneumonia aspirativa?</div>
+        <div class="source-btns">
+          <button class="source-btn" id="src-sim" onclick="setSource(true)">Sim</button>
+          <button class="source-btn" id="src-nao" onclick="setSource(false)">Não</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results"></div>
+
+  <button id="btn-reset" onclick="resetForm()">↺ &nbsp;Nova Avaliação</button>
+
+  <footer>
+    Algoritmo de Esquema Antimicrobiano Empírico — SCIH/HUSF<br>
+    Dr. Leandro Mendes · IDSA 2024 · ESCMID 2022 · Giannella 2014 · Parente 2018<br>
+    Validar limiares de CP com dados locais antes de uso institucional
+  </footer>
+
+</main>
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'SUA_URL_AQUI'; // substituir após deploy
+const CP_NEG      = 20;  // swab negativo: limiar de CP (%)
+const CP_ND_LOW   = 30;  // sem swab + SOFA <7: limiar
+const CP_ND_HIGH  = 15;  // sem swab + SOFA ≥7: limiar
+// ────────────────────────────────────────────────────────────────────────────────
+
+let S = {
+  sofa:        null,   // 'low' | 'high'
+  swab:        null,   // 'negative' | 'pos_ESBL' | 'pos_KPC' | 'pos_Acineto' | 'no_result'
+  swabSelClass: null,  // 'neg' | 'pos' | 'nd'
+  source:      null,   // true=abdominal/aspirative, false=other
+  cp:          {}
+};
+
+// ── CP FETCH ───────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  if (APPS_SCRIPT_URL === 'SUA_URL_AQUI') {
+    renderCP({ ESBL: 14.2, KPC: 9.8, Acineto: 22.5, dias: 15, atualizado: 'demonstração' });
+    return;
+  }
+  fetch(APPS_SCRIPT_URL)
+    .then(r => r.json())
+    .then(renderCP)
+    .catch(() => {
+      document.getElementById('cp-chips').innerHTML =
+        '<div class="cp-error">Dados não carregados — verifique a URL do Apps Script</div>';
+    });
+});
+
+function renderCP(data) {
+  S.cp = data;
+  const defs = [
+    { key: 'ESBL',    label: 'ESBL',    threshold: null },
+    { key: 'KPC',     label: 'KPC/EPC', threshold: null },
+    { key: 'Acineto', label: 'Acineto', threshold: null }
+  ];
+  document.getElementById('cp-chips').innerHTML = defs.map(d => {
+    const v = data[d.key];
+    if (v === null || v === undefined)
+      return `<div class="cp-chip"><span class="cp-name">${d.label}</span><span class="cp-val-nd">N/D</span></div>`;
+    const cls = v >= CP_NEG ? 'cp-val-high' : 'cp-val-ok';
+    const flag = v >= CP_NEG ? ' ▲' : '';
+    return `<div class="cp-chip"><span class="cp-name">${d.label}</span><span class="${cls}">${v.toFixed(1)}%${flag}</span></div>`;
+  }).join('');
+  if (data.dias && data.atualizado)
+    document.getElementById('cp-meta').textContent =
+      `${data.dias} dias analisados · atualizado em ${data.atualizado}`;
+}
+
+// ── SOFA ────────────────────────────────────────────────────────────────────────
+function selectSOFA(val) {
+  S.sofa = val;
+  document.getElementById('btn-sofa-low').className  = 'sofa-btn' + (val === 'low'  ? ' sel-low'  : '');
+  document.getElementById('btn-sofa-high').className = 'sofa-btn' + (val === 'high' ? ' sel-high' : '');
+  document.getElementById('sec-swab').classList.remove('hidden');
+  document.getElementById('sec-swab').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  recompute();
+}
+
+// ── SWAB ────────────────────────────────────────────────────────────────────────
+const SWAB_IDS = { negative: 'opt-neg', pos_ESBL: 'opt-esbl', pos_KPC: 'opt-kpc', pos_Acineto: 'opt-acin', no_result: 'opt-nd' };
+
+function selectSwab(val, selClass) {
+  S.swab = val;
+  S.swabSelClass = selClass;
+  S.source = null;
+  // clear all options
+  Object.values(SWAB_IDS).forEach(id => {
+    document.getElementById(id).className = 'swab-opt';
+  });
+  // apply selected class
+  const clsMap = { neg: 'sel-neg', pos: 'sel-pos', nd: 'sel-nd' };
+  document.getElementById(SWAB_IDS[val]).classList.add(clsMap[selClass]);
+  // reset source buttons
+  document.getElementById('src-sim').classList.remove('sel');
+  document.getElementById('src-nao').classList.remove('sel');
+  recompute();
+}
+
+function setSource(val) {
+  S.source = val;
+  document.getElementById('src-sim').classList.toggle('sel', val === true);
+  document.getElementById('src-nao').classList.toggle('sel', val === false);
+  recompute();
+}
+
+// ── DECISION LOGIC ─────────────────────────────────────────────────────────────
+function getGNDecision() {
+  const { sofa, swab, cp } = S;
+  if (!sofa || !swab) return null;
+
+  // Positive swab → specific coverage
+  if (swab === 'pos_ESBL')    return { type: 'specific', pathogen: 'ESBL',    regimen: 'meropenem' };
+  if (swab === 'pos_KPC')     return { type: 'specific', pathogen: 'KPC',     regimen: 'caz_avi' };
+  if (swab === 'pos_Acineto') return { type: 'specific', pathogen: 'Acineto', regimen: 'ampsulb' };
+
+  // Determine CP threshold
+  let threshold;
+  if (swab === 'negative') {
+    threshold = CP_NEG;
+  } else { // no_result
+    threshold = sofa === 'low' ? CP_ND_LOW : CP_ND_HIGH;
+  }
+
+  // CP checks — priority: Acineto > KPC > ESBL
+  const cpA = cp?.Acineto, cpK = cp?.KPC, cpE = cp?.ESBL;
+
+  if (cpA != null && cpA >= threshold) return { type: 'cp', pathogen: 'Acineto', regimen: 'ampsulb',  cp: cpA, threshold };
+  if (cpK != null && cpK >= threshold) return { type: 'cp', pathogen: 'KPC',     regimen: 'caz_avi',  cp: cpK, threshold };
+  if (cpE != null && cpE >= threshold) return { type: 'cp', pathogen: 'ESBL',    regimen: 'meropenem',cp: cpE, threshold };
+
+  // No CP data and no_result + SOFA high → conservative
+  if (swab === 'no_result' && sofa === 'high' && cpA == null && cpK == null && cpE == null)
+    return { type: 'no_cp', regimen: 'narrow_conservative' };
+
+  return { type: 'narrow', regimen: 'narrow', threshold };
+}
+
+function getMRSADecision() {
+  if (!S.sofa) return null;
+  return S.sofa === 'low' ? 'no_vanco' : 'vanco';
+}
+
+// ── REGIMEN CONTENT ────────────────────────────────────────────────────────────
+const REGIMENS = {
+  meropenem: {
+    verb: 'Meropenem — cobertura ESBL',
+    text: 'Meropenem 1–2g q8h IV\n(ajustar para SOFA e função renal)',
+    note: 'Carbapenem de escolha para infecção por ESBL grave ou com risco elevado.',
+    checkpoint: 'De-escalar às 48–72h se culturas sem ESBL-E + melhora clínica + SOFA em queda.'
+  },
+  caz_avi: {
+    verb: 'Ceftazidima-avibactam — cobertura EPC/KPC',
+    text: 'Ceftazidima-avibactam 2,5g q8h (infusão 3h)\n± amicacina se sensível\nSe NDM: adicionar aztreonam 2g q6h',
+    note: 'Aguardar tipagem molecular (KPC vs NDM) — impacta o esquema definitivo.',
+    checkpoint: 'Confirmar mecanismo em 48h. De-escalar se culturas negativas para EPC.'
+  },
+  ampsulb: {
+    verb: 'Amp-sulbactam + Polimixina B — cobertura CRAB',
+    text: 'Ampicilina-sulbactam 27g/dia (infusão extendida ≥3h)\n+ Polimixina B 25.000 UI/kg/dia ÷ q12h',
+    note: 'Mortalidade de CRAB sem cobertura adequada >70% em UTI. Monitorar toxicidade renal.',
+    checkpoint: 'De-escalar às 48–72h se aspirado traqueal/BAL sem CRAB + melhora ventilatória.'
+  },
+  narrow_abdominal: {
+    verb: 'Piperacilina-tazobactam — espectro abdominal/aspirativo',
+    text: 'Piperacilina-tazobactam 4,5g q6h IV (infusão ext. 4h)',
+    note: 'Preferido em infecção de foco abdominal ou pneumonia aspirativa pelo espectro anaeróbio.',
+    checkpoint: 'De-escalar às 48–72h com resultado de culturas. Sem crescimento de MDR: manter ou simplificar.'
+  },
+  narrow_other: {
+    verb: 'Cefepima — espectro padrão',
+    text: 'Cefepima 2g q8h IV (infusão ext. 3h)',
+    note: 'Swab negativo + perfil de baixo risco: cefepima cobre Gram-negativos sem pressão adicional de carbapenêmico.',
+    checkpoint: 'De-escalar às 48–72h com culturas. Sem MDR: completar curso com cefepima ou de-escalar.'
+  },
+  narrow_conservative: {
+    verb: 'Sem swab disponível + CP indisponível — conduta conservadora',
+    text: 'Meropenem 1g q8h IV\n(cobertura empírica ampla ante incerteza)',
+    note: 'CP não carregada e sem swab recente com SOFA ≥7: adotar cobertura conservadora.',
+    checkpoint: 'Obter swab de vigilância imediatamente. Re-avaliar esquema em 48h com resultado.'
+  }
+};
+
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function recompute() {
+  const gnDec   = getGNDecision();
+  const mrsaDec = getMRSADecision();
+
+  if (!gnDec || !mrsaDec) { document.getElementById('results').innerHTML = ''; return; }
+
+  // Determine if we need the source question
+  const needSource = gnDec.regimen === 'narrow' && S.source === null;
+  document.getElementById('source-block').classList.toggle('hidden', gnDec.regimen !== 'narrow');
+
+  // GN regimen key
+  let gnKey;
+  if (gnDec.regimen === 'narrow') {
+    if (S.source === null) { document.getElementById('results').innerHTML = ''; return; }
+    gnKey = S.source ? 'narrow_abdominal' : 'narrow_other';
+  } else if (gnDec.regimen === 'narrow_conservative') {
+    gnKey = 'narrow_conservative';
+  } else {
+    gnKey = gnDec.regimen;
+  }
+
+  const gnR = REGIMENS[gnKey];
+  const isNarrow = gnKey.startsWith('narrow');
+  const gnClass = isNarrow ? 'ok' : (gnKey === 'narrow_conservative' ? 'warn' : 'alert');
+  const gnIcon  = isNarrow ? '✓' : '⚠';
+
+  // Reason text
+  let gnReason = '';
+  if (gnDec.type === 'specific') gnReason = `Swab positivo para ${gnDec.pathogen} — cobertura dirigida`;
+  else if (gnDec.type === 'cp')  gnReason = `CP ${gnDec.pathogen}: ${gnDec.cp?.toFixed(1)}% ≥ ${gnDec.threshold}% · SOFA ${S.sofa === 'low' ? '<7' : '≥7'}`;
+  else if (gnDec.type === 'narrow') {
+    const thr = gnDec.threshold;
+    const parts = [];
+    if (S.cp?.Acineto != null) parts.push(`Acineto ${S.cp.Acineto.toFixed(1)}%`);
+    if (S.cp?.KPC     != null) parts.push(`KPC ${S.cp.KPC.toFixed(1)}%`);
+    if (S.cp?.ESBL    != null) parts.push(`ESBL ${S.cp.ESBL.toFixed(1)}%`);
+    const cpSummary = parts.length ? ` (${parts.join(' · ')}) < ${thr}%` : '';
+    gnReason = `Swab ${S.swab === 'negative' ? 'negativo' : 'ausente'} · CP abaixo do limiar${cpSummary}`;
+  } else {
+    gnReason = 'CP indisponível — conduta conservadora adoptada';
+  }
+
+  // MRSA card
+  const mrsaIsVanco = mrsaDec === 'vanco';
+  const mrsaClass   = mrsaIsVanco ? 'alert' : 'ok';
+  const mrsaIcon    = mrsaIsVanco ? '⚠' : '✓';
+  const mrsaVerb    = mrsaIsVanco
+    ? 'Vancomicina — cobertura MRSA'
+    : 'Sem cobertura anti-MRSA empírica';
+  const mrsaRegimen = mrsaIsVanco
+    ? 'Vancomicina AUC-guided (AUC₂₄h: 400–600 mg·h/L)\nou Linezolida 600mg q12h (preferível em HAP/VAP)'
+    : 'Sem vancomicina\nMRSA: prevalência historicamente <10% na instituição';
+  const mrsaNote = mrsaIsVanco
+    ? 'SOFA ≥7: risco de falha por MRSA em cenário de alta gravidade justifica cobertura empírica.'
+    : 'SOFA <7 + prevalência institucional de MRSA <10%: omissão de vancomicina é segura.';
+  const mrsaCheck = mrsaIsVanco
+    ? 'Suspender vancomicina às 48h se culturas sem MRSA + melhora clínica.'
+    : 'Manter vigilância. Se cultura positiva para MRSA: iniciar vancomicina AUC-guided.';
+  const mrsaReason = mrsaIsVanco
+    ? 'SOFA ≥7 — cobertura empírica recomendada'
+    : 'SOFA <7 + prevalência <10% — omissão segura';
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-section-label">Cobertura Gram-negativos MDR</div>
+    <div class="result-card ${gnClass}">
+      <div class="result-head">
+        <span class="result-icon">${gnIcon}</span>
+        <div>
+          <div class="result-verb">${gnR.verb}</div>
+          <div class="result-reason">${gnReason}</div>
+        </div>
+      </div>
+      <div class="regimen-box">${gnR.text}</div>
+      <div class="result-note">${gnR.note}</div>
+      <div class="checkpoint">${gnR.checkpoint}</div>
+    </div>
+
+    <div class="result-section-label">Cobertura MRSA</div>
+    <div class="result-card ${mrsaClass}">
+      <div class="result-head">
+        <span class="result-icon">${mrsaIcon}</span>
+        <div>
+          <div class="result-verb">${mrsaVerb}</div>
+          <div class="result-reason">${mrsaReason}</div>
+        </div>
+      </div>
+      <div class="regimen-box">${mrsaRegimen}</div>
+      <div class="result-note">${mrsaNote}</div>
+      <div class="checkpoint">${mrsaCheck}</div>
+    </div>
+  `;
+
+  document.getElementById('btn-reset').style.display = 'block';
+}
+
+// ── RESET ──────────────────────────────────────────────────────────────────────
+function resetForm() {
+  S = { sofa: null, swab: null, swabSelClass: null, source: null, cp: S.cp };
+
+  document.getElementById('btn-sofa-low').className  = 'sofa-btn';
+  document.getElementById('btn-sofa-high').className = 'sofa-btn';
+  document.getElementById('sec-swab').classList.add('hidden');
+  document.getElementById('source-block').classList.add('hidden');
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('btn-reset').style.display = 'none';
+  Object.values(SWAB_IDS).forEach(id => document.getElementById(id).className = 'swab-opt');
+  document.getElementById('src-sim').classList.remove('sel');
+  document.getElementById('src-nao').classList.remove('sel');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// SWAB_IDS also needed by resetForm
+const SWAB_IDS = { negative: 'opt-neg', pos_ESBL: 'opt-esbl', pos_KPC: 'opt-kpc', pos_Acineto: 'opt-acin', no_result: 'opt-nd' };
+</script>
+
+<!--
+══════════════════════════════════════════════════════════════════════
+  GOOGLE APPS SCRIPT — colar em Extensões › Apps Script do Censo_MDRs
+  Implantar › Nova implantação › Aplicativo da Web
+    Executar como: Eu | Quem acessa: Qualquer pessoa
+  Copiar URL e substituir 'SUA_URL_AQUI' acima.
+══════════════════════════════════════════════════════════════════════
+
+function doGet(e) {
+  const MONTHS = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  const DAYS_BACK = 15;
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const today = new Date();
+  const mIdx  = today.getMonth();
+
+  let rows = [], idx = mIdx;
+  while (rows.length < DAYS_BACK && idx >= 0) {
+    const sh = ss.getSheetByName(MONTHS[idx]);
+    if (!sh) { idx--; continue; }
+    const last = (idx === mIdx) ? today.getDate() : 31;
+    const vals = sh.getRange(4, 1, 31, 22).getValues();
+    for (let d = last; d >= 1 && rows.length < DAYS_BACK; d--) {
+      const r  = vals[d - 1];
+      const pd = (Number(r[9])||0) + (Number(r[21])||0);
+      if (!pd) continue;
+      rows.push({
+        esbl: (Number(r[1])||0)+(Number(r[13])||0),
+        acin: (Number(r[3])||0)+(Number(r[15])||0),
+        kpc:  (Number(r[5])||0)+(Number(r[17])||0),
+        pd
+      });
+    }
+    idx--;
+  }
+  const pd   = rows.reduce((s,r)=>s+r.pd,   0);
+  const pct  = n => pd>0 ? Math.round(n/pd*1000)/10 : null;
+  const out  = {
+    ESBL:    pct(rows.reduce((s,r)=>s+r.esbl,0)),
+    KPC:     pct(rows.reduce((s,r)=>s+r.kpc, 0)),
+    Acineto: pct(rows.reduce((s,r)=>s+r.acin,0)),
+    MRSA:    null,
+    dias:    rows.length,
+    atualizado: Utilities.formatDate(today,'America/Sao_Paulo','dd/MM/yyyy')
+  };
+  return ContentService.createTextOutput(JSON.stringify(out))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+══════════════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
