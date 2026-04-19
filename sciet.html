@@ -456,7 +456,7 @@ function getGNDecision() {
 
   // Positive swab → specific coverage
   if (swab === 'pos_ESBL')    return { type: 'specific', pathogen: 'ESBL',    regimen: 'meropenem' };
-  if (swab === 'pos_KPC')     return { type: 'specific', pathogen: 'KPC',     regimen: 'caz_avi' };
+  if (swab === 'pos_KPC')     return { type: 'specific', pathogen: 'KPC',     regimen: 'poliB' };
   if (swab === 'pos_Acineto') return { type: 'specific', pathogen: 'Acineto', regimen: 'ampsulb' };
 
   // Determine CP threshold
@@ -471,7 +471,7 @@ function getGNDecision() {
   const cpA = cp?.Acineto, cpK = cp?.KPC, cpE = cp?.ESBL;
 
   if (cpA != null && cpA >= threshold) return { type: 'cp', pathogen: 'Acineto', regimen: 'ampsulb',  cp: cpA, threshold };
-  if (cpK != null && cpK >= threshold) return { type: 'cp', pathogen: 'KPC',     regimen: 'caz_avi',  cp: cpK, threshold };
+  if (cpK != null && cpK >= threshold) return { type: 'cp', pathogen: 'KPC',     regimen: 'poliB',  cp: cpK, threshold };
   if (cpE != null && cpE >= threshold) return { type: 'cp', pathogen: 'ESBL',    regimen: 'meropenem',cp: cpE, threshold };
 
   // No CP data and no_result + SOFA high → conservative
@@ -495,9 +495,9 @@ const REGIMENS = {
     note: 'Carbapenem de escolha para infecção por ESBL grave ou com risco elevado.',
     checkpoint: 'De-escalar às 48–72h se culturas sem ESBL-E + melhora clínica + SOFA em queda.'
   },
-  caz_avi: {
-    verb: 'Ceftazidima-avibactam — cobertura EPC/KPC',
-    text: 'Ceftazidima-avibactam 2,5g q8h (infusão 3h)\n± amicacina se sensível\nSe NDM: adicionar aztreonam 2g q6h',
+  poliB: {
+    verb: 'Polimixina + Meropenem — cobertura EPC/KPC',
+    text: 'Polimixina B ± amicacina se sensível',
     note: 'Aguardar tipagem molecular (KPC vs NDM) — impacta o esquema definitivo.',
     checkpoint: 'Confirmar mecanismo em 48h. De-escalar se culturas negativas para EPC.'
   },
