@@ -1,0 +1,97 @@
+name: Atualizar Pressão de Colonização (SCIET)
+
+on:
+  schedule:
+    # Roda dia 1 e dia 16 de cada mês às 06:00 (horário de Brasília = UTC-3 → 09:00 UTC)
+    - cron: '0 9 1,16 * *'
+  workflow_dispatch:  # permite rodar manualmente pelo GitHub a qualquer hora
+
+jobs:
+  update-cp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # necessário para fazer commit
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Buscar dados do Apps Script
+        id: fetch
+        run: |
+          # -L segue redirects (necessário para o Apps Script)
+          # -s silencia progress, --max-time 15 evita travar
+          RESPONSE=$(curl -sL --max-time 15 "${{ secrets.APPS_SCRIPT_URL }}")
+          echo "Resposta: $RESPONSE"
+
+          # Extrai cada valor com jq
+          ESBL=$(echo "$RESPONSE"    | jq -r '.ESBL    // "null"')
+          KPC=$(echo "$RESPONSE"     | jq -r '.KPC     // "null"')
+          ACINETO=$(echo "$RESPONSE" | jq -r '.Acineto // "null"')
+          DIAS=$(echo "$RESPONSE"    | jq -r '.dias    // "?"')
+          REF=$(echo "$RESPONSE"     | jq -r '.referencia // "?"')
+          ATU=$(echo "$RESPONSE"     | jq -r '.atualizado // "?"')
+
+          echo "esbl=$ESBL"    >> $GITHUB_OUTPUT
+          echo "kpc=$KPC"      >> $GITHUB_OUTPUT
+          echo "acineto=$ACINETO" >> $GITHUB_OUTPUT
+          echo "dias=$DIAS"    >> $GITHUB_OUTPUT
+          echo "ref=$REF"      >> $GITHUB_OUTPUT
+          echo "atu=$ATU"      >> $GITHUB_OUTPUT
+
+      - name: Atualizar sciet.html
+        run: |
+          # Substitui o bloco entre os marcadores CP_DATA_START e CP_DATA_END
+          python3 - <<'PYEOF'
+          import re, os
+
+          esbl    = os.environ['ESBL']
+          kpc     = os.environ['KPC']
+          acineto = os.environ['ACINETO']
+          dias    = os.environ['DIAS']
+          ref     = os.environ['REF']
+          atu     = os.environ['ATU']
+
+          novo_bloco = f"""// CP_DATA_START
+          renderCP({{
+            ESBL:    {esbl},
+            KPC:     {kpc},
+            Acineto: {acineto},
+            MRSA:    null,
+            dias:    {dias},
+            referencia: '{ref}',
+            atualizado: '{atu}'
+          }});
+          // CP_DATA_END"""
+
+          with open('sciet.html', 'r', encoding='utf-8') as f:
+              conteudo = f.read()
+
+          novo = re.sub(
+              r'// CP_DATA_START.*?// CP_DATA_END',
+              novo_bloco,
+              conteudo,
+              flags=re.DOTALL
+          )
+
+          with open('sciet.html', 'w', encoding='utf-8') as f:
+              f.write(novo)
+
+          print(f"Atualizado: ESBL={esbl} KPC={kpc} Acineto={acineto} ({ref})")
+          PYEOF
+        env:
+          ESBL:    ${{ steps.fetch.outputs.esbl }}
+          KPC:     ${{ steps.fetch.outputs.kpc }}
+          ACINETO: ${{ steps.fetch.outputs.acineto }}
+          DIAS:    ${{ steps.fetch.outputs.dias }}
+          REF:     ${{ steps.fetch.outputs.ref }}
+          ATU:     ${{ steps.fetch.outputs.atu }}
+
+      - name: Commit e push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sciet.html
+          # Só commita se houver mudança real
+          git diff --staged --quiet || git commit -m "CP atualizada automaticamente — ${{ steps.fetch.outputs.ref }}"
+          git push
