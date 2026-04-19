@@ -320,6 +320,14 @@
         </div>
       </div>
 
+      <div class="swab-opt" id="opt-mrsa" onclick="selectSwab('pos_MRSA','pos')">
+        <div class="radio-circle"><div class="radio-dot"></div></div>
+        <div class="swab-opt-text">
+          <div class="swab-opt-main">Positivo para MRSA</div>
+          <div class="swab-opt-sub">S. aureus resistente à meticilina — swab nasal ou cultura clínica</div>
+        </div>
+      </div>
+
       <div class="swab-opt" id="opt-nd" onclick="selectSwab('no_result','nd')">
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
@@ -414,8 +422,8 @@ function selectSOFA(val) {
 }
 
 // ── SWAB ────────────────────────────────────────────────────────────────────────
-const SWAB_IDS = { negative: 'opt-neg', pos_ESBL: 'opt-esbl', pos_KPC: 'opt-kpc', pos_Acineto: 'opt-acin', no_result: 'opt-nd' };
-
+const SWAB_IDS = { negative: 'opt-neg', pos_ESBL: 'opt-esbl', pos_KPC: 'opt-kpc', pos_Acineto: 'opt-acin', pos_MRSA: 'opt-mrsa', no_result: 'opt-nd' };
+  
 function selectSwab(val, selClass) {
   S.swab = val;
   S.swabSelClass = selClass;
@@ -474,6 +482,7 @@ function getGNDecision() {
 
 function getMRSADecision() {
   if (!S.sofa) return null;
+  if (S.swab === 'pos_MRSA') return 'vanco';  // swab positivo → sempre cobrir
   return S.sofa === 'low' ? 'no_vanco' : 'vanco';
 }
 
