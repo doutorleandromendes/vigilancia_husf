@@ -377,7 +377,7 @@ window.addEventListener('load', () => {
     renderCP({ ESBL: 14.2, KPC: 9.8, Acineto: 22.5, dias: 15, atualizado: 'demonstração' });
     return;
   }
-  fetch(APPS_SCRIPT_URL)
+  fetch(APPS_SCRIPT_URL, { redirect: 'follow' })
     .then(r => r.json())
     .then(renderCP)
     .catch(() => {
