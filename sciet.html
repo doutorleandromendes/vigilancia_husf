@@ -256,7 +256,7 @@
     <span class="top-badge">SCIH · HUSF</span>
     <div>
       <div class="top-title">Algoritmo de Esquema Antimicrobiano Empírico</div>
-      <div class="top-sub">UTI Adulto · Bragança Paulista</div>
+      <div class="top-sub">UTI Adulto</div>
     </div>
   </div>
 </div>
@@ -395,7 +395,7 @@
     IMPORTANTE
   </div>
   <p style="font-size:12px; color:#78350f; line-height:1.65; font-family:Georgia,serif;">
-    Essas recomendações visam exclusivamente adequar a terapia antimicrobiana empírica à ecologia do paciente e da unidade. Não substitui o Sistema de Uso Racional de Antimicrobianos ou as orientações da Infectologia. O diagnóstico e a indicação ainda serão auditados conforme ficha de solicitação.
+    Essas recomendações visam exclusivamente adequar a terapia antimicrobiana empírica à ecologia do paciente e da unidade.\n Elas não substituem os pareceres do Sistema de Uso Racional de Antimicrobianos ou as orientações da Infectologia.\n O diagnóstico e a indicação ainda serão auditados conforme ficha de solicitação.
   </p>
 </div>
   <button id="btn-reset" onclick="resetForm()">↺ &nbsp;Nova Avaliação</button>
@@ -587,7 +587,7 @@ const REGIMENS = {
   },
   narrow_other: {
     verb: 'Cefepime',
-    text: 'Cefepima 2g 8/8h IV (infusão em 3 horas)',
+    text: 'Cefepime 2g 8/8h IV (infusão em 3 horas)',
     note: 'Dosagem recomendada assume ClCr > 60ml/min',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
@@ -637,7 +637,7 @@ function recompute() {
     if (S.cp?.KPC     != null) parts.push(`KPC ${S.cp.KPC.toFixed(1)}%`);
     if (S.cp?.ESBL    != null) parts.push(`ESBL ${S.cp.ESBL.toFixed(1)}%`);
     const cpSummary = parts.length ? ` (${parts.join(' · ')}) < ${thr}%` : '';
-    gnReason = `Swab ${S.swabs.has('negative') ? 'negativo' : 'ausente'} · CP abaixo do limiar${cpSummary}`;
+    gnReason = `Swab ${S.swabs.has('negative') ? 'negativo' : 'ausente'} · Prevalência abaixo do limiar${cpSummary}`;
   } else {
     gnReason = 'CP indisponível — conduta conservadora adoptada';
   }
