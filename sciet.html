@@ -395,7 +395,7 @@
     IMPORTANTE
   </div>
   <p style="font-size:12px; color:#78350f; line-height:1.65; font-family:Georgia,serif;">
-    Essas recomendações visam exclusivamente adequar a terapia antimicrobiana empírica à ecologia do paciente e da unidade.\n Elas não substituem os pareceres do Sistema de Uso Racional de Antimicrobianos ou as orientações da Infectologia.\n O diagnóstico e a indicação ainda serão auditados conforme ficha de solicitação.
+    Essas recomendações visam exclusivamente adequar a terapia antimicrobiana empírica à ecologia do paciente e da unidade.<br> Elas não substituem os pareceres do Sistema de Uso Racional de Antimicrobianos ou as orientações da Infectologia.<br> O diagnóstico e a indicação ainda serão auditados conforme ficha de solicitação.
   </p>
 </div>
   <button id="btn-reset" onclick="resetForm()">↺ &nbsp;Nova Avaliação</button>
@@ -563,20 +563,20 @@ function getMRSADecision() {
 const REGIMENS = {
   meropenem: {
     verb: 'Meropenem',
-    text: 'Meropenem 2g q8h IV\n(infusão em 4 horas)',
-    note: 'Dosagem recomendada assume ClCr > 50ml/min\n Obrigatório dosagem de proteína C reativa antes do início e após 24h e 48h',
+    text: 'Meropenem 2g IV 8/8h\n(infusão em 4 horas)',
+    note: 'Dosagem recomendada assume ClCr > 50ml/min<br> Obrigatório dosagem de proteína C reativa antes do início e após 24h e 48h',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   poliB: {
     verb: 'Polimixina B + Meropenem',
     text: 'Polimixina B 2.000.000UI de ataque +\n 1.000.000UI 12/12h (<75kg) ou\n 1.250.000UI 12/12h (>75kg)\n ± Amicacina se foco urinário ou suspeita/confirmação de resistência a PoliB',
-    note: 'Obrigatório dosagem de procalcitonina antes do início e após 24-48h\n Não há indicação de qualquer ajuste de dose por disfunção renal',
+    note: 'Obrigatório dosagem de procalcitonina antes do início e após 24-48h<br> Não há indicação de qualquer ajuste de dose por disfunção renal',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   ampsulb: {
     verb: 'Polimixina B + Sulbactam',
     text: 'Ampicilina-sulbactam 9g EV 8/8h 27g/dia no total +\nPolimixina B 2.000.000UI de ataque +\n 1.000.000UI 12/12h (<75kg) ou\n 1.250.000UI 12/12h (>75kg)',
-    note: 'Dosagem de Ampicilina/Sulbactam assume ClCr > 30ml/min \n Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
+    note: 'Dosagem de Ampicilina/Sulbactam assume ClCr > 30ml/min<br> Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_abdominal: {
