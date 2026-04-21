@@ -123,12 +123,12 @@
     }
     .swab-opt:hover { border-color: var(--border-mid); }
     .radio-circle {
-      width: 18px; height: 18px; border-radius: 50%;
-      border: 2px solid var(--border-mid); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: all .15s;
-    }
-    .radio-dot { width: 8px; height: 8px; border-radius: 50%; display: none; }
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 2px solid var(--border-mid); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.radio-dot { width: 10px; height: 10px; border-radius: 2px; display: none; }
     .swab-opt-text { flex: 1; }
     .swab-opt-main { font-size: 13px; font-weight: 500; color: var(--text); }
     .swab-opt-sub  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
@@ -237,6 +237,15 @@
     }
 
     .hidden { display: none !important; }
+
+    .mrsa-opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: rgba(255,255,255,.6); border: 1px solid var(--amber-border);
+  border-radius: 6px; padding: 10px 12px; cursor: pointer;
+  font-size: 13px; color: var(--text); line-height: 1.4;
+}
+.mrsa-opt input[type=checkbox] { margin-top: 2px; flex-shrink: 0; accent-color: var(--amber); }
+.mrsa-opt:has(input:checked) { background: var(--amber-bg); border-color: var(--amber); font-weight: 500; }
   </style>
 </head>
 <body>
@@ -288,7 +297,7 @@
     <div class="step-q">Resultado de swabs de vigilância dos últimos 7 dias</div>
     <div class="swab-options" id="swab-opts">
 
-      <div class="swab-opt" id="opt-neg" onclick="selectSwab('negative','neg')">
+      <div class="swab-opt" id="opt-neg" onclick="selectSwab('negative')">
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Negativo</div>
@@ -296,7 +305,7 @@
         </div>
       </div>
 
-      <div class="swab-opt" id="opt-esbl" onclick="selectSwab('pos_ESBL','pos')">
+      <div class="swab-opt" id="opt-esbl" onclick="selectSwab('pos_ESBL')">
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Positivo para ESBL</div>
@@ -304,7 +313,7 @@
         </div>
       </div>
 
-      <div class="swab-opt" id="opt-kpc" onclick="selectSwab('pos_KPC','pos')">
+      <div class="swab-opt" id="opt-kpc" onclick="selectSwab('pos_KPC')">
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Positivo para EPC</div>
@@ -312,7 +321,7 @@
         </div>
       </div>
 
-      <div class="swab-opt" id="opt-acin" onclick="selectSwab('pos_Acineto','pos')">
+      <div class="swab-opt" id="opt-acin" onclick="selectSwab('pos_Acineto')">
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Positivo para Acinetobacter</div>
@@ -320,15 +329,7 @@
         </div>
       </div>
 
-      <div class="swab-opt" id="opt-mrsa" onclick="selectSwab('pos_MRSA','pos')">
-        <div class="radio-circle"><div class="radio-dot"></div></div>
-        <div class="swab-opt-text">
-          <div class="swab-opt-main">Positivo para MRSA</div>
-          <div class="swab-opt-sub">S. aureus resistente à meticilina — swab nasal ou cultura clínica</div>
-        </div>
-      </div>
-
-      <div class="swab-opt" id="opt-nd" onclick="selectSwab('no_result','nd')">
+      <div class="swab-opt" id="opt-nd" onclick="selectSwab('no_result')">
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Sem resultado disponível nos últimos 7 dias</div>
@@ -348,11 +349,55 @@
         </div>
       </div>
     </div>
+
+    <!-- MRSA RISK FACTORS -->
+    <div id="mrsa-block" class="hidden">
+      <div class="source-card" style="border-color: var(--amber-border); background: var(--amber-bg);">
+        <div class="source-q" style="color: var(--amber);">Fatores de risco para MRSA — marque todos que se aplicam</div>
+        <div style="display:flex; flex-direction:column; gap:7px;" id="mrsa-checks">
+
+          <label class="mrsa-opt" id="mrsa-swab">
+            <input type="checkbox" onchange="recompute()">
+            <span>Swab positivo para MRSA desde a admissão</span>
+          </label>
+
+          <label class="mrsa-opt" id="mrsa-cult">
+            <input type="checkbox" onchange="recompute()">
+            <span>Cultura positiva para MRSA nos últimos 30 dias</span>
+          </label>
+
+          <label class="mrsa-opt" id="mrsa-cir">
+            <input type="checkbox" onchange="recompute()">
+            <span>Cirurgia nos últimos 15 dias</span>
+          </label>
+
+          <label class="mrsa-opt" id="mrsa-gram">
+            <input type="checkbox" onchange="recompute()">
+            <span>Cocos Gram-positivos agrupados em bacterioscopia ou cultura parcial nas últimas 24h</span>
+          </label>
+
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- RESULTS -->
   <div id="results"></div>
-
+<div id="aviso-final" class="hidden" style="
+  margin-top: 20px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #d97706;
+  border-radius: 8px;
+  padding: 14px 16px;
+">
+  <div style="font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:2px; color:#92400e; margin-bottom:6px;">
+    IMPORTANTE
+  </div>
+  <p style="font-size:12px; color:#78350f; line-height:1.65; font-family:Georgia,serif;">
+    Essas recomendações visam exclusivamente adequar a terapia antimicrobiana empírica à ecologia do paciente e da unidade. Não substitui o Sistema de Uso Racional de Antimicrobianos ou as orientações da Infectologia. O diagnóstico e a indicação ainda serão auditados conforme ficha de solicitação.
+  </p>
+</div>
   <button id="btn-reset" onclick="resetForm()">↺ &nbsp;Nova Avaliação</button>
 
   <footer>
@@ -373,11 +418,10 @@ const CP_ND_HIGH  = 15;  // sem swab + SOFA ≥7: limiar
 // ────────────────────────────────────────────────────────────────────────────────
 
 let S = {
-  sofa:        null,   // 'low' | 'high'
-  swab:        null,   // 'negative' | 'pos_ESBL' | 'pos_KPC' | 'pos_Acineto' | 'no_result'
-  swabSelClass: null,  // 'neg' | 'pos' | 'nd'
-  source:      null,   // true=abdominal/aspirative, false=other
-  cp:          {}
+  sofa:   null,
+  swabs:  new Set(),
+  source: null,
+  cp:     {}
 };
 
 // ── CP FETCH ───────────────────────────────────────────────────────────────────
@@ -423,22 +467,41 @@ function selectSOFA(val) {
 }
 
 // ── SWAB ────────────────────────────────────────────────────────────────────────
-const SWAB_IDS = { negative: 'opt-neg', pos_ESBL: 'opt-esbl', pos_KPC: 'opt-kpc', pos_Acineto: 'opt-acin', pos_MRSA: 'opt-mrsa', no_result: 'opt-nd' };
+const SWAB_IDS = { negative: 'opt-neg', pos_ESBL: 'opt-esbl', pos_KPC: 'opt-kpc', pos_Acineto: 'opt-acin', no_result: 'opt-nd' };
   
-function selectSwab(val, selClass) {
-  S.swab = val;
-  S.swabSelClass = selClass;
+function selectSwab(val) {
+  const exclusivos = ['negative', 'no_result'];
+  const positivos  = ['pos_ESBL', 'pos_KPC', 'pos_Acineto', 'pos_MRSA'];
+
+  if (exclusivos.includes(val)) {
+    // Negativo / Sem resultado: limpa tudo e seleciona só este
+    S.swabs.clear();
+    S.swabs.add(val);
+  } else {
+    // Positivo: remove exclusivos, toggle o item clicado
+    S.swabs.delete('negative');
+    S.swabs.delete('no_result');
+    if (S.swabs.has(val)) S.swabs.delete(val);
+    else S.swabs.add(val);
+  }
+
   S.source = null;
-  // clear all options
-  Object.values(SWAB_IDS).forEach(id => {
-    document.getElementById(id).className = 'swab-opt';
-  });
-  // apply selected class
-  const clsMap = { neg: 'sel-neg', pos: 'sel-pos', nd: 'sel-nd' };
-  document.getElementById(SWAB_IDS[val]).classList.add(clsMap[selClass]);
-  // reset source buttons
   document.getElementById('src-sim').classList.remove('sel');
   document.getElementById('src-nao').classList.remove('sel');
+
+  // Atualiza visual de todos os itens
+  Object.entries(SWAB_IDS).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    el.className = 'swab-opt';
+    if (S.swabs.has(key)) {
+      if (key === 'negative') el.classList.add('sel-neg');
+      else if (key === 'no_result') el.classList.add('sel-nd');
+      else el.classList.add('sel-pos');
+    }
+  });
+
+  // Mostrar bloco MRSA assim que qualquer opção for selecionada
+  document.getElementById('mrsa-block').classList.remove('hidden');
   recompute();
 }
 
@@ -451,21 +514,27 @@ function setSource(val) {
 
 // ── DECISION LOGIC ─────────────────────────────────────────────────────────────
 function getGNDecision() {
-  const { sofa, swab, cp } = S;
-  if (!sofa || !swab) return null;
+  const { sofa, cp } = S;
+  if (!sofa) return null;
 
   // Positive swab → specific coverage
-  if (swab === 'pos_ESBL')    return { type: 'specific', pathogen: 'ESBL',    regimen: 'meropenem' };
-  if (swab === 'pos_KPC')     return { type: 'specific', pathogen: 'KPC',     regimen: 'poliB' };
-  if (swab === 'pos_Acineto') return { type: 'specific', pathogen: 'Acineto', regimen: 'ampsulb' };
+ const sw = S.swabs;
+if (!sw.size) return null;
+
+const isNeg = sw.has('negative');
+const isND  = sw.has('no_result');
+
+if (sw.has('pos_Acineto')) return { type: 'specific', pathogen: 'Acinetobacter', regimen: 'ampsulb' };
+if (sw.has('pos_KPC'))     return { type: 'specific', pathogen: 'EPC/KPC',       regimen: 'poliB' };
+if (sw.has('pos_ESBL'))    return { type: 'specific', pathogen: 'ESBL',          regimen: 'meropenem' };
 
   // Determine CP threshold
   let threshold;
-  if (swab === 'negative') {
-    threshold = CP_NEG;
-  } else { // no_result
-    threshold = sofa === 'low' ? CP_ND_LOW : CP_ND_HIGH;
-  }
+if (isNeg) {
+  threshold = CP_NEG;
+} else {
+  threshold = sofa === 'low' ? CP_ND_LOW : CP_ND_HIGH;
+}
 
   // CP checks — priority: Acineto > KPC > ESBL
   const cpA = cp?.Acineto, cpK = cp?.KPC, cpE = cp?.ESBL;
@@ -475,7 +544,7 @@ function getGNDecision() {
   if (cpE != null && cpE >= threshold) return { type: 'cp', pathogen: 'ESBL',    regimen: 'meropenem',cp: cpE, threshold };
 
   // No CP data and no_result + SOFA high → conservative
-  if (swab === 'no_result' && sofa === 'high' && cpA == null && cpK == null && cpE == null)
+  if (isND && sofa === 'high' && cpA == null && cpK == null && cpE == null)
     return { type: 'no_cp', regimen: 'narrow_conservative' };
 
   return { type: 'narrow', regimen: 'narrow', threshold };
@@ -483,7 +552,10 @@ function getGNDecision() {
 
 function getMRSADecision() {
   if (!S.sofa) return null;
-  if (S.swab === 'pos_MRSA') return 'vanco';  // swab positivo → sempre cobrir
+  // Qualquer fator de risco marcado → vancomicina
+  const checks = document.querySelectorAll('#mrsa-checks input[type=checkbox]');
+  const anyChecked = Array.from(checks).some(c => c.checked);
+  if (anyChecked) return 'vanco';
   return S.sofa === 'low' ? 'no_vanco' : 'vanco';
 }
 
@@ -565,7 +637,7 @@ function recompute() {
     if (S.cp?.KPC     != null) parts.push(`KPC ${S.cp.KPC.toFixed(1)}%`);
     if (S.cp?.ESBL    != null) parts.push(`ESBL ${S.cp.ESBL.toFixed(1)}%`);
     const cpSummary = parts.length ? ` (${parts.join(' · ')}) < ${thr}%` : '';
-    gnReason = `Swab ${S.swab === 'negative' ? 'negativo' : 'ausente'} · CP abaixo do limiar${cpSummary}`;
+    gnReason = `Swab ${S.swabs.has('negative') ? 'negativo' : 'ausente'} · CP abaixo do limiar${cpSummary}`;
   } else {
     gnReason = 'CP indisponível — conduta conservadora adoptada';
   }
@@ -619,13 +691,13 @@ function recompute() {
       <div class="checkpoint">${mrsaCheck}</div>
     </div>
   `;
-
+  document.getElementById('aviso-final').classList.remove('hidden');
   document.getElementById('btn-reset').style.display = 'block';
 }
 
 // ── RESET ──────────────────────────────────────────────────────────────────────
 function resetForm() {
-  S = { sofa: null, swab: null, swabSelClass: null, source: null, cp: S.cp };
+  S = { sofa: null, swabs: new Set(), source: null, cp: S.cp };
 
   document.getElementById('btn-sofa-low').className  = 'sofa-btn';
   document.getElementById('btn-sofa-high').className = 'sofa-btn';
@@ -636,7 +708,9 @@ function resetForm() {
   Object.values(SWAB_IDS).forEach(id => document.getElementById(id).className = 'swab-opt');
   document.getElementById('src-sim').classList.remove('sel');
   document.getElementById('src-nao').classList.remove('sel');
-
+  document.getElementById('mrsa-block').classList.add('hidden');
+  document.querySelectorAll('#mrsa-checks input[type=checkbox]').forEach(c => c.checked = false);
+  document.getElementById('aviso-final').classList.add('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
