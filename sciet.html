@@ -576,7 +576,7 @@ const REGIMENS = {
   ampsulb: {
     verb: 'Polimixina B + Sulbactam',
     text: 'Ampicilina-sulbactam 9g EV 8/8h 27g/dia no total +\nPolimixina B 2.000.000UI de ataque +\n 1.000.000UI 12/12h (<75kg) ou\n 1.250.000UI 12/12h (>75kg)',
-    note: 'Dosagem de Ampicilina/Sulbactam assume ClCr > 30ml/min\n Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
+    note: 'Dosagem de Ampicilina/Sulbactam assume ClCr > 30ml/min \n Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_abdominal: {
@@ -647,20 +647,20 @@ function recompute() {
   const mrsaClass   = mrsaIsVanco ? 'alert' : 'ok';
   const mrsaIcon    = mrsaIsVanco ? '⚠' : '✓';
   const mrsaVerb    = mrsaIsVanco
-    ? 'Vancomicina — cobertura MRSA'
-    : 'Sem cobertura anti-MRSA empírica';
+    ? 'Vancomicina/Teicoplanina'
+    : 'Sem Vancomicina/Teicoplanina empírica';
   const mrsaRegimen = mrsaIsVanco
-    ? 'Vancomicina AUC-guided (AUC₂₄h: 400–600 mg·h/L)\nou Linezolida 600mg q12h (preferível em HAP/VAP)'
-    : 'Sem vancomicina\nMRSA: prevalência historicamente <10% na instituição';
+    ? 'Vancomicina 25-30mg/kg de ataque +\n 30-50mg/kg/dia dividido 8/8 ou 12/12h de manutenção'
+    : 'Prevalência historicamente <10% na instituição';
   const mrsaNote = mrsaIsVanco
-    ? 'SOFA ≥7: risco de falha por MRSA em cenário de alta gravidade justifica cobertura empírica.'
-    : 'SOFA <7 + prevalência institucional de MRSA <10%: omissão de vancomicina é segura.';
+    ? 'Cálculo de dose SEMPRE baseado em peso REAL'
+    : 'Discutir com a Infectologia em caso de dúvida sobre fatores de risco ou possível indicação';
   const mrsaCheck = mrsaIsVanco
-    ? 'Suspender vancomicina às 48h se culturas sem MRSA + melhora clínica.'
-    : 'Manter vigilância. Se cultura positiva para MRSA: iniciar vancomicina AUC-guided.';
+    ? 'Considerar Teicoplanina em caso de risco de lesão renal e/ou associação com Piperacilina-Tazobactam\n Em caso de lesão renal instalada, não há benefício claro no uso de Teicoplanina em relação a Vancomicina'
+    : 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.';
   const mrsaReason = mrsaIsVanco
-    ? 'SOFA ≥7 — cobertura empírica recomendada'
-    : 'SOFA <7 + prevalência <10% — omissão segura';
+    ? 'Otimização PK/PD (AUC₂₄h: 400–600 mg·h/L), discutir com Infectologia em caso de risco de subexposição'
+    : 'Esquemas empíricos recomendados acima tem cobertura intrínseca para MSSA';
 
   document.getElementById('results').innerHTML = `
     <div class="result-section-label">Cobertura Gram-negativos MDR</div>
