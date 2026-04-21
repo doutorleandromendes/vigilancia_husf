@@ -564,19 +564,19 @@ const REGIMENS = {
   meropenem: {
     verb: 'Meropenem',
     text: 'Meropenem 2g q8h IV\n(infusão em 4 horas)',
-    note: 'Dosagem recomendada assume ClCr > 50ml/min',
+    note: 'Dosagem recomendada assume ClCr > 50ml/min\n Obrigatório dosagem de proteína C reativa antes do início e após 24h e 48h',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   poliB: {
     verb: 'Polimixina B + Meropenem',
     text: 'Polimixina B 2.000.000UI de ataque +\n 1.000.000UI 12/12h (<75kg) ou\n 1.250.000UI 12/12h (>75kg)\n ± Amicacina se foco urinário ou suspeita/confirmação de resistência a PoliB',
-    note: 'Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
+    note: 'Obrigatório dosagem de procalcitonina antes do início e após 24-48h\n Não há indicação de qualquer ajuste de dose por disfunção renal',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   ampsulb: {
-    verb: 'Amp-sulbactam + Polimixina B — cobertura CRAB',
-    text: 'Ampicilina-sulbactam 27g/dia (infusão extendida ≥3h)\n+ Polimixina B 25.000 UI/kg/dia ÷ q12h',
-    note: 'Mortalidade de CRAB sem cobertura adequada >70% em UTI. Monitorar toxicidade renal.',
+    verb: 'Polimixina B + Sulbactam',
+    text: 'Ampicilina-sulbactam 9g EV 8/8h 27g/dia no total +\nPolimixina B 2.000.000UI de ataque +\n 1.000.000UI 12/12h (<75kg) ou\n 1.250.000UI 12/12h (>75kg)',
+    note: 'Dosagem de Ampicilina/Sulbactam assume ClCr > 30ml/min\n Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_abdominal: {
@@ -586,9 +586,9 @@ const REGIMENS = {
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_other: {
-    verb: 'Cefepima — espectro padrão',
-    text: 'Cefepima 2g q8h IV (infusão ext. 3h)',
-    note: 'Swab negativo + perfil de baixo risco: cefepima cobre Gram-negativos sem pressão adicional de carbapenêmico.',
+    verb: 'Cefepime',
+    text: 'Cefepima 2g 8/8h IV (infusão em 3 horas)',
+    note: 'Dosagem recomendada assume ClCr > 60ml/min',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_conservative: {
