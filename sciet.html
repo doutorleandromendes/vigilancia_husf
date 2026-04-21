@@ -650,13 +650,13 @@ function recompute() {
     ? 'Vancomicina/Teicoplanina'
     : 'Sem Vancomicina/Teicoplanina empírica';
   const mrsaRegimen = mrsaIsVanco
-    ? 'Vancomicina 25-30mg/kg de ataque +\n 30-50mg/kg/dia dividido 8/8 ou 12/12h de manutenção'
+    ? 'Vancomicina 25-30mg/kg de ataque +\n 30-50mg/kg/dia dividido 8/8 ou 12/12h de manutenção<br>ou<br> Teicoplanina 12mg/kg 12/12h por 5 doses e 12mg/kg 1x/dia após'
     : 'Prevalência historicamente <10% na instituição';
   const mrsaNote = mrsaIsVanco
     ? 'Cálculo de dose SEMPRE baseado em peso REAL'
     : 'Discutir com a Infectologia em caso de dúvida sobre fatores de risco ou possível indicação';
   const mrsaCheck = mrsaIsVanco
-    ? 'Considerar Teicoplanina em caso de risco de lesão renal e/ou associação com Piperacilina-Tazobactam\n Em caso de lesão renal instalada, não há benefício claro no uso de Teicoplanina em relação a Vancomicina'
+    ? 'Considerar Teicoplanina em caso de risco de lesão renal e/ou associação com Piperacilina-Tazobactam<br> Em caso de lesão renal instalada, não há benefício claro no uso de Teicoplanina em relação a Vancomicina'
     : 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.';
   const mrsaReason = mrsaIsVanco
     ? 'Otimização PK/PD (AUC₂₄h: 400–600 mg·h/L), discutir com Infectologia em caso de risco de subexposição'
