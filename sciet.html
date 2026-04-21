@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Algoritmo Antimicrobiano Empírico · SCIH/HUSF</title>
+  <title>Algoritmo Antimicrobiano Empírico UTI-Adulto · SCIH/HUSF</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -276,7 +276,7 @@
 
   <!-- STEP 1: SOFA -->
   <div class="section" id="sec-sofa">
-    <div class="step-label">Passo 1 · Gravidade</div>
+    <div class="step-label">Passo 1 · Risco · Gravidade</div>
     <div class="step-q">Qual o SOFA atual do paciente?</div>
     <div class="sofa-grid">
       <button class="sofa-btn" id="btn-sofa-low" onclick="selectSOFA('low')">
@@ -309,7 +309,7 @@
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Positivo para ESBL</div>
-          <div class="swab-opt-sub">Enterobacterales produtor de ESBL — swab retal</div>
+          <div class="swab-opt-sub">Enterobacterales produtor de ESBL</div>
         </div>
       </div>
 
@@ -317,7 +317,7 @@
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Positivo para EPC</div>
-          <div class="swab-opt-sub">Enterobacterales produtor de carbapenemase (KPC/NDM) — swab retal + molecular</div>
+          <div class="swab-opt-sub">Enterobacterales produtor de carbapenemase (EPC/KPC/NDM)</div>
         </div>
       </div>
 
@@ -325,7 +325,7 @@
         <div class="radio-circle"><div class="radio-dot"></div></div>
         <div class="swab-opt-text">
           <div class="swab-opt-main">Positivo para Acinetobacter</div>
-          <div class="swab-opt-sub">A. baumannii resistente a carbapenêmicos — aspirado traqueal ou swab</div>
+          <div class="swab-opt-sub">Acinetobacter resistente a carbapenêmicos</div>
         </div>
       </div>
 
@@ -342,7 +342,7 @@
     <!-- Source question (shown when narrow coverage likely) -->
     <div id="source-block" class="hidden">
       <div class="source-card">
-        <div class="source-q">Trata-se de infecção abdominal ou pneumonia aspirativa?</div>
+        <div class="source-q">Trata-se de infecção abdominal, pneumonia aspirativa ou outro foco com alta suspeita de participação de anaeróbios?</div>
         <div class="source-btns">
           <button class="source-btn" id="src-sim" onclick="setSource(true)">Sim</button>
           <button class="source-btn" id="src-nao" onclick="setSource(false)">Não</button>
@@ -358,12 +358,12 @@
 
           <label class="mrsa-opt" id="mrsa-swab">
             <input type="checkbox" onchange="recompute()">
-            <span>Swab positivo para MRSA desde a admissão</span>
+            <span>Swab positivo para MRSA (desde a admissão)</span>
           </label>
 
           <label class="mrsa-opt" id="mrsa-cult">
             <input type="checkbox" onchange="recompute()">
-            <span>Cultura positiva para MRSA nos últimos 30 dias</span>
+            <span>Qualquer cultura positiva para MRSA nos últimos 30 dias</span>
           </label>
 
           <label class="mrsa-opt" id="mrsa-cir">
@@ -562,40 +562,40 @@ function getMRSADecision() {
 // ── REGIMEN CONTENT ────────────────────────────────────────────────────────────
 const REGIMENS = {
   meropenem: {
-    verb: 'Meropenem — cobertura ESBL',
-    text: 'Meropenem 1–2g q8h IV\n(ajustar para SOFA e função renal)',
-    note: 'Carbapenem de escolha para infecção por ESBL grave ou com risco elevado.',
-    checkpoint: 'De-escalar às 48–72h se culturas sem ESBL-E + melhora clínica + SOFA em queda.'
+    verb: 'Meropenem',
+    text: 'Meropenem 2g q8h IV\n(infusão em 4 horas)',
+    note: 'Dosagem recomendada assume ClCr > 50ml/min',
+    checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   poliB: {
-    verb: 'Polimixina + Meropenem — cobertura EPC/KPC',
-    text: 'Polimixina B ± amicacina se sensível',
-    note: 'Aguardar tipagem molecular (KPC vs NDM) — impacta o esquema definitivo.',
-    checkpoint: 'Confirmar mecanismo em 48h. De-escalar se culturas negativas para EPC.'
+    verb: 'Polimixina B + Meropenem',
+    text: 'Polimixina B 2.000.000UI ataque seguido de 1.000.000UI 12/12h (<75kg) ou 1.250.000UI 12/12h (>75kg)/n ± Amicacina se foco urinário ou suspeita/confirmação de resistência a PoliB',
+    note: 'Obrigatório dosagem de procalcitonina antes do início e após 24-48h',
+    checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   ampsulb: {
     verb: 'Amp-sulbactam + Polimixina B — cobertura CRAB',
     text: 'Ampicilina-sulbactam 27g/dia (infusão extendida ≥3h)\n+ Polimixina B 25.000 UI/kg/dia ÷ q12h',
     note: 'Mortalidade de CRAB sem cobertura adequada >70% em UTI. Monitorar toxicidade renal.',
-    checkpoint: 'De-escalar às 48–72h se aspirado traqueal/BAL sem CRAB + melhora ventilatória.'
+    checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_abdominal: {
-    verb: 'Piperacilina-tazobactam — espectro abdominal/aspirativo',
-    text: 'Piperacilina-tazobactam 4,5g q6h IV (infusão ext. 4h)',
-    note: 'Preferido em infecção de foco abdominal ou pneumonia aspirativa pelo espectro anaeróbio.',
-    checkpoint: 'De-escalar às 48–72h com resultado de culturas. Sem crescimento de MDR: manter ou simplificar.'
+    verb: 'Piperacilina-tazobactam',
+    text: 'Piperacilina-tazobactam 4,5g q6h IV (infusão em, no mínimo, 4h)',
+    note: 'Dosagem recomendada assume ClCr > 40ml/min',
+    checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_other: {
     verb: 'Cefepima — espectro padrão',
     text: 'Cefepima 2g q8h IV (infusão ext. 3h)',
     note: 'Swab negativo + perfil de baixo risco: cefepima cobre Gram-negativos sem pressão adicional de carbapenêmico.',
-    checkpoint: 'De-escalar às 48–72h com culturas. Sem MDR: completar curso com cefepima ou de-escalar.'
+    checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   },
   narrow_conservative: {
     verb: 'Sem swab disponível + CP indisponível — conduta conservadora',
     text: 'Meropenem 1g q8h IV\n(cobertura empírica ampla ante incerteza)',
     note: 'CP não carregada e sem swab recente com SOFA ≥7: adotar cobertura conservadora.',
-    checkpoint: 'Obter swab de vigilância imediatamente. Re-avaliar esquema em 48h com resultado.'
+    checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   }
 };
 
