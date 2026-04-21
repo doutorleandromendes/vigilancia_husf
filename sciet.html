@@ -441,7 +441,7 @@ function renderCP(data) {
   S.cp = data;
   const defs = [
     { key: 'ESBL',    label: 'ESBL',    threshold: null },
-    { key: 'KPC',     label: 'KPC/EPC', threshold: null },
+    { key: 'KPC',     label: 'EPC', threshold: null },
     { key: 'Acineto', label: 'Acineto', threshold: null }
   ];
   document.getElementById('cp-chips').innerHTML = defs.map(d => {
