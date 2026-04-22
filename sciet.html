@@ -280,11 +280,11 @@
     <div class="step-q">Qual o SOFA atual do paciente?</div>
     <div class="sofa-grid">
       <button class="sofa-btn" id="btn-sofa-low" onclick="selectSOFA('low')">
-        <span class="sofa-val">&lt; 7</span>
+        <span class="sofa-val">&lt; 9</span>
         <span class="sofa-sub">baixo · moderado</span>
       </button>
       <button class="sofa-btn" id="btn-sofa-high" onclick="selectSOFA('high')">
-        <span class="sofa-val">≥ 7</span>
+        <span class="sofa-val">≥ 9</span>
         <span class="sofa-sub">elevado · crítico</span>
       </button>
     </div>
@@ -413,8 +413,8 @@
 // ── CONFIGURATION ──────────────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjrV3CoUDGpP9w3AkqH4Ia9lYpbvNvTl2WO16QwXRIzfutIjiAZQCOMoRVami9cTJ1/exec'; // substituir após deploy
 const CP_NEG      = 20;  // swab negativo: limiar de CP (%)
-const CP_ND_LOW   = 30;  // sem swab + SOFA <7: limiar
-const CP_ND_HIGH  = 15;  // sem swab + SOFA ≥7: limiar
+const CP_ND_LOW   = 30;  // sem swab + SOFA <9: limiar
+const CP_ND_HIGH  = 15;  // sem swab + SOFA ≥9: limiar
 // ────────────────────────────────────────────────────────────────────────────────
 
 let S = {
@@ -594,7 +594,7 @@ const REGIMENS = {
   narrow_conservative: {
     verb: 'Sem swab disponível + CP indisponível — conduta conservadora',
     text: 'Meropenem 1g q8h IV\n(cobertura empírica ampla ante incerteza)',
-    note: 'CP não carregada e sem swab recente com SOFA ≥7: adotar cobertura conservadora.',
+    note: 'CP não carregada e sem swab recente com SOFA ≥9: adotar cobertura conservadora.',
     checkpoint: 'Aguardar parecer do Sistema de Uso Racional de Antimicrobianos e, se necessário, orientação da Infectologia.'
   }
 };
