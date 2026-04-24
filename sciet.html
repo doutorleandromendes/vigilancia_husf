@@ -181,22 +181,20 @@
       animation: fadeUp .25s ease;
     }
     @keyframes fadeUp { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-
     .result-card.ok     { background: var(--green-bg); border-color: var(--green-border); }
     .result-card.alert  { background: var(--red-bg);   border-color: var(--red-border); }
     .result-card.warn   { background: var(--amber-bg); border-color: var(--amber-border); }
     .result-card.info   { background: var(--blue-bg);  border-color: var(--blue-border); }
-
+    .result-card.neutral { background: #f0fdfa; border-color: #5eead4; }
     .result-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
     .result-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
     .result-verb { font-size: 13px; font-weight: 700; letter-spacing: .3px; }
     .result-reason { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
-
     .result-card.ok    .result-verb { color: var(--green); }
     .result-card.alert .result-verb { color: var(--red); }
     .result-card.warn  .result-verb { color: var(--amber); }
     .result-card.info  .result-verb { color: var(--blue); }
-
+    .result-card.neutral .result-verb { color: #0f766e; }
     .regimen-box {
       background: rgba(255,255,255,.7); border-radius: 5px;
       padding: 10px 12px; margin-bottom: 8px;
@@ -216,6 +214,14 @@
       border-left: 2px solid var(--border-mid);
     }
     .checkpoint::before { content: '⏱ '; }
+    .obrig {
+      font-weight: 600;
+      background: #fef08a;
+      color: #713f12;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
 
     /* ── RESET ── */
     #btn-reset {
@@ -603,6 +609,7 @@ const REGIMENS = {
 function recompute() {
   const gnDec   = getGNDecision();
   const mrsaDec = getMRSADecision();
+  const hl = t => t.replace(/Obrigatório/g, '<span class="obrig">Obrigatório</span>');
 
   if (!gnDec || !mrsaDec) { document.getElementById('results').innerHTML = ''; return; }
 
@@ -623,14 +630,13 @@ function recompute() {
 
   const gnR = REGIMENS[gnKey];
   const isNarrow = gnKey.startsWith('narrow');
-  const gnClass = isNarrow ? 'ok' : (gnKey === 'narrow_conservative' ? 'warn' : 'alert');
-  const gnIcon  = isNarrow ? '✓' : '⚠';
+  const gnClass = 'neutral';
+  const gnIcon  = '';
 
   // Reason text
   let gnReason = '';
   if (gnDec.type === 'specific') gnReason = `Swab positivo para ${gnDec.pathogen} — cobertura dirigida`;
-  else if (gnDec.type === 'cp')  gnReason = `CP ${gnDec.pathogen}: ${gnDec.cp?.toFixed(1)}% ≥ ${gnDec.threshold}% · SOFA ${S.sofa === 'low' ? '<7' : '≥7'}`;
-  else if (gnDec.type === 'narrow') {
+else if (gnDec.type === 'cp')  gnReason = `CP ${gnDec.pathogen}: ${gnDec.cp?.toFixed(1)}% ≥ ${gnDec.threshold}% · SOFA ${S.sofa === 'low' ? '<9' : '≥9'}`;  else if (gnDec.type === 'narrow') {
     const thr = gnDec.threshold;
     const parts = [];
     if (S.cp?.Acineto != null) parts.push(`Acineto ${S.cp.Acineto.toFixed(1)}%`);
@@ -644,8 +650,8 @@ function recompute() {
 
   // MRSA card
   const mrsaIsVanco = mrsaDec === 'vanco';
-  const mrsaClass   = mrsaIsVanco ? 'alert' : 'ok';
-  const mrsaIcon    = mrsaIsVanco ? '⚠' : '✓';
+  const mrsaClass   = 'neutral';
+  const mrsaIcon    = '';
   const mrsaVerb    = mrsaIsVanco
     ? 'Vancomicina/Teicoplanina'
     : 'Sem Vancomicina/Teicoplanina empírica';
@@ -672,9 +678,9 @@ function recompute() {
           <div class="result-reason">${gnReason}</div>
         </div>
       </div>
-      <div class="regimen-box">${gnR.text}</div>
-      <div class="result-note">${gnR.note}</div>
-      <div class="checkpoint">${gnR.checkpoint}</div>
+      <div class="regimen-box">${hl(gnR.text)}</div>
+      <div class="result-note">${hl(gnR.note)}</div>
+      <div class="checkpoint">${hl(gnR.checkpoint)}</div>
     </div>
 
     <div class="result-section-label">Cobertura MRSA</div>
@@ -686,9 +692,9 @@ function recompute() {
           <div class="result-reason">${mrsaReason}</div>
         </div>
       </div>
-      <div class="regimen-box">${mrsaRegimen}</div>
-      <div class="result-note">${mrsaNote}</div>
-      <div class="checkpoint">${mrsaCheck}</div>
+      <div class="regimen-box">${hl(mrsaRegimen)}</div>
+      <div class="result-note">${hl(mrsaNote)}</div>
+      <div class="checkpoint">${hl(mrsaCheck)}</div>
     </div>
   `;
   document.getElementById('aviso-final').classList.remove('hidden');
