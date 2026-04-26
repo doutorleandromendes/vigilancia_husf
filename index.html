@@ -3,492 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUSF Vigilância Respiratória - SE 11/2026</title>
+    <title>HUSF Vigilância Automática - SE 14/2026</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
             padding: 10px;
-            min-height: 100vh;
-        }
-        
-        .container-mobile {
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* HEADER COMPACTO */
-        .header-mobile {
-            background: linear-gradient(135deg, #2c3e50 0%, #4a6741 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .header-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .header-subtitle {
-            font-size: 0.85rem;
-            opacity: 0.9;
             margin: 0;
         }
         
-        /* ALERTA ATUALIZAÇÃO */
-        .alerta-atualizacao {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            margin: 8px 0;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 8px rgba(231,76,60,0.3);
-        }
-        
-        /* CARDS DE DECISÃO - PRIORIDADE MÁXIMA */
-        .decisao-container {
-            margin: 10px 0;
-        }
-        
-        .patogeno-card {
+        .card-patogeno {
             background: white;
             margin: 8px 0;
             border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            padding: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
             border-left: 5px solid #ddd;
         }
         
-        .status-liberar { border-left-color: #28a745; }
-        .status-cautela { border-left-color: #ffc107; }
-        .status-nao-liberar { border-left-color: #dc3545; }
+        .liberar { border-left-color: #28a745; }
+        .cautela { border-left-color: #ffc107; }
+        .rtpcr { border-left-color: #dc3545; }
         
         .patogeno-header {
-            padding: 12px 15px 8px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
         }
         
         .patogeno-nome {
             font-weight: 700;
-            font-size: 1rem;
-            color: #2c3e50;
-        }
-        
-        .patogeno-vpn {
-            font-weight: 700;
             font-size: 1.1rem;
-            padding: 4px 8px;
-            border-radius: 8px;
+            color: #2c3e50;
+        }
+        
+        .vpn-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
             color: white;
-        }
-        
-        .vpn-liberar { background: #28a745; }
-        .vpn-cautela { background: #ffc107; color: #000; }
-        .vpn-nao-liberar { background: #dc3545; }
-        
-        .patogeno-decisao {
-            padding: 0 15px 12px 15px;
             font-size: 0.9rem;
+        }
+        
+        .vpn-verde { background: #28a745; }
+        .vpn-amarelo { background: #ffc107; color: #000; }
+        .vpn-vermelho { background: #dc3545; }
+        
+        .orientacao {
             font-weight: 600;
-        }
-        
-        .decisao-liberar { color: #28a745; }
-        .decisao-cautela { color: #d39e00; }
-        .decisao-nao-liberar { color: #dc3545; }
-        
-        /* RESUMO EPIDEMIOLÓGICO - COMPACTO */
-        .resumo-section {
-            background: white;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .resumo-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .stats-mobile {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .stat-mobile {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-        
-        .stat-mobile-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #2c3e50;
-            display: block;
-        }
-        
-        .stat-mobile-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 4px;
-        }
-        
-        /* CRITÉRIO VISUAL - COMPACTO */
-        .criterio-mobile {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 10px 0;
-            border-left: 4px solid #2196f3;
-        }
-        
-        .criterio-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            text-align: center;
-        }
-        
-        .criterio-item {
-            padding: 8px;
-        }
-        
-        .criterio-valor {
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: block;
-        }
-        
-        .criterio-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-top: 4px;
-            text-transform: uppercase;
-        }
-        
-        .valor-liberar { color: #28a745; }
-        .valor-cautela { color: #d39e00; }
-        .valor-pcr { color: #dc3545; }
-        
-        /* DETALHES COLAPSÍVEIS */
-        .detalhes-section {
-            background: white;
-            margin: 8px 0;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        
-        .detalhes-toggle {
-            width: 100%;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border: none;
-            text-align: left;
             font-size: 0.9rem;
-            font-weight: 600;
-            color: #495057;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
-        .detalhes-toggle:hover { background: #e9ecef; }
+        .orientacao-verde { color: #28a745; }
+        .orientacao-amarelo { color: #d39e00; }
+        .orientacao-vermelho { color: #dc3545; }
         
-        .detalhes-content {
-            padding: 15px;
-            display: none;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            border-top: 1px solid #e9ecef;
-        }
-        
-        .detalhes-content.show { display: block; }
-        
-        /* PATÓGENOS BADGES */
-        .patogenos-distribuicao {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin: 10px 0;
-        }
-        
-        .patogeno-badge-mobile {
-            padding: 4px 8px;
+        .header-automatico {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
             border-radius: 15px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: white;
             text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         
-        .badge-rinovirus { background: #ff6b6b; }
-        .badge-vsr { background: #4ecdc4; }
-        .badge-covid { background: #45b7d1; }
-        .badge-influenza { background: #f9ca24; color: #000; }
-        .badge-outros { background: #6c5ce7; }
-        
-        /* ALERTA ESPECIAL */
-        .alerta-especial {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 1px solid #ffeaa7;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-        
-        /* FOOTER */
-        .footer-info {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            text-align: center;
-            font-size: 0.7rem;
+        .resumo-dados {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         @media (max-width: 576px) {
-            body { padding: 5px; }
-            .header-title { font-size: 1rem; }
-            .criterio-valor { font-size: 1.2rem; }
-            .stat-mobile-value { font-size: 1.1rem; }
+            .patogeno-header { flex-direction: column; gap: 10px; }
+            .vpn-badge { font-size: 1rem; }
         }
     </style>
 </head>
 
 <body>
-    <div class="container-mobile">
-        <!-- HEADER MOBILE-FIRST -->
-        <div class="header-mobile">
-            <div class="header-title">
-                <i class="fas fa-hospital-alt"></i> HUSF - Vigilância Respiratória
-            </div>
-            <small>SE 11/2026 &bull; 15-21 Março 2026 &bull; Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</small>
+    <div class="container-fluid">
+        <!-- HEADER -->
+        <div class="header-automatico">
+            <h1 style="margin: 0; font-size: 1.4rem;">
+                <i class="fas fa-robot"></i> HUSF - Sistema Automático
+            </h1>
+            <small>Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</small>
         </div>
         
-        <!-- ALERTA DADOS CORRETOS -->
-        <div class="alerta-atualizacao">
-            <i class="fas fa-sync-alt"></i> <strong>DADOS CORRIGIDOS:</strong> Sistema atualizado com dados reais do InfoGripe SE 11/2026
-        </div>
-
-        <!-- CARDS DE DECISÃO CLÍNICA - PRIORIDADE NO TOPO -->
-        <div class="decisao-container">
-            <!-- CARD COVID-19 -->
-            <div class="patogeno-card status-liberar">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">COVID-19</div>
-                    <div class="patogeno-vpn vpn-liberar">97%</div>
-                </div>
-                <div class="patogeno-decisao decisao-liberar">
-                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-                </div>
-            </div>
-            <!-- CARD Influenza A -->
-            <div class="patogeno-card status-nao-liberar">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">Influenza A</div>
-                    <div class="patogeno-vpn vpn-nao-liberar">87%</div>
-                </div>
-                <div class="patogeno-decisao decisao-nao-liberar">
-                    <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
-                </div>
-            </div>
-            <!-- CARD Influenza B -->
-            <div class="patogeno-card status-liberar">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">Influenza B</div>
-                    <div class="patogeno-vpn vpn-liberar">99%</div>
-                </div>
-                <div class="patogeno-decisao decisao-liberar">
-                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-                </div>
-            </div>
-            <!-- CARD VSR -->
-            <div class="patogeno-card status-liberar">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">VSR</div>
-                    <div class="patogeno-vpn vpn-liberar">96%</div>
-                </div>
-                <div class="patogeno-decisao decisao-liberar">
-                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-                </div>
-            </div>
-            <!-- CARD Rinovírus -->
-            <div class="patogeno-card status-nao-liberar">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">Rinovírus</div>
-                    <div class="patogeno-vpn vpn-nao-liberar">71%</div>
-                </div>
-                <div class="patogeno-decisao decisao-nao-liberar">
-                    <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
-                </div>
-            </div>
-            <!-- CARD Outros -->
-            <div class="patogeno-card status-liberar">
-                <div class="patogeno-header">
-                    <div class="patogeno-nome">Outros</div>
-                    <div class="patogeno-vpn vpn-liberar">100%</div>
-                </div>
-                <div class="patogeno-decisao decisao-liberar">
-                    <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-                </div>
-            </div>
+        <!-- STATUS -->
+        <div class="alert-success" style="margin: 10px 0; padding: 15px; border-radius: 10px;">
+            <strong>✅ SISTEMA ONLINE - SE 14/2026</strong>
         </div>
         
-        <!-- CRITÉRIO VISUAL COMPACTO -->
-        <div class="criterio-mobile">
-            <div style="text-align: center; margin-bottom: 10px; font-weight: 700; color: #2c3e50;">
-                <i class="fas fa-bullseye"></i> Critério de Liberação
+        <div class='alert alert-info'><i class='fas fa-robot'></i> <strong>Automático:</strong> Busca automática + Parser PDF</div>
+        
+        <!-- ORIENTAÇÕES -->
+        <div class="orientacoes">
+        <div class="card-patogeno cautela">
+            <div class="patogeno-header">
+                <div class="patogeno-nome">COVID-19</div>
+                <div class="vpn-badge vpn-amarelo">VPN 91%</div>
             </div>
-            <div class="criterio-grid">
-                <div class="criterio-item">
-                    <span class="criterio-valor valor-liberar">&ge;95%</span>
-                    <div class="criterio-label valor-liberar">LIBERAR</div>
-                </div>
-                <div class="criterio-item">
-                    <span class="criterio-valor valor-cautela">90-95%</span>
-                    <div class="criterio-label valor-cautela">CAUTELA</div>
-                </div>
-                <div class="criterio-item">
-                    <span class="criterio-valor valor-pcr">&lt;90%</span>
-                    <div class="criterio-label valor-pcr">RT-PCR</div>
-                </div>
+            <div class="orientacao orientacao-amarelo">
+                <i class="fas fa-exclamation-triangle"></i> CAUTELA - AVALIAR CLINICAMENTE
             </div>
         </div>
-        <!-- RESUMO EPIDEMIOLÓGICO COMPACTO -->
-        <div class="resumo-section">
-            <div class="resumo-title">
-                <i class="fas fa-chart-line"></i>
-                Cenário Epidemiológico
+        <div class="card-patogeno liberar">
+            <div class="patogeno-header">
+                <div class="patogeno-nome">Influenza A</div>
+                <div class="vpn-badge vpn-verde">VPN 98%</div>
             </div>
-            <div class="stats-mobile">
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">24.281</span>
-                    <div class="stat-mobile-label">Casos SRAG</div>
-                </div>
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">39%</span>
-                    <div class="stat-mobile-label">Positividade</div>
-                </div>
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">SE 11</span>
-                    <div class="stat-mobile-label">Sem. Epidem.</div>
-                </div>
-                <div class="stat-mobile">
-                    <span class="stat-mobile-value">9.443</span>
-                    <div class="stat-mobile-label">Positivos</div>
-                </div>
+            <div class="orientacao orientacao-verde">
+                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
             </div>
         </div>
-        <!-- ALERTA ESPECIAL INFLUENZA A -->
-        <div class="alerta-especial">
-            <div style="font-weight: 700; margin-bottom: 8px;">
-                <i class="fas fa-exclamation-triangle"></i> Atenção: Influenza A
+        <div class="card-patogeno liberar">
+            <div class="patogeno-header">
+                <div class="patogeno-nome">Influenza B</div>
+                <div class="vpn-badge vpn-verde">VPN 99%</div>
             </div>
-            <div style="font-size: 0.9rem;">
-                <strong>Crescimento explosivo antecipado (27.8%).</strong> VPN baixo exige RT-PCR para confirmação.
-                Aumento antes do outono - vacinação urgente.
-            </div>
-        </div>
-        <!-- ALERTA ESPECIAL RINOVÍRUS -->
-        <div class="alerta-especial">
-            <div style="font-weight: 700; margin-bottom: 8px;">
-                <i class="fas fa-exclamation-triangle"></i> Atenção: Rinovírus
-            </div>
-            <div style="font-size: 0.9rem;">
-                <strong>Principal patógeno circulante (45.0%).</strong> Sensibilidade limitada (50%). 
-                Teste negativo + sintomas &rarr; RT-PCR recomendado.
+            <div class="orientacao orientacao-verde">
+                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
             </div>
         </div>
-        <!-- DETALHES: DISTRIBUIÇÃO DE PATÓGENOS -->
-        <div class="detalhes-section">
-            <button class="detalhes-toggle" onclick="toggleDetalhes('distribuicao')">
-                <span><i class="fas fa-chart-pie"></i> Distribuição dos Patógenos (SE 11/2026)</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="detalhes-content" id="content-distribuicao">
-                <div class="patogenos-distribuicao"><span class="patogeno-badge-mobile badge-rinovirus">Rinovírus: 45.0%</span><span class="patogeno-badge-mobile badge-influenza">Influenza A: 27.8%</span><span class="patogeno-badge-mobile badge-vsr">VSR: 14.6%</span><span class="patogeno-badge-mobile badge-covid">COVID-19: 9.1%</span><span class="patogeno-badge-mobile badge-influenza">Influenza B: 1.4%</span><span class="patogeno-badge-mobile badge-outros">Outros: 1.1%</span>
+        <div class="card-patogeno rtpcr">
+            <div class="patogeno-header">
+                <div class="patogeno-nome">VSR</div>
+                <div class="vpn-badge vpn-vermelho">VPN 84%</div>
+            </div>
+            <div class="orientacao orientacao-vermelho">
+                <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
+            </div>
+        </div>
+        <div class="card-patogeno rtpcr">
+            <div class="patogeno-header">
+                <div class="patogeno-nome">Rinovírus</div>
+                <div class="vpn-badge vpn-vermelho">VPN 86%</div>
+            </div>
+            <div class="orientacao orientacao-vermelho">
+                <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
+            </div>
+        </div>
+        <div class="card-patogeno liberar">
+            <div class="patogeno-header">
+                <div class="patogeno-nome">Outros</div>
+                <div class="vpn-badge vpn-verde">VPN 100%</div>
+            </div>
+            <div class="orientacao orientacao-verde">
+                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+            </div>
+        </div>
+        </div>
+        
+        <!-- RESUMO -->
+        <div class="resumo-dados">
+            <h5 style="color: #2c3e50; margin-bottom: 15px;">
+                <i class="fas fa-chart-area"></i> Resumo Epidemiológico
+            </h5>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #2c3e50;">
+                        2,025
+                    </div>
+                    <small>Casos SRAG</small>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #2c3e50;">
+                        42%
+                    </div>
+                    <small>Positividade</small>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center; color: #6c757d; font-size: 0.8rem;">
+                Período: 06/04-12/04/2026 | Atualizado: 26/04/2026 13:01
             </div>
         </div>
         
-        <!-- DETALHES: BASE CIENTÍFICA -->
-        <div class="detalhes-section">
-            <button class="detalhes-toggle" onclick="toggleDetalhes('cientifica')">
-                <span><i class="fas fa-microscope"></i> Base Científica</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="detalhes-content" id="content-cientifica">
-                <div style="margin-bottom: 15px;">
-                    <strong>Sensibilidades (Meta-análises):</strong><br>
-                    &bull; COVID-19: 70% (60 estudos)<br>
-                    &bull; Influenza A: 62% (159 estudos)<br>  
-                    &bull; Influenza B: 58% (159 estudos)<br>
-                    &bull; VSR: 75% (literatura)<br>
-                    &bull; Rinovírus: 50% (conservadora)
-                </div>
-                <div>
-                    <strong>Parâmetros do Sistema:</strong><br>
-                    &bull; Especificidade: 98% (todos os testes)<br>
-                    &bull; VPN &ge; 95% = Liberação segura<br>
-                    &bull; Atualização: Quinzenal<br>
-                    &bull; Fonte: InfoGripe/Fiocruz
-                </div>
-            </div>
-        </div>
-        
-        <!-- FOOTER COMPACTO -->
-        <div class="footer-info">
-            <i class="fas fa-hospital"></i>
-            <div style="margin-top: 5px;">
-                Sistema HUSF - Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH
-            </div>
-            <div style="margin-top: 3px; font-size: 0.6rem; opacity: 0.8;">
-                Sistema baseado em evidências científicas • VPN >=95% = Liberação Segura • Dados corretos SE 11/2026
-            </div>
+        <!-- FOOTER AUTOMÁTICO -->
+        <div style="text-align: center; color: white; font-size: 0.7rem; margin: 15px 0;">
+            <i class="fas fa-sync-alt"></i> Sistema 100% Automático - Busca + Parse + VPN<br>
+            Executado: 26/04/2026 13:01:04
         </div>
     </div>
-
-    <script>
-        function toggleDetalhes(secao) {{
-            const content = document.getElementById('content-' + secao);
-            const icon = content.previousElementSibling.querySelector('.fa-chevron-down, .fa-chevron-up');
-            
-            if (content.classList.contains('show')) {{
-                content.classList.remove('show');
-                icon.className = 'fas fa-chevron-down';
-            }} else {{
-                content.classList.add('show');
-                icon.className = 'fas fa-chevron-up';
-            }}
-        }}
-    </script>
 </body>
 </html>
