@@ -277,7 +277,20 @@
     <div class="cp-meta" id="cp-meta"></div>
   </div>
 </div>
-
+<div id="aviso-manutencao" style="
+  display: none;
+  background: #fef2f2;
+  border-bottom: 2px solid #fca5a5;
+  padding: 14px 20px;
+  text-align: center;
+">
+  <div style="max-width:560px; margin:0 auto;">
+    <div style="font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:2px; color:#b91c1c; margin-bottom:4px;">FERRAMENTA SUSPENSA</div>
+    <p style="font-size:12px; color:#7f1d1d; font-family:Georgia,serif; line-height:1.6;">
+      Esta ferramenta está em manutenção conforme questionamentos levantados e ficará suspensa temporariamente.
+    </p>
+  </div>
+</div>
 <main>
 
   <!-- STEP 1: SOFA -->
@@ -417,6 +430,7 @@
 
 <script>
 // ── CONFIGURATION ──────────────────────────────────────────────────────────────
+const MANUTENCAO = false; // true = ativa o aviso e bloqueia o formulário
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjrV3CoUDGpP9w3AkqH4Ia9lYpbvNvTl2WO16QwXRIzfutIjiAZQCOMoRVami9cTJ1/exec'; // substituir após deploy
 const CP_NEG      = 20;  // swab negativo: limiar de CP (%)
 const CP_ND_LOW   = 30;  // sem swab + SOFA <9: limiar
@@ -718,6 +732,14 @@ function resetForm() {
   document.querySelectorAll('#mrsa-checks input[type=checkbox]').forEach(c => c.checked = false);
   document.getElementById('aviso-final').classList.add('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+  // ── MANUTENÇÃO ─────────────────────────────────────────────────────────────────
+if (MANUTENCAO) {
+  document.getElementById('aviso-manutencao').style.display = 'block';
+  document.getElementById('sec-sofa').style.opacity = '0.3';
+  document.getElementById('sec-sofa').style.pointerEvents = 'none';
+  document.getElementById('sec-swab').classList.add('hidden');
 }
 </script>
 
