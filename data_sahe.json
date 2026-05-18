@@ -1,0 +1,155 @@
+{
+  "gerado": "2026-05-18",
+  "utiAB": {
+    "ref_inicio": "jan/22",
+    "ref_fim": "mar/26",
+    "n_ref": 51,
+    "pav": {
+      "p10": 7.78,
+      "p25": 11.11,
+      "p50": 13.7,
+      "p75": 17.69,
+      "p90": 24.32,
+      "mk_tau": -0.028,
+      "mk_p": 0.7763,
+      "mk_dir": -1,
+      "sen": -0.018,
+      "meses": {
+        "jan/26": {
+          "zona": "endemica",
+          "pct": 43,
+          "p_poi": 0.7345
+        },
+        "feb/26": {
+          "zona": "endemica",
+          "pct": 71,
+          "p_poi": 0.3383
+        },
+        "mar/26": {
+          "zona": "baixa",
+          "pct": 18,
+          "p_poi": 0.931
+        },
+        "apr/26": {
+          "zona": "endemica",
+          "pct": 39,
+          "p_poi": 0.7345
+        }
+      }
+    },
+    "ipcs": {
+      "p10": 4.58,
+      "p25": 7.32,
+      "p50": 10.15,
+      "p75": 12.78,
+      "p90": 15.53,
+      "mk_tau": -0.14,
+      "mk_p": 0.1443,
+      "mk_dir": -1,
+      "sen": -0.062,
+      "meses": {
+        "jan/26": {
+          "zona": "alerta",
+          "pct": 82,
+          "p_poi": 0.2182
+        },
+        "feb/26": {
+          "zona": "baixa",
+          "pct": 20,
+          "p_poi": 0.9367
+        },
+        "mar/26": {
+          "zona": "endemica",
+          "pct": 61,
+          "p_poi": 0.4297
+        },
+        "apr/26": {
+          "zona": "endemica",
+          "pct": 47,
+          "p_poi": 0.6785
+        }
+      }
+    },
+    "cvc": {
+      "p10": 65.64,
+      "p25": 70.06,
+      "p50": 74.91,
+      "p75": 79.09,
+      "p90": 81.97,
+      "mk_tau": -0.19,
+      "mk_p": 0.0476,
+      "mk_dir": -1,
+      "sen": -0.128,
+      "meses": {
+        "jan/26": {
+          "zona": "baixa",
+          "pct": 16,
+          "p_poi": 0.8096
+        },
+        "feb/26": {
+          "zona": "endemica",
+          "pct": 43,
+          "p_poi": 0.5191
+        },
+        "mar/26": {
+          "zona": "abaixo",
+          "pct": 10,
+          "p_poi": 0.8683
+        },
+        "apr/26": {
+          "zona": "endemica",
+          "pct": 41,
+          "p_poi": 0.5654
+        }
+      }
+    },
+    "svd": {
+      "p10": 68.34,
+      "p25": 72.76,
+      "p50": 76.04,
+      "p75": 80.91,
+      "p90": 83.06,
+      "mk_tau": -0.281,
+      "mk_p": 0.0033,
+      "mk_dir": -1,
+      "sen": -0.157,
+      "meses": {
+        "jan/26": {
+          "zona": "endemica",
+          "pct": 47,
+          "p_poi": 0.4803
+        },
+        "feb/26": {
+          "zona": "abaixo",
+          "pct": 2,
+          "p_poi": 1
+        },
+        "mar/26": {
+          "zona": "baixa",
+          "pct": 25,
+          "p_poi": 0.6173
+        },
+        "apr/26": {
+          "zona": "endemica",
+          "pct": 27,
+          "p_poi": 0.6173
+        }
+      }
+    }
+  },
+  "utic": {
+    "ref_inicio": "feb/26",
+    "ref_fim": "apr/26",
+    "n_ref": 3,
+    "pav": {},
+    "ipcs": {},
+    "cvc": {},
+    "svd": {}
+  },
+  "utiNeo": {
+    "ref_inicio": "feb/26",
+    "ref_fim": "apr/26",
+    "n_ref": 3,
+    "ipcs": {}
+  }
+}
