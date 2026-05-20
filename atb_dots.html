@@ -181,7 +181,7 @@ function makeTip(){
 
 // ── Chart: grouped bars + total trend line (single axis, ComposedChart) ────────
 function ChartByATB(props){
-  var atb=props.atb,unitKeys=props.unitKeys,ht=props.h||320;
+  var atb=props.atb,unitKeys=props.unitKeys,ht=props.h||320,jp=props.jp||null;
   var unitLabels=UNITS.filter(function(u){return unitKeys.indexOf(u.key)>=0;});
   var win=buildWindow();
   var pvLast=lastPrevLabel(win); // last prev-year label for shading
@@ -231,6 +231,10 @@ function ChartByATB(props){
           tickFormatter:function(v){return v.toFixed(0);}}),
         h(RCTip,{content:makeTip()}),
         h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:SLATE,paddingTop:8}}),
+        // Joinpoint reference line — only when stats available
+        jp&&jp.jp_lbl!=null?h(RefLine,{x:jp.jp_lbl,yAxisId:'left',
+          stroke:'#ff7043',strokeDasharray:'4 3',strokeWidth:1.5,
+          label:{value:'JP',fill:'#ff7043',fontSize:8,position:'insideTopRight'}}):null,
         bars[0]||null, bars[1]||null, bars[2]||null,
         bars[3]||null, bars[4]||null, bars[5]||null,
         // Single continuous trend line across full window
@@ -412,6 +416,32 @@ function Heatmap(props){
   );
 }
 
+
+// ── MKBadge — Mann-Kendall result badge ───────────────────────────────────────
+function MKBadge(props){
+  var mk=props.mk; // {tau, Z, p_value, tendencia, sig}
+  if(!mk||mk.tau==null) return null;
+  var up=mk.tau>0, sig=mk.sig||mk.p_value<0.05, marginal=mk.p_value<0.10;
+  var col=up?(sig?'#c62828':(marginal?'#e65100':'#78909c'))
+            :(sig?'#2e7d32':(marginal?'#388e3c':'#78909c'));
+  var bg =up?(sig?'#ffebee':(marginal?'#fff3e0':'#f5f6f7'))
+            :(sig?'#e8f5e9':(marginal?'#f1f8e9':'#f5f6f7'));
+  var bdr=up?(sig?'#ef9a9a':(marginal?'#ffcc80':'#cfd8dc'))
+            :(sig?'#a5d6a7':(marginal?'#c5e1a5':'#cfd8dc'));
+  var arrow=up?'↑':'↓';
+  var star=sig?'*':(marginal?'+':'');
+  return h('span',{title:'Mann-Kendall: τ='+mk.tau+' p='+mk.p_value,
+    style:{display:'inline-flex',alignItems:'center',gap:4,
+      fontSize:10,fontFamily:"'IBM Plex Mono',monospace",fontWeight:500,
+      padding:'2px 7px',borderRadius:4,background:bg,
+      color:col,border:'1px solid '+bdr,whiteSpace:'nowrap'}},
+    h('span',{style:{fontSize:12}},arrow),
+    mk.tendencia+star,
+    h('span',{style:{opacity:0.65,fontSize:9}},
+      ' τ='+mk.tau+(sig?' p='+mk.p_value:''))
+  );
+}
+
 // ── Pill button ───────────────────────────────────────────────────────────────
 function Pill(props){
   var a=props.active,col=props.color||'#1565c0';
@@ -466,8 +496,15 @@ function App(){
   var as=useState('cbp');   var selATB=as[0],setSelATB=as[1];
   var us=useState('utiab'); var selUnit=us[0],setSelUnit=us[1];
   var ps=useState('2026');  var periodo=ps[0],setPeriodo=ps[1];
+  var SS=useState(null);    var STATS=SS[0],setStats=SS[1];
 
   useEffect(function(){
+    // Fetch stats JSON in parallel — graceful fallback if not present
+    fetch('./husf_stats_output.json?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(s){setStats(s);})
+      .catch(function(){});
+
     fetch('./data_iras.json?t='+Date.now())
       .then(function(r){return r.json();})
       .then(function(d){
@@ -547,14 +584,41 @@ function App(){
 
   var content;
   switch(view){
-    case 'byAtb':
+    case 'byAtb':{
+      // Gather MK badges from stats for all units
+      var mkAll={};
+      if(STATS&&STATS.dot_mensal_por_par){
+        Object.keys(STATS.dot_mensal_por_par).forEach(function(k){
+          var parts=k.split('_'); // e.g. 'cbp_utiab'
+          if(parts[0]===selATB) mkAll[parts[1]]=STATS.dot_mensal_por_par[k].mann_kendall;
+        });
+      }
+      // Joinpoint for selected ATB (using first unit with a JP as reference)
+      var jpInfo=null;
+      if(STATS&&STATS.dot_mensal_por_par){
+        var jpKey=selATB+'_utiab';
+        var jpData=STATS.dot_mensal_por_par[jpKey];
+        if(jpData&&jpData.joinpoint&&jpData.joinpoint.jp_lbl!=null) jpInfo=jpData.joinpoint;
+      }
       content=h('div',{className:'fi'},
         h(Card,{},
           secHead(atbMeta.label+' — DOT/1000 pac-dia por Unidade',
             'Barras agrupadas · cada cor = uma unidade'),
-          h(ChartByATB,{atb:atbMeta,unitKeys:allKeys,h:340})
+          // MK badges row — only when stats available
+          Object.keys(mkAll).length>0?h('div',{style:{display:'flex',gap:6,
+            flexWrap:'wrap',marginBottom:10}},
+            Object.keys(mkAll).map(function(uk){
+              var u=UNITS.find(function(x){return x.key===uk;})||{label:uk};
+              return h('div',{key:uk,style:{display:'flex',alignItems:'center',gap:5,
+                fontSize:10,color:SLATE}},
+                h('span',{style:{color:MUTED}},u.label+':'),
+                h(MKBadge,{mk:mkAll[uk]})
+              );
+            })
+          ):null,
+          h(ChartByATB,{atb:atbMeta,unitKeys:allKeys,h:340,jp:jpInfo})
         )
-      ); break;
+      ); break;}
 
     case 'byUnit':
       content=h('div',{className:'fi'},
