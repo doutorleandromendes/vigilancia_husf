@@ -12,7 +12,7 @@
   ::-webkit-scrollbar{width:4px;height:4px}
   ::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes pulse-cs{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0)}50%{box-shadow:0 0 0 4px rgba(198,40,40,0.18)}}
+  @keyframes pulseCs{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0)}50%{box-shadow:0 0 0 5px rgba(198,40,40,0.18)}}
   .fi{animation:fadeIn .18s ease-out}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
   .pulse{animation:pulse 2.2s ease-in-out infinite}
@@ -390,90 +390,122 @@ function SurveillanceCards(props){
 }
 
 
-// ── CusumPill — CUSUM status indicator ────────────────────────────────────────
-// props: unit (e.g.'utiAB'), org (e.g.'kpc'), label, stats
+// ── CusumPill ─────────────────────────────────────────────────────────────────
+// props: unit='utiAB'|'utic', org='kpc'|'esbl'|'acin', stats=STATS
 function CusumPill(props){
-  var cs=props.stats&&props.stats.cusum&&props.stats.cusum[props.unit]&&
-         props.stats.cusum[props.unit][props.org];
+  var cs = props.stats && props.stats.cusum &&
+           props.stats.cusum[props.unit] &&
+           props.stats.cusum[props.unit][props.org];
   if(!cs) return null;
-  var s_arr=cs.S||[]; var s_last=s_arr.length?s_arr[s_arr.length-1]:0;
-  var h_val=cs.h||1; var pct=Math.min(s_last/h_val,1)*100;
-  var alarme=cs.alarme||s_last>=h_val;
-  var warn=!alarme&&pct>=50;
-  var col=alarme?'#c62828':(warn?'#e65100':'#2e7d32');
-  var bg =alarme?'#ffebee':(warn?'#fff8e1':'#f1f8e9');
-  var bdr=alarme?'#ef9a9a':(warn?'#ffca28':'#aed581');
-  var tooltip='CUSUM: S='+s_last.toFixed(2)+' / h='+h_val.toFixed(2)+
-              '\nPhase 1: μ='+cs.mu0+' σ='+cs.sigma0+
-              '\nStatus: '+(alarme?'ALARME':warn?'Atenção':'Sob controle');
-  return h('div',{title:tooltip,style:{display:'inline-flex',alignItems:'center',gap:5,
-    padding:'3px 7px',borderRadius:12,border:'1px solid '+bdr,background:bg,
-    fontSize:10,fontWeight:500,color:col,marginTop:5,cursor:'default',
-    animation:alarme?'pulse-cs 2s ease-in-out infinite':'none'}},
-    h('div',{style:{width:6,height:6,borderRadius:'50%',background:col,flexShrink:0}}),
-    'S='+s_last.toFixed(1),
-    h('div',{style:{width:36,height:4,background:'rgba(0,0,0,0.12)',borderRadius:2,overflow:'hidden',marginLeft:2}},
-      h('div',{style:{width:pct+'%',height:'100%',background:col,borderRadius:2,
-        transition:'width 0.4s'}})),
-    alarme?h('span',{style:{marginLeft:2}},'⚠'):null
+  // cs.S pode ser scalar 0 (auto_unbox) ou array
+  var sArr = Array.isArray(cs.S) ? cs.S : (cs.S != null ? [cs.S] : []);
+  var sLast = sArr.length ? sArr[sArr.length-1] : 0;
+  var hVal  = cs.h || 1;
+  var pct   = Math.min(sLast / hVal, 1) * 100;
+  var alarm = cs.alarme === true || sLast >= hVal;
+  var warn  = !alarm && pct >= 50;
+  var col = alarm ? RED  : warn ? AMBER : GREEN;
+  var bg  = alarm ? '#ffebee' : warn ? '#fff8e1' : '#f1f8e9';
+  var bdr = alarm ? '#ef9a9a' : warn ? '#ffca28' : '#aed581';
+  var tip = 'CUSUM: S=' + sLast.toFixed(2) + ' / h=' + hVal.toFixed(2) +
+            '\nmu0=' + cs.mu0 + '  s0=' + cs.s0 +
+            '\n' + (alarm ? 'ALARME' : warn ? 'Atenção' : 'Sob controle');
+  return h('div', {title: tip, style: {
+    display:'inline-flex', alignItems:'center', gap:5,
+    padding:'3px 8px', borderRadius:12, border:'1px solid '+bdr,
+    background:bg, color:col, fontSize:10, fontWeight:500,
+    cursor:'default',
+    animation: alarm ? 'pulseCs 2s ease-in-out infinite' : 'none'
+  }},
+    h('div', {style:{width:6,height:6,borderRadius:'50%',background:col,flexShrink:0}}),
+    'S=' + sLast.toFixed(1),
+    h('div', {style:{width:36,height:4,background:'rgba(0,0,0,0.12)',
+        borderRadius:2,overflow:'hidden',marginLeft:2}},
+      h('div', {style:{width: pct+'%', height:'100%', background:col,
+          borderRadius:2, transition:'width 0.4s'}})
+    ),
+    alarm ? h('span', {}, ' ⚠') : null
   );
 }
 
-// ── TrendMDRTable — MDR monthly trend summary ──────────────────────────────────
+// ── TrendMDRTable ──────────────────────────────────────────────────────────────
+// props: unit='utiAB'|'utic', stats=STATS
+// Renderiza abaixo do grid LineMDR+BarS (não dentro dele)
+// Chaves JSON: mk.p (não p_value), mk.sig, jp.jp_lbl
 function TrendMDRTable(props){
-  var stats=props.stats,unit=props.unit;
-  if(!stats||!stats.mdr_mensal) return null;
-  var orgs=[
-    {k:unit+'_kpc', label:'KPC',          col:RED},
-    {k:unit+'_esbl',label:'ESBL',         col:GREEN},
-    {k:unit+'_acin',label:'Acinetobacter',col:BLUE},
+  var stats = props.stats, unit = props.unit;
+  if(!stats || !stats.mdr_mensal) return null;
+  var orgs = [
+    {k: unit+'_kpc',  label:'KPC',          col:RED},
+    {k: unit+'_esbl', label:'ESBL',          col:GREEN},
+    {k: unit+'_acin', label:'Acinetobacter', col:BLUE}
   ];
-  var rows=orgs.map(function(o){
-    var d=stats.mdr_mensal[o.k];
-    if(!d||!d.mann_kendall||d.mann_kendall.tau==null) return null;
-    var mk=d.mann_kendall, jp=d.joinpoint;
-    var up=mk.tau>0, sig=mk.p_value<0.05, marginal=mk.p_value<0.10;
-    var arrowCol=up?(sig?RED:(marginal?AMBER:MUTED)):(sig?GREEN:(marginal?'#388e3c':MUTED));
-    var star=sig?'*':(marginal?'+':'');
-    var cs=stats.cusum&&stats.cusum[unit]&&stats.cusum[unit][o.k.split('_')[1]];
-    var csS=cs&&cs.S&&cs.S.length?cs.S[cs.S.length-1]:null;
-    var csH=cs&&cs.h;
-    var csAlarme=cs&&cs.alarme;
-    return h('tr',{key:o.k,style:{borderBottom:'1px solid '+BRDR+'44'}},
-      h('td',{style:{padding:'5px 8px',fontWeight:600,color:o.col,fontSize:11}},o.label),
-      h('td',{style:{padding:'5px 8px',fontSize:11,fontFamily:"'IBM Plex Mono',monospace"}},
-        h('span',{style:{color:arrowCol,fontWeight:700,marginRight:2}},up?'↑':'↓'),
-        h('span',{style:{fontSize:9,color:arrowCol}},mk.tendencia+star)),
-      h('td',{style:{padding:'5px 8px',fontFamily:"'IBM Plex Mono',monospace",fontSize:10,color:SLATE}},
-        mk.tau.toFixed(3)),
-      h('td',{style:{padding:'5px 8px',fontFamily:"'IBM Plex Mono',monospace",fontSize:10,
-        color:sig?arrowCol:MUTED}},mk.p_value.toFixed(4)),
-      h('td',{style:{padding:'5px 8px',fontSize:10,color:SLATE}},
-        jp&&jp.jp_lbl!=null?h('span',{style:{background:'#fff3e0',color:'#e65100',
-          border:'1px solid #ffcc80',borderRadius:3,padding:'1px 5px',
-          fontFamily:"'IBM Plex Mono',monospace",fontSize:9}},
-          jp.jp_lbl+(jp.sb!=null?' ('+jp.sb.toFixed(2)+'→'+jp.sa.toFixed(2)+')':''))
-        :h('span',{style:{color:MUTED,fontSize:9}},'—')),
-      h('td',{style:{padding:'5px 8px'}},
-        csS!=null?h('span',{style:{
-          fontSize:10,fontFamily:"'IBM Plex Mono',monospace",
-          color:csAlarme?RED:(csS/csH>0.5?AMBER:GREEN),fontWeight:500}},
-          'S='+csS.toFixed(1)+(csAlarme?' ⚠':''))
-        :h('span',{style:{color:MUTED,fontSize:9}},'—'))
+  var rows = orgs.map(function(o){
+    var d  = stats.mdr_mensal[o.k];
+    if(!d || !d.mann_kendall || d.mann_kendall.tau == null) return null;
+    var mk = d.mann_kendall;
+    var jp = d.joinpoint || {};
+    var up  = mk.tau > 0;
+    var sig = mk.sig === true;           // exportado como booleano pelo R
+    var mp  = mk.p != null ? mk.p : 1;  // chave JSON é 'p', não 'p_value'
+    var marginal = mp < 0.10;
+    var aC = up ? (sig ? RED : (marginal ? AMBER : MUTED))
+                : (sig ? GREEN : (marginal ? '#388e3c' : MUTED));
+    var star = sig ? '*' : (marginal ? '+' : '');
+    var cs   = stats.cusum && stats.cusum[unit] &&
+               stats.cusum[unit][o.k.split('_')[1]];
+    var sArr = cs ? (Array.isArray(cs.S) ? cs.S : (cs.S != null ? [cs.S] : [])) : [];
+    var sLast = sArr.length ? sArr[sArr.length-1] : null;
+    var alarm = cs && (cs.alarme === true || (sLast != null && sLast >= cs.h));
+    // Joinpoint label — exportado como índice; só mostrar se não-null e not {}
+    var jpLbl = jp.jp_lbl != null && typeof jp.jp_lbl !== 'object'
+                ? String(jp.jp_lbl) : null;
+    return h('tr', {key:o.k, style:{borderBottom:'1px solid '+BRDR+'44'}},
+      h('td', {style:{padding:'5px 8px', fontWeight:600, color:o.col, fontSize:11}}, o.label),
+      h('td', {style:{padding:'5px 8px', fontSize:11}},
+        h('span', {style:{color:aC, fontWeight:700, marginRight:2}}, up ? '↑' : '↓'),
+        h('span', {style:{fontSize:9, color:aC}}, mk.tendencia + star)
+      ),
+      h('td', {style:{padding:'5px 8px', fontFamily:"'IBM Plex Mono',monospace",
+          fontSize:10, color:SLATE}}, mk.tau.toFixed(3)),
+      h('td', {style:{padding:'5px 8px', fontFamily:"'IBM Plex Mono',monospace",
+          fontSize:10, color: sig ? aC : MUTED}}, mp.toFixed(4)),
+      h('td', {style:{padding:'5px 8px', fontSize:10}},
+        jpLbl
+          ? h('span', {style:{background:'#fff3e0', color:AMBER,
+              border:'1px solid #ffcc80', borderRadius:3,
+              padding:'1px 5px', fontFamily:"'IBM Plex Mono',monospace",
+              fontSize:9}}, jpLbl)
+          : h('span', {style:{color:MUTED, fontSize:9}}, '—')
+      ),
+      h('td', {style:{padding:'5px 8px'}},
+        sLast != null
+          ? h('span', {style:{fontSize:10, fontFamily:"'IBM Plex Mono',monospace",
+              fontWeight:500,
+              color: alarm ? RED : (sLast / (cs.h||1) > 0.5 ? AMBER : GREEN)}},
+              'S=' + sLast.toFixed(1) + (alarm ? ' ⚠' : ''))
+          : h('span', {style:{color:MUTED, fontSize:9}}, '—')
+      )
     );
   }).filter(Boolean);
+
   if(!rows.length) return null;
-  return h('div',{style:{marginTop:10}},
-    h('div',{style:{fontSize:9,color:SLATE,fontWeight:600,marginBottom:5,
-      textTransform:'uppercase',letterSpacing:'0.05em'}},'Tendências MDR — Mann-Kendall mensal'),
-    h('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:11}},
-      h('thead',{},h('tr',{style:{borderBottom:'2px solid '+BRDR}},
-        ['Organismo','Tendência','τ','p','Joinpoint','CUSUM'].map(function(th){
-          return h('th',{key:th,style:{padding:'4px 8px',textAlign:'left',fontSize:9,
-            fontWeight:600,color:MUTED,textTransform:'uppercase',letterSpacing:'0.05em'}},th);
-        })
-      )),
-      h('tbody',{},rows)
+  return h('div', {style:{marginTop:8, background:'#fafbfc',
+      border:'1px solid '+BRDR, borderRadius:6, padding:'8px 12px'}},
+    h('div', {style:{fontSize:9, color:SLATE, fontWeight:600, marginBottom:6,
+        textTransform:'uppercase', letterSpacing:'0.05em'}},
+      'Tendências MDR — Mann-Kendall mensal'),
+    h('table', {style:{width:'100%', borderCollapse:'collapse', fontSize:11}},
+      h('thead', {},
+        h('tr', {style:{borderBottom:'2px solid '+BRDR}},
+          ['Organismo','Tendência','τ','p','Joinpoint','CUSUM'].map(function(th){
+            return h('th', {key:th, style:{padding:'4px 8px', textAlign:'left',
+              fontSize:9, fontWeight:600, color:MUTED,
+              textTransform:'uppercase', letterSpacing:'0.05em'}}, th);
+          })
+        )
+      ),
+      h('tbody', {}, rows)
     )
   );
 }
@@ -517,7 +549,7 @@ function OverviewSection(props){
 
 function UtiSection(props){
   var D=props.D,ud=D[props.u],stats=props.stats||null;
-  var unitStatKey=props.u; // 'utiAB' or 'utic'
+  var uKey=props.u;
   return h('div',{className:'fi'},
     h(LimLegenda),
     h(SH,{t:'IrAS — Densidade (/1000 dispositivo-dia)'}),
@@ -540,31 +572,33 @@ function UtiSection(props){
       h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200})
     ),
     h(SH,{t:'MDR · Clopper-Pearson'}),
-    // CUSUM status pills — only when stats available
-    stats&&stats.cusum&&stats.cusum[unitStatKey]?h('div',{style:{display:'flex',
-      gap:12,flexWrap:'wrap',marginBottom:8,padding:'8px 12px',
-      background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
-      boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
-      h('div',{style:{fontSize:9,color:MUTED,fontWeight:600,
-        textTransform:'uppercase',letterSpacing:'0.06em',
-        display:'flex',alignItems:'center',marginRight:4}},'CUSUM:'),
-      ['kpc','esbl','acin'].map(function(org){
-        var lbl={kpc:'KPC',esbl:'ESBL',acin:'Acinetobacter'}[org];
-        return h('div',{key:org,style:{display:'flex',alignItems:'center',gap:4}},
-          h('span',{style:{fontSize:9,color:SLATE}}),
-          h('span',{style:{fontSize:9,fontWeight:600,
-            color:{kpc:RED,esbl:GREEN,acin:BLUE}[org],marginRight:2}},lbl),
-          h(CusumPill,{unit:unitStatKey,org:org,stats:stats})
-        );
-      })
-    ):null,
-    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:10}},
-      h('div',{},
-        h(LineMDR,{title:'MDR — Densidade (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
-        h(TrendMDRTable,{stats:stats,unit:unitStatKey})
-      ),
+    // CUSUM strip — só quando stats disponível
+    (stats && stats.cusum && stats.cusum[uKey])
+      ? h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',
+            marginBottom:8,padding:'6px 12px',
+            background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
+            boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+          h('span',{style:{fontSize:9,color:MUTED,fontWeight:600,
+            textTransform:'uppercase',letterSpacing:'0.06em',marginRight:4}},'CUSUM:'),
+          h('div',{style:{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}},
+            ['kpc','esbl','acin'].map(function(org){
+              var lbl={kpc:'KPC',esbl:'ESBL',acin:'Acinetobacter'}[org];
+              var orgCol={kpc:RED,esbl:GREEN,acin:BLUE}[org];
+              return h('div',{key:org,style:{display:'flex',alignItems:'center',gap:4}},
+                h('span',{style:{fontSize:9,fontWeight:600,color:orgCol}},lbl),
+                h(CusumPill,{unit:uKey,org:org,stats:stats})
+              );
+            })
+          )
+        )
+      : null,
+    // Grid original preservado intacto
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:4}},
+      h(LineMDR,{title:'MDR — Densidade (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
       h(BarS,{title:'Higiene das Mãos (ml/pac-dia)',data:ud.hm,refY:20,refLbl:'OMS',unit:'ml',maxY:80,h:175,note:'OMS ≥ 20 ml/pac-dia'})
     ),
+    // TrendMDRTable abaixo do grid — não interfere com layout
+    h(TrendMDRTable,{stats:stats,unit:uKey}),
     h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
       (function(){
@@ -970,7 +1004,6 @@ function App(){
 
   useEffect(function(){
     setD(FB); setLoading(false);
-    // Fetch stats in parallel — graceful fallback if not present
     fetch('./husf_stats_output.json?t='+Date.now())
       .then(function(r){return r.json();})
       .then(function(s){setStats(s);})
