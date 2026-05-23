@@ -12,11 +12,31 @@
   ::-webkit-scrollbar{width:4px;height:4px}
   ::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes pulseCs{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0)}50%{box-shadow:0 0 0 5px rgba(198,40,40,0.18)}}
   .fi{animation:fadeIn .18s ease-out}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
   .pulse{animation:pulse 2.2s ease-in-out infinite}
   button{cursor:pointer}
+  .help-btn{background:none;border:none;padding:0;font-size:13px;color:#b0bac8;
+    cursor:pointer;line-height:1;vertical-align:middle;margin-left:3px;
+    transition:color .15s;font-family:inherit;}
+  .help-btn:hover,.help-btn.active{color:#1a2744;}
+  .sahe-pop{position:absolute;bottom:calc(100% + 8px);left:0;z-index:300;
+    width:220px;background:#1c2b44;color:#dde6f0;border-radius:9px;
+    padding:13px 15px 12px;box-shadow:0 10px 28px rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,.06);display:none;pointer-events:none;}
+  .sahe-pop.right{left:auto;right:0;}
+  .sahe-pop.open{display:block;animation:spIn .14s ease;}
+  @keyframes spIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+  .sahe-pop::after{content:'';position:absolute;top:100%;left:16px;
+    border:6px solid transparent;border-top-color:#1c2b44;}
+  .sahe-pop.right::after{left:auto;right:16px;}
+  .sp-title{font-size:8.5px;font-weight:700;color:#6da8e8;text-transform:uppercase;
+    letter-spacing:.7px;margin-bottom:5px;font-family:'IBM Plex Sans',sans-serif;}
+  .sp-body{font-size:10px;line-height:1.6;color:#c2d4ea;
+    font-family:'IBM Plex Sans',sans-serif;}
+  .sp-tip{margin-top:7px;padding:6px 9px;background:rgba(109,168,232,.1);
+    border-radius:5px;border-left:2px solid #4a90d9;font-size:9px;
+    color:#8bb8e0;line-height:1.5;font-family:'IBM Plex Sans',sans-serif;}
 </style>
 </head>
 <body>
@@ -39,6 +59,27 @@ var NAVY='#1a2744', SLATE='#4a5568', LIGHT='#6b7280';
 var BLUE='#1565c0', RED='#c62828', GREEN='#2e7d32', AMBER='#e65100', PURPLE='#4527a0', TEAL='#00695c';
 var HIST='#9eaab8', CURR=BLUE;
 var GRID='#e2e6ea';
+// ── SAHE global ───────────────────────────────────────────────────────────────
+var SAHE=null;
+// ── Textos dos popovers por zona/significância ────────────────────────────────
+var SAHE_TXT={
+  pct:{
+    endemica:{b:'O valor deste mês está dentro da faixa historicamente esperada para a UTI — compatível com o comportamento normal da unidade.',t:'Zona endêmica: situação sob controle. Manter as práticas atuais de prevenção.'},
+    baixa:   {b:'O valor está abaixo da mediana histórica, um resultado favorável. Pode refletir melhora real ou período de menor demanda.',t:'Zona baixa (abaixo de P25): bom sinal. Vale registrar o que foi feito de diferente.'},
+    alerta:  {b:'O valor está na zona de atenção — acima de 75% dos meses anteriores, mas ainda abaixo do limite crítico.',t:'Zona de alerta (P75–P90): monitorar de perto. Se mantiver nessa faixa no próximo mês, investigar causa.'},
+    epidemica:{b:'O valor supera 90% de todos os meses registrados desde 2022. Situação incomum que exige investigação ativa — não esperar o próximo mês.',t:'Zona epidêmica (acima de P90): acionar protocolo de investigação imediatamente.'},
+    abaixo:  {b:'O valor está abaixo do mínimo historicamente esperado. Pode ser um resultado excelente — mas vale verificar se houve sub-notificação.',t:'Abaixo de P10: investigar se todos os eventos foram notificados.'}
+  },
+  poi:{
+    sig:{b:'A elevação observada é estatisticamente improvável de ocorrer pela simples variação normal. Há evidência de que algo real pode ter mudado na unidade.',t:'p < 0,05: não descartar como acaso. Investigar causa junto à equipe.'},
+    ns: {b:'A variação deste mês é compatível com a flutuação normal esperada. Não há evidência estatística de que algo mudou de verdade.',t:'p ≥ 0,05: variação esperada pelo acaso. Observar no próximo mês antes de agir.'}
+  },
+  mk:{
+    up:{b:'A análise dos últimos meses detectou tendência real de aumento — não é oscilação aleatória. O indicador está subindo de forma consistente.',t:'Tendência crescente confirmada: sem intervenção, o indicador continuará subindo. Rever processos estruturais.'},
+    dn:{b:'A análise confirma tendência real de redução ao longo dos meses. O indicador está melhorando de forma consistente.',t:'Tendência decrescente confirmada: manter e documentar as intervenções que geraram essa melhora.'},
+    ns:{b:'Não há tendência estatisticamente detectável. O indicador oscila sem direção definida ao longo dos meses — situação estável.',t:'Sem tendência: comportamento estável. Monitorar mensalmente.'}
+  }
+};
 
 // ── Recharts ──────────────────────────────────────────────────────────────────
 var RC=Recharts;
@@ -142,40 +183,207 @@ function makeTip(unit){
   };
 }
 
-// ── BarS with per-point thresholds ────────────────────────────────────────────
+// ── BarS — canal endêmico SAHE + strip mensal interativo ─────────────────────
 function BarS(props){
   var data=props.data,title=props.title,unit=props.unit||'';
   var badge=props.badge,maxY=props.maxY,refY=props.refY,refLbl=props.refLbl;
-  var ht=props.h||160,note=props.note;
-  var hasLim=data.some(function(d){return d.lMin!=null||d.lMax!=null;});
+  var ht=props.h||160,note=props.note,sahe=props.sahe||null;
+  var hasLim=!sahe&&data.some(function(d){return d.lMin!=null||d.lMax!=null;});
 
-  return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
-    padding:'14px 14px 8px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
-    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}},
+  // Mês corrente (c:1) como seleção padrão
+  var defPt=null;
+  data.forEach(function(d){if(d.c)defPt=d.p;});
+  if(!defPt&&data.length)defPt=data[data.length-1].p;
+
+  var stRef=useState({sel:defPt,pop:null});
+  var st=stRef[0],setSt=stRef[1];
+  var selPt=st.sel,openPop=st.pop;
+  function tPop(k){setSt(function(s){return{sel:s.sel,pop:s.pop===k?null:k};});}
+  function selBar(p){setSt(function(s){return{sel:p,pop:null};});}
+
+  // Dados SAHE do mês selecionado
+  var sm=sahe&&sahe.meses&&selPt?sahe.meses[selPt]:null;
+  var zona=sm?sm.zona:null;
+  var ZS={
+    epidemica:{bg:'#ffebee',c:'#c62828',b:'#c6282833',l:'epidêmica'},
+    alerta:   {bg:'#fff8e1',c:'#e65100',b:'#e6510033',l:'alerta'},
+    endemica: {bg:'#e8f5e9',c:'#2e7d32',b:'#2e7d3233',l:'endêmica'},
+    baixa:    {bg:'#e8f5e9',c:'#2e7d32',b:'#2e7d3233',l:'zona baixa'},
+    abaixo:   {bg:'#e3f2fd',c:'#1565c0',b:'#1565c033',l:'abaixo esperado'}
+  };
+  var zs=zona&&ZS[zona]?ZS[zona]:null;
+
+  // Badge de zona (substitui badge manual quando SAHE)
+  var badgeEl=zs
+    ?h('span',{style:{background:zs.bg,color:zs.c,fontSize:8,fontWeight:700,
+        letterSpacing:.4,padding:'3px 8px',borderRadius:20,
+        border:'1px solid '+zs.b,whiteSpace:'nowrap'}},
+        zs.l+(sm&&sm.pct!=null?' · P'+sm.pct:''))
+    :badge?h('span',{style:{background:'#e8f5e9',color:GREEN,fontSize:8,fontWeight:600,
+        letterSpacing:.5,padding:'2px 7px',borderRadius:4,
+        border:'1px solid '+GREEN+'44',whiteSpace:'nowrap'}},badge):null;
+
+  // Badge MK (só quando p<0.05)
+  var mkEl=null;
+  if(sahe&&sahe.mk_p!=null&&sahe.mk_p<0.05){
+    var up=sahe.mk_dir>0;
+    mkEl=h('span',{style:{fontSize:7.5,fontWeight:700,padding:'2px 6px',borderRadius:20,
+      marginLeft:4,background:up?'#ffebee':'#e8f5e9',
+      color:up?'#c62828':'#1b5e20',
+      border:'1px solid '+(up?'#c6282833':'#2e7d3233'),whiteSpace:'nowrap'}},
+      up?'↑ tendência crescente':'↓ tendência decrescente');
+  }
+
+  // Cor da barra atual conforme zona
+  var currColor=CURR;
+  if(zona==='epidemica')currColor='#c62828';
+  else if(zona==='alerta')currColor='#e65100';
+
+  // Popover helper
+  function Pop(key,isRight){
+    var txt=null;
+    if(key==='pct'&&sm){var z=sm.zona||'endemica';txt=SAHE_TXT.pct[z]||SAHE_TXT.pct.endemica;}
+    if(key==='poi'&&sm){txt=sm.p_poi!=null&&sm.p_poi<0.05?SAHE_TXT.poi.sig:SAHE_TXT.poi.ns;}
+    if(key==='mk'&&sahe){
+      var dir=sahe.mk_p!=null&&sahe.mk_p<0.05?(sahe.mk_dir>0?'up':'dn'):'ns';
+      txt=SAHE_TXT.mk[dir];
+    }
+    if(!txt)return null;
+    var cls='sahe-pop'+(openPop===key?' open':'')+(isRight?' right':'');
+    return h('div',{className:cls,style:{pointerEvents:'none'}},
+      h('div',{className:'sp-title'},
+        key==='pct'?'Posição histórica':key==='poi'?'A variação foi por acaso?':'A situação está melhorando ou piorando?'),
+      h('div',{className:'sp-body'},txt.b),
+      h('div',{className:'sp-tip'},txt.t)
+    );
+  }
+
+  // Strip estatístico
+  var stripEl=null;
+  if(sahe){
+    function fmtP(v){if(v==null)return'—';if(v<0.001)return'<0,001';return String(v).replace('.',',');}
+    var sig=sm&&sm.p_poi!=null&&sm.p_poi<0.05;
+    var mkSig=sahe.mk_p!=null&&sahe.mk_p<0.05;
+    var mkDir=sahe.mk_dir>0?'+':'';
+    var sigC='#c62828',okC='#1b5e20',neuC='#1a2744';
+    var pctC=zona==='epidemica'?sigC:zona==='alerta'?'#b85000':okC;
+
+    function Cell3(label,popKey,val,sub,vc,isRight){
+      return h('div',{style:{padding:'8px 11px 9px',position:'relative',
+          flex:1,borderRight:isRight?'none':'1px solid #f0f2f5',
+          cursor:'default'},
+          onMouseLeave:function(){setSt(function(s){return{sel:s.sel,pop:null};});}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:4,marginBottom:3}},
+          h('span',{style:{fontSize:7,fontWeight:600,color:'#9eaab8',
+            textTransform:'uppercase',letterSpacing:.6,
+            fontFamily:"'IBM Plex Mono',monospace"}},label),
+          h('button',{className:'help-btn'+(openPop===popKey?' active':''),
+            onClick:function(e){e.stopPropagation();tPop(popKey);},'aria-label':'Saiba mais'},'ⓘ')
+        ),
+        h('div',{style:{fontSize:12,fontWeight:700,
+          fontFamily:"'IBM Plex Mono',monospace",color:vc,lineHeight:1.2}},val),
+        h('div',{style:{fontSize:7,color:'#9eaab8',
+          fontFamily:"'IBM Plex Mono',monospace",marginTop:2}},sub),
+        Pop(popKey,isRight)
+      );
+    }
+
+    stripEl=h('div',{style:{display:'flex',borderTop:'1px solid #f0f2f5'}},
+      Cell3('Posição histórica','pct',
+        sm&&sm.pct!=null?'P'+sm.pct:'—',
+        sahe.p10!=null?'P10='+sahe.p10+' · P90='+sahe.p90:'',
+        pctC,false),
+      Cell3('Por acaso?','poi',
+        sm&&sm.p_poi!=null?'p = '+fmtP(sm.p_poi)+(sig?' ✱':''):'—',
+        sig?'improvável por acaso':'variação esperada',
+        sig?sigC:okC,false),
+      Cell3('Tendência','mk',
+        sahe.mk_tau!=null?(mkDir+sahe.mk_tau):'—',
+        'Sen='+(sahe.sen!=null?(sahe.sen>0?'+':'')+sahe.sen:' —')+'/mês · p='+fmtP(sahe.mk_p),
+        mkSig?sigC:neuC,true)
+    );
+
+    // Indicador do mês selecionado (quando não é o corrente)
+    var currPtP=defPt;
+    if(selPt&&selPt!==currPtP){
+      stripEl=h('div',null,
+        h('div',{style:{padding:'3px 11px',background:'#f0f4f8',fontSize:7.5,
+          color:'#4a5568',fontFamily:"'IBM Plex Mono',monospace",
+          borderTop:'1px solid #e8eaed'}},
+          '← mostrando '+selPt+' · clique em outra barra ou na barra atual para alternar'),
+        stripEl
+      );
+    }
+  }
+
+  // Margem direita maior p/ labels do canal
+  var chartMargin={top:4,right:sahe?50:4,left:-28,bottom:0};
+
+  return h('div',{style:{background:WHITE,
+    border:'1px solid '+(zona==='epidemica'?'#e57373':BRDR),
+    borderRadius:8,padding:'14px 14px 0',
+    boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',
+      alignItems:'flex-start',marginBottom:8}},
       h('span',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
-        color:NAVY,maxWidth:'75%',lineHeight:1.35}},title),
-      badge?h('span',{style:{background:'#e8f5e9',color:GREEN,fontSize:8,fontWeight:600,
-        letterSpacing:.5,padding:'2px 7px',borderRadius:4,border:'1px solid '+GREEN+'44',
-        whiteSpace:'nowrap'}},badge):null
+        color:NAVY,maxWidth:'75%',lineHeight:1.35}},title,mkEl),
+      badgeEl
     ),
     h(RCont,{width:'100%',height:ht},
-      h(ComposedChart,{data:data,margin:{top:4,right:4,left:-28,bottom:0}},
+      h(ComposedChart,{data:data,margin:chartMargin,
+          onClick:function(e){if(e&&e.activePayload&&e.activePayload.length)
+            selBar(e.activePayload[0].payload.p);}},
         h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
-        h(XAxis,{dataKey:'p',tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
-        h(YAxis,{tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,domain:[0,maxY||'auto']}),
+        h(XAxis,{dataKey:'p',tick:{fill:LIGHT,fontSize:8,
+          fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{tick:{fill:LIGHT,fontSize:8,
+          fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,
+          domain:[0,maxY||'auto']}),
         h(RCTip,{content:makeTip(unit)}),
+        // ── Canal SAHE ──────────────────────────────────────────────────────
+        sahe&&sahe.p90!=null?h(RefArea,{y1:sahe.p90,
+          y2:maxY||(sahe.p90*1.6),fill:'#ffebee',fillOpacity:.4,ifOverflow:'visible'}):null,
+        sahe&&sahe.p75!=null?h(RefArea,{y1:sahe.p75,y2:sahe.p90,
+          fill:'#fff8e1',fillOpacity:.5}):null,
+        sahe&&sahe.p90!=null?h(RefLine,{y:sahe.p90,stroke:'#c62828',
+          strokeDasharray:'5 3',strokeWidth:1.1,opacity:.7,
+          label:{value:'P90',position:'right',fill:'#c62828',fontSize:6}}):null,
+        sahe&&sahe.p75!=null?h(RefLine,{y:sahe.p75,stroke:AMBER,
+          strokeDasharray:'4 3',strokeWidth:1,opacity:.65,
+          label:{value:'P75',position:'right',fill:AMBER,fontSize:6}}):null,
+        sahe&&sahe.p50!=null?h(RefLine,{y:sahe.p50,stroke:HIST,
+          strokeDasharray:'3 2',strokeWidth:1.2,
+          label:{value:'P50',position:'right',fill:HIST,fontSize:6}}):null,
+        sahe&&sahe.p10!=null?h(RefLine,{y:sahe.p10,stroke:GREEN,
+          strokeDasharray:'4 3',strokeWidth:1,opacity:.65,
+          label:{value:'P10',position:'right',fill:GREEN,fontSize:6}}):null,
+        // ── Ref manual (fallback) ────────────────────────────────────────────
         refY!=null?h(RefLine,{y:refY,stroke:AMBER,strokeDasharray:'4 2',strokeWidth:1,
           label:{value:refLbl||'',fill:AMBER,fontSize:7,position:'insideTopRight'}}):null,
-        h(Bar,{dataKey:'v',radius:[3,3,0,0]},
-          data.map(function(d,i){return h(Cell,{key:i,fill:d.c?CURR:HIST,opacity:d.c?1:.7});})),
+        // ── Barras ──────────────────────────────────────────────────────────
+        h(Bar,{dataKey:'v',radius:[3,3,0,0],style:{cursor:sahe?'pointer':'default'}},
+          data.map(function(d,i){
+            var isCurr=d.c;
+            var isSel=selPt&&d.p===selPt;
+            var fill=isCurr?currColor:HIST;
+            var op=isCurr?1:isSel?.85:.7;
+            return h(Cell,{key:i,fill:fill,opacity:op,
+              strokeWidth:isSel&&!isCurr?1.5:0,
+              stroke:isSel&&!isCurr?'#1a2744':'none'});
+          })),
+        // ── lMin/lMax manuais (fallback sem SAHE) ───────────────────────────
         hasLim?h(Line,{type:'linear',dataKey:'lMax',stroke:RED,strokeDasharray:'5 3',
           strokeWidth:1.5,dot:false,connectNulls:false,legendType:'none'}):null,
         hasLim?h(Line,{type:'linear',dataKey:'lMin',stroke:GREEN,strokeDasharray:'5 3',
           strokeWidth:1.5,dot:false,connectNulls:false,legendType:'none'}):null
       )
     ),
-    note?h('div',{style:{fontSize:8,color:MUTED,marginTop:3,
-      fontFamily:"'IBM Plex Mono',monospace"}},note):null
+    stripEl,
+    note?h('div',{style:{fontSize:8,color:MUTED,padding:'4px 0 8px',
+      fontFamily:"'IBM Plex Mono',monospace"}},note):null,
+    sahe?h('div',{style:{fontSize:7,color:'#b0bac8',padding:'0 0 7px',
+      fontFamily:"'IBM Plex Mono',monospace"}},
+      'Ref: '+sahe.ref_inicio+' – '+sahe.ref_fim+' · bootstrap n=3000'):null
   );
 }
 
@@ -243,7 +451,23 @@ function SH(props){
     props.t);
 }
 
-// ── LimLegenda ────────────────────────────────────────────────────────────────
+// ── SaheLegenda ───────────────────────────────────────────────────────────────
+function SaheLegenda(){
+  function sq(bg,bd){return h('span',{style:{display:'inline-block',width:12,height:8,
+    borderRadius:2,background:bg,border:'1px solid '+bd,marginRight:4}});}
+  function ln(c){return h('span',{style:{display:'inline-block',width:16,height:0,
+    borderTop:'1.5px dashed '+c,marginRight:4,verticalAlign:'middle'}});}
+  return h('div',{style:{display:'flex',gap:14,padding:'6px 12px',background:'#f8f9fa',
+    borderRadius:6,border:'1px solid '+BRDR,marginBottom:12,fontSize:8,
+    color:MUTED,alignItems:'center',flexWrap:'wrap'}},
+    h('span',{style:{color:SLATE,fontWeight:600}},'Canal endêmico pós-COVID:'),
+    h('span',{style:{display:'flex',alignItems:'center'}},sq('#ffebee','#c6282833'),'epidêmica (>P90)'),
+    h('span',{style:{display:'flex',alignItems:'center'}},sq('#fff8e1','#e6510033'),'alerta (P75–P90)'),
+    h('span',{style:{display:'flex',alignItems:'center'}},ln(HIST),'P50 mediana'),
+    h('span',{style:{fontStyle:'italic',color:'#b0bac8'}},'Clique em uma barra para ver o mês')
+  );
+}
+// ── LimLegenda (mantida para unidades sem SAHE) ───────────────────────────────
 function LimLegenda(){
   return h('div',{style:{display:'flex',gap:14,padding:'6px 12px',background:'#f8f9fa',
     borderRadius:6,border:'1px solid '+BRDR,marginBottom:12,fontSize:8,
@@ -389,127 +613,6 @@ function SurveillanceCards(props){
   );
 }
 
-
-// ── CusumPill ─────────────────────────────────────────────────────────────────
-// props: unit='utiAB'|'utic', org='kpc'|'esbl'|'acin', stats=STATS
-function CusumPill(props){
-  var cs = props.stats && props.stats.cusum &&
-           props.stats.cusum[props.unit] &&
-           props.stats.cusum[props.unit][props.org];
-  if(!cs) return null;
-  // cs.S pode ser scalar 0 (auto_unbox) ou array
-  var sArr = Array.isArray(cs.S) ? cs.S : (cs.S != null ? [cs.S] : []);
-  var sLast = sArr.length ? sArr[sArr.length-1] : 0;
-  var hVal  = cs.h || 1;
-  var pct   = Math.min(sLast / hVal, 1) * 100;
-  var alarm = cs.alarme === true || sLast >= hVal;
-  var warn  = !alarm && pct >= 50;
-  var col = alarm ? RED  : warn ? AMBER : GREEN;
-  var bg  = alarm ? '#ffebee' : warn ? '#fff8e1' : '#f1f8e9';
-  var bdr = alarm ? '#ef9a9a' : warn ? '#ffca28' : '#aed581';
-  var tip = 'CUSUM: S=' + sLast.toFixed(2) + ' / h=' + hVal.toFixed(2) +
-            '\nmu0=' + cs.mu0 + '  s0=' + cs.s0 +
-            '\n' + (alarm ? 'ALARME' : warn ? 'Atenção' : 'Sob controle');
-  return h('div', {title: tip, style: {
-    display:'inline-flex', alignItems:'center', gap:5,
-    padding:'3px 8px', borderRadius:12, border:'1px solid '+bdr,
-    background:bg, color:col, fontSize:10, fontWeight:500,
-    cursor:'default',
-    animation: alarm ? 'pulseCs 2s ease-in-out infinite' : 'none'
-  }},
-    h('div', {style:{width:6,height:6,borderRadius:'50%',background:col,flexShrink:0}}),
-    'S=' + sLast.toFixed(1),
-    h('div', {style:{width:36,height:4,background:'rgba(0,0,0,0.12)',
-        borderRadius:2,overflow:'hidden',marginLeft:2}},
-      h('div', {style:{width: pct+'%', height:'100%', background:col,
-          borderRadius:2, transition:'width 0.4s'}})
-    ),
-    alarm ? h('span', {}, ' ⚠') : null
-  );
-}
-
-// ── TrendMDRTable ──────────────────────────────────────────────────────────────
-// props: unit='utiAB'|'utic', stats=STATS
-// Renderiza abaixo do grid LineMDR+BarS (não dentro dele)
-// Chaves JSON: mk.p (não p_value), mk.sig, jp.jp_lbl
-function TrendMDRTable(props){
-  var stats = props.stats, unit = props.unit;
-  if(!stats || !stats.mdr_mensal) return null;
-  var orgs = [
-    {k: unit+'_kpc',  label:'KPC',          col:RED},
-    {k: unit+'_esbl', label:'ESBL',          col:GREEN},
-    {k: unit+'_acin', label:'Acinetobacter', col:BLUE}
-  ];
-  var rows = orgs.map(function(o){
-    var d  = stats.mdr_mensal[o.k];
-    if(!d || !d.mann_kendall || d.mann_kendall.tau == null) return null;
-    var mk = d.mann_kendall;
-    var jp = d.joinpoint || {};
-    var up  = mk.tau > 0;
-    var sig = mk.sig === true;           // exportado como booleano pelo R
-    var mp  = mk.p != null ? mk.p : 1;  // chave JSON é 'p', não 'p_value'
-    var marginal = mp < 0.10;
-    var aC = up ? (sig ? RED : (marginal ? AMBER : MUTED))
-                : (sig ? GREEN : (marginal ? '#388e3c' : MUTED));
-    var star = sig ? '*' : (marginal ? '+' : '');
-    var cs   = stats.cusum && stats.cusum[unit] &&
-               stats.cusum[unit][o.k.split('_')[1]];
-    var sArr = cs ? (Array.isArray(cs.S) ? cs.S : (cs.S != null ? [cs.S] : [])) : [];
-    var sLast = sArr.length ? sArr[sArr.length-1] : null;
-    var alarm = cs && (cs.alarme === true || (sLast != null && sLast >= cs.h));
-    // Joinpoint label — exportado como índice; só mostrar se não-null e not {}
-    var jpLbl = jp.jp_lbl != null && typeof jp.jp_lbl !== 'object'
-                ? String(jp.jp_lbl) : null;
-    return h('tr', {key:o.k, style:{borderBottom:'1px solid '+BRDR+'44'}},
-      h('td', {style:{padding:'5px 8px', fontWeight:600, color:o.col, fontSize:11}}, o.label),
-      h('td', {style:{padding:'5px 8px', fontSize:11}},
-        h('span', {style:{color:aC, fontWeight:700, marginRight:2}}, up ? '↑' : '↓'),
-        h('span', {style:{fontSize:9, color:aC}}, mk.tendencia + star)
-      ),
-      h('td', {style:{padding:'5px 8px', fontFamily:"'IBM Plex Mono',monospace",
-          fontSize:10, color:SLATE}}, mk.tau.toFixed(3)),
-      h('td', {style:{padding:'5px 8px', fontFamily:"'IBM Plex Mono',monospace",
-          fontSize:10, color: sig ? aC : MUTED}}, mp.toFixed(4)),
-      h('td', {style:{padding:'5px 8px', fontSize:10}},
-        jpLbl
-          ? h('span', {style:{background:'#fff3e0', color:AMBER,
-              border:'1px solid #ffcc80', borderRadius:3,
-              padding:'1px 5px', fontFamily:"'IBM Plex Mono',monospace",
-              fontSize:9}}, jpLbl)
-          : h('span', {style:{color:MUTED, fontSize:9}}, '—')
-      ),
-      h('td', {style:{padding:'5px 8px'}},
-        sLast != null
-          ? h('span', {style:{fontSize:10, fontFamily:"'IBM Plex Mono',monospace",
-              fontWeight:500,
-              color: alarm ? RED : (sLast / (cs.h||1) > 0.5 ? AMBER : GREEN)}},
-              'S=' + sLast.toFixed(1) + (alarm ? ' ⚠' : ''))
-          : h('span', {style:{color:MUTED, fontSize:9}}, '—')
-      )
-    );
-  }).filter(Boolean);
-
-  if(!rows.length) return null;
-  return h('div', {style:{marginTop:8, background:'#fafbfc',
-      border:'1px solid '+BRDR, borderRadius:6, padding:'8px 12px'}},
-    h('div', {style:{fontSize:9, color:SLATE, fontWeight:600, marginBottom:6,
-        textTransform:'uppercase', letterSpacing:'0.05em'}},
-      'Tendências MDR — Mann-Kendall mensal'),
-    h('table', {style:{width:'100%', borderCollapse:'collapse', fontSize:11}},
-      h('thead', {},
-        h('tr', {style:{borderBottom:'2px solid '+BRDR}},
-          ['Organismo','Tendência','τ','p','Joinpoint','CUSUM'].map(function(th){
-            return h('th', {key:th, style:{padding:'4px 8px', textAlign:'left',
-              fontSize:9, fontWeight:600, color:MUTED,
-              textTransform:'uppercase', letterSpacing:'0.05em'}}, th);
-          })
-        )
-      ),
-      h('tbody', {}, rows)
-    )
-  );
-}
-
 function OverviewSection(props){
   var D=props.D;
   var curr=D.global.taxaIH.filter(function(d){return d.c;})[0];
@@ -548,20 +651,26 @@ function OverviewSection(props){
 }
 
 function UtiSection(props){
-  var D=props.D,ud=D[props.u],stats=props.stats||null;
-  var uKey=props.u;
+  var D=props.D,ud=D[props.u];
+  // SAHE: disponível para utiAB e utic
+  var saheKey={'utiAB':'utiAB','utic':'utic'}[props.u]||null;
+  var s=saheKey&&SAHE&&SAHE[saheKey]?SAHE[saheKey]:null;
+  function sp(k){
+    if(!s||!s[k])return null;
+    return Object.assign({},s[k],{ref_inicio:s.ref_inicio,ref_fim:s.ref_fim});
+  }
   return h('div',{className:'fi'},
-    h(LimLegenda),
+    s?h(SaheLegenda):h(LimLegenda),
     h(SH,{t:'IrAS — Densidade (/1000 dispositivo-dia)'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
-      h(BarS,{title:'PAV (/1000 VM-dia)',data:ud.pav,maxY:35}),
+      h(BarS,{title:'PAV (/1000 VM-dia)',data:ud.pav,maxY:35,sahe:sp('pav')}),
       h(BarS,{title:'ITU Relacionada a SVD (/1000 SVD-dia)',data:ud.itu,maxY:14}),
-      h(BarS,{title:'IPCS Laboratorial — CVC (/1000 CVC-dia)',data:ud.ipcs,maxY:40})
+      h(BarS,{title:'IPCS Laboratorial — CVC (/1000 CVC-dia)',data:ud.ipcs,maxY:40,sahe:sp('ipcs')})
     ),
     h(SH,{t:'Utilização de Dispositivos (%)'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
-      h(BarS,{title:'SVD',data:ud.svd,unit:'%',maxY:100}),
-      h(BarS,{title:'CVC',data:ud.cvc,unit:'%',maxY:100}),
+      h(BarS,{title:'SVD',data:ud.svd,unit:'%',maxY:100,sahe:sp('svd')}),
+      h(BarS,{title:'CVC',data:ud.cvc,unit:'%',maxY:100,sahe:sp('cvc')}),
       h(BarS,{title:'TOT / TQT',data:ud.tot,unit:'%',maxY:100})
     ),
     h(SH,{t:'Consumo de Antimicrobianos (DDD/1000 pac-dia)'}),
@@ -572,33 +681,10 @@ function UtiSection(props){
       h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200})
     ),
     h(SH,{t:'MDR · Clopper-Pearson'}),
-    // CUSUM strip — só quando stats disponível
-    (stats && stats.cusum && stats.cusum[uKey])
-      ? h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',
-            marginBottom:8,padding:'6px 12px',
-            background:WHITE,border:'1px solid '+BRDR,borderRadius:6,
-            boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
-          h('span',{style:{fontSize:9,color:MUTED,fontWeight:600,
-            textTransform:'uppercase',letterSpacing:'0.06em',marginRight:4}},'CUSUM:'),
-          h('div',{style:{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}},
-            ['kpc','esbl','acin'].map(function(org){
-              var lbl={kpc:'KPC',esbl:'ESBL',acin:'Acinetobacter'}[org];
-              var orgCol={kpc:RED,esbl:GREEN,acin:BLUE}[org];
-              return h('div',{key:org,style:{display:'flex',alignItems:'center',gap:4}},
-                h('span',{style:{fontSize:9,fontWeight:600,color:orgCol}},lbl),
-                h(CusumPill,{unit:uKey,org:org,stats:stats})
-              );
-            })
-          )
-        )
-      : null,
-    // Grid original preservado intacto
-    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:4}},
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:10}},
       h(LineMDR,{title:'MDR — Densidade (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
       h(BarS,{title:'Higiene das Mãos (ml/pac-dia)',data:ud.hm,refY:20,refLbl:'OMS',unit:'ml',maxY:80,h:175,note:'OMS ≥ 20 ml/pac-dia'})
     ),
-    // TrendMDRTable abaixo do grid — não interfere com layout
-    h(TrendMDRTable,{stats:stats,unit:uKey}),
     h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
       (function(){
@@ -637,10 +723,14 @@ function UtiNeoSection(props){
   var D=props.D,neo=D.utiNeo;
   var auditData=(neo.auditSeries||[]).map(function(a){return {p:a.p,v:a.pct};});
   var lastAudit=neo.auditSeries?neo.auditSeries[neo.auditSeries.length-1]:neo.audit;
+  var neoS=SAHE&&SAHE.utiNeo?SAHE.utiNeo:null;
+  var neoIpcsSahe=neoS&&neoS.ipcs
+    ?Object.assign({},neoS.ipcs,{ref_inicio:neoS.ref_inicio,ref_fim:neoS.ref_fim})
+    :null;
   return h('div',{className:'fi'},
-    h(LimLegenda),
+    neoIpcsSahe?h(SaheLegenda):h(LimLegenda),
     h(SH,{t:'IrAS — IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)'}),
-    h(BarS,{title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',data:neo.ipcs,maxY:55,h:220}),
+    h(BarS,{title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',data:neo.ipcs,maxY:55,h:220,sahe:neoIpcsSahe}),
     h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
       auditData.length>0?h(BarS,{title:'% Não-conformes por Mês',data:auditData,unit:'%',maxY:100,h:180}):null,
@@ -1000,13 +1090,13 @@ function App(){
   var s1=useState('overview'); var active=s1[0],setActive=s1[1];
   var s2=useState(null);       var D=s2[0],setD=s2[1];
   var s3=useState(true);       var loading=s3[0],setLoading=s3[1];
-  var s4=useState(null);       var STATS=s4[0],setStats=s4[1];
 
   useEffect(function(){
     setD(FB); setLoading(false);
-    fetch('./husf_stats_output.json?t='+Date.now())
-      .then(function(r){return r.json();})
-      .then(function(s){setStats(s);})
+    // Carrega data_sahe.json (canal endêmico estatístico)
+    fetch('./data_sahe.json?t='+Date.now())
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){if(d){SAHE=d;}})
       .catch(function(){});
     fetch('./data_iras.json?t='+Date.now())
       .then(function(r){return r.json();})
@@ -1191,8 +1281,8 @@ function App(){
       case 'overview':         return h(OverviewSection,{D:D});
       case 'mdrInst':          return h(MdrInstSection,{D:D});
       case 'abio':             return h(AbioSection,{D:D});
-      case 'utiAB':            return h(UtiSection,{D:D,u:'utiAB',stats:STATS});
-      case 'utic':             return h(UtiSection,{D:D,u:'utic',stats:STATS});
+      case 'utiAB':            return h(UtiSection,{D:D,u:'utiAB'});
+      case 'utic':             return h(UtiSection,{D:D,u:'utic'});
       case 'utiNeo':           return h(UtiNeoSection,{D:D});
       case 'hd':               return h(HdSection,{D:D});
       case 'clinicaMedica':    return h(ClinicaSection,{D:D,which:'clinicaMedica'});

@@ -277,11 +277,47 @@
     <div class="cp-meta" id="cp-meta"></div>
   </div>
 </div>
-
+<div id="aviso-manutencao" style="
+  display: none;
+  background: #fef2f2;
+  border-bottom: 2px solid #fca5a5;
+  padding: 14px 20px;
+  text-align: center;
+">
+  <div style="max-width:560px; margin:0 auto;">
+    <div style="font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:2px; color:#b91c1c; margin-bottom:4px;">FERRAMENTA SUSPENSA</div>
+    <p style="font-size:12px; color:#7f1d1d; font-family:Georgia,serif; line-height:1.6;">
+      Esta ferramenta está em manutenção conforme questionamentos levantados e ficará suspensa temporariamente.
+    </p>
+  </div>
+</div>
 <main>
 
+  <!-- STEP 0: ORIGIN SCREENING -->
+  <div class="section" id="sec-origin">
+    <div class="step-label">Passo 0 · Elegibilidade</div>
+    <div class="step-q">Trata-se de suspeita de infecção hospitalar adquirida no HUSF?</div>
+    <div class="source-btns" style="grid-template-columns: 1fr 1fr;">
+      <button class="source-btn" id="btn-origin-sim" onclick="selectOrigin(true)">
+        ✓ &nbsp;Sim — infecção hospitalar<br>adquirida no HUSF
+      </button>
+      <button class="source-btn" id="btn-origin-nao" onclick="selectOrigin(false)">
+        ✕ &nbsp;Não — infecção comunitária<br>ou adquirida em outro serviço
+      </button>
+    </div>
+    <div id="origin-warn" class="hidden" style="margin-top:14px; background:var(--amber-bg); border:1px solid var(--amber-border); border-left:4px solid #d97706; border-radius:8px; padding:14px 16px;">
+      <div style="font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:2px; color:var(--amber); margin-bottom:5px;">FERRAMENTA NÃO INDICADA</div>
+      <p style="font-size:12px; color:#78350f; line-height:1.65; font-family:Georgia,serif;">
+        Esta ferramenta orienta esquemas empíricos com base na ecologia local do HUSF.<br>
+        Para infecções comunitárias ou adquiridas em outros serviços, consulte a Infectologia diretamente — a ecologia pode ser substancialmente diferente.
+      </p>
+    </div>
+  </div>
+
+  <hr class="divider" id="div-origin" style="display:none;">
+
   <!-- STEP 1: SOFA -->
-  <div class="section" id="sec-sofa">
+  <div class="section hidden" id="sec-sofa">
     <div class="step-label">Passo 1 · Risco · Gravidade</div>
     <div class="step-q">Qual o SOFA atual do paciente?</div>
     <div class="sofa-grid">
@@ -343,6 +379,53 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- 30-DAY CHECK (SOFA ≥9 + swab negativo últimos 7d) -->
+    <div id="sec-swab30" class="hidden">
+      <div class="source-card" style="margin-top:14px; border-color: var(--red-border); background: var(--red-bg);">
+        <div class="source-q" style="color: var(--red); font-size:13px;">
+          ⚠ SOFA ≥ 9 — há resultado de vigilância identificando MDR nos <strong>últimos 30 dias</strong>?
+          <div style="font-size:11px; font-weight:400; color:var(--text-sec); margin-top:4px; font-style:italic;">
+            Paciente de alto risco sem resultado recente: avaliar histórico 30 dias
+          </div>
+        </div>
+        <div class="swab-options" id="swab30-opts" style="margin-top:8px;">
+
+          <div class="swab-opt" id="opt30-none" onclick="selectSwab30('none')">
+            <div class="radio-circle"><div class="radio-dot"></div></div>
+            <div class="swab-opt-text">
+              <div class="swab-opt-main">Não — apenas negativos nos últimos 30 dias</div>
+              <div class="swab-opt-sub">Ou sem resultado disponível nos últimos 30 dias</div>
+            </div>
+          </div>
+
+          <div class="swab-opt" id="opt30-esbl" onclick="selectSwab30('pos_ESBL')">
+            <div class="radio-circle"><div class="radio-dot"></div></div>
+            <div class="swab-opt-text">
+              <div class="swab-opt-main">Sim — ESBL nos últimos 30 dias</div>
+              <div class="swab-opt-sub">Enterobacterales produtor de ESBL</div>
+            </div>
+          </div>
+
+          <div class="swab-opt" id="opt30-kpc" onclick="selectSwab30('pos_KPC')">
+            <div class="radio-circle"><div class="radio-dot"></div></div>
+            <div class="swab-opt-text">
+              <div class="swab-opt-main">Sim — EPC/KPC nos últimos 30 dias</div>
+              <div class="swab-opt-sub">Enterobacterales produtor de carbapenemase</div>
+            </div>
+          </div>
+
+          <div class="swab-opt" id="opt30-acin" onclick="selectSwab30('pos_Acineto')">
+            <div class="radio-circle"><div class="radio-dot"></div></div>
+            <div class="swab-opt-text">
+              <div class="swab-opt-main">Sim — Acinetobacter resistente nos últimos 30 dias</div>
+              <div class="swab-opt-sub">Acinetobacter resistente a carbapenêmicos</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
     <!-- Source question (shown when narrow coverage likely) -->
@@ -417,6 +500,7 @@
 
 <script>
 // ── CONFIGURATION ──────────────────────────────────────────────────────────────
+const MANUTENCAO = false; // true = ativa o aviso e bloqueia o formulário
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjrV3CoUDGpP9w3AkqH4Ia9lYpbvNvTl2WO16QwXRIzfutIjiAZQCOMoRVami9cTJ1/exec'; // substituir após deploy
 const CP_NEG      = 20;  // swab negativo: limiar de CP (%)
 const CP_ND_LOW   = 30;  // sem swab + SOFA <9: limiar
@@ -424,8 +508,10 @@ const CP_ND_HIGH  = 15;  // sem swab + SOFA ≥9: limiar
 // ────────────────────────────────────────────────────────────────────────────────
 
 let S = {
+  origin: null,
   sofa:   null,
   swabs:  new Set(),
+  swab30: new Set(),
   source: null,
   cp:     {}
 };
@@ -433,13 +519,13 @@ let S = {
 // ── CP FETCH ───────────────────────────────────────────────────────────────────
 // CP_DATA_START
 renderCP({
-  ESBL:    20.5,
-  KPC:     11.8,
-  Acineto: 6.6,
+  ESBL:    18.8,
+  KPC:     13.4,
+  Acineto: 15.4,
   MRSA:    null,
   dias:    15,
   referencia: '?',
-  atualizado: '01/05/2026'
+  atualizado: '16/05/2026'
 });
 // CP_DATA_END
 
@@ -462,6 +548,32 @@ function renderCP(data) {
     document.getElementById('cp-meta').textContent =
       `${data.dias} dias analisados · atualizado em ${data.atualizado}`;
 }
+// ── ORIGIN ─────────────────────────────────────────────────────────────────────
+function selectOrigin(val) {
+  S.origin = val;
+  document.getElementById('btn-origin-sim').classList.toggle('sel', val === true);
+  document.getElementById('btn-origin-nao').classList.toggle('sel', val === false);
+
+  const warn = document.getElementById('origin-warn');
+  const sofa = document.getElementById('sec-sofa');
+  const div  = document.getElementById('div-origin');
+
+  if (val === true) {
+    warn.classList.add('hidden');
+    sofa.classList.remove('hidden');
+    div.style.display = 'block';
+    sofa.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    warn.classList.remove('hidden');
+    sofa.classList.add('hidden');
+    div.style.display = 'none';
+    document.getElementById('sec-swab').classList.add('hidden');
+    document.getElementById('results').innerHTML = '';
+    document.getElementById('btn-reset').style.display = 'none';
+    document.getElementById('aviso-final').classList.add('hidden');
+  }
+}
+
 // ── SOFA ────────────────────────────────────────────────────────────────────────
 function selectSOFA(val) {
   S.sofa = val;
@@ -469,6 +581,7 @@ function selectSOFA(val) {
   document.getElementById('btn-sofa-high').className = 'sofa-btn' + (val === 'high' ? ' sel-high' : '');
   document.getElementById('sec-swab').classList.remove('hidden');
   document.getElementById('sec-swab').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  update30dBlockVisibility();
   recompute();
 }
 
@@ -480,11 +593,9 @@ function selectSwab(val) {
   const positivos  = ['pos_ESBL', 'pos_KPC', 'pos_Acineto', 'pos_MRSA'];
 
   if (exclusivos.includes(val)) {
-    // Negativo / Sem resultado: limpa tudo e seleciona só este
     S.swabs.clear();
     S.swabs.add(val);
   } else {
-    // Positivo: remove exclusivos, toggle o item clicado
     S.swabs.delete('negative');
     S.swabs.delete('no_result');
     if (S.swabs.has(val)) S.swabs.delete(val);
@@ -495,7 +606,6 @@ function selectSwab(val) {
   document.getElementById('src-sim').classList.remove('sel');
   document.getElementById('src-nao').classList.remove('sel');
 
-  // Atualiza visual de todos os itens
   Object.entries(SWAB_IDS).forEach(([key, id]) => {
     const el = document.getElementById(id);
     el.className = 'swab-opt';
@@ -506,8 +616,42 @@ function selectSwab(val) {
     }
   });
 
-  // Mostrar bloco MRSA assim que qualquer opção for selecionada
   document.getElementById('mrsa-block').classList.remove('hidden');
+  update30dBlockVisibility();
+  recompute();
+}
+
+// ── SWAB 30 DAYS ────────────────────────────────────────────────────────────────
+const SWAB30_IDS = { none: 'opt30-none', pos_ESBL: 'opt30-esbl', pos_KPC: 'opt30-kpc', pos_Acineto: 'opt30-acin' };
+
+function update30dBlockVisibility() {
+  const show = S.sofa === 'high' && S.swabs.has('no_result');
+  document.getElementById('sec-swab30').classList.toggle('hidden', !show);
+  if (!show && S.swab30.size > 0) {
+    S.swab30 = new Set();
+    Object.values(SWAB30_IDS).forEach(id => document.getElementById(id).className = 'swab-opt');
+  }
+}
+
+function selectSwab30(val) {
+  const exclusivos = ['none'];
+  if (exclusivos.includes(val)) {
+    S.swab30 = new Set();
+    S.swab30.add(val);
+  } else {
+    S.swab30.delete('none');
+    if (S.swab30.has(val)) S.swab30.delete(val);
+    else S.swab30.add(val);
+  }
+
+  Object.entries(SWAB30_IDS).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    el.className = 'swab-opt';
+    if (S.swab30.has(key)) {
+      if (key === 'none') el.classList.add('sel-neg');
+      else el.classList.add('sel-pos');
+    }
+  });
   recompute();
 }
 
@@ -523,24 +667,36 @@ function getGNDecision() {
   const { sofa, cp } = S;
   if (!sofa) return null;
 
-  // Positive swab → specific coverage
- const sw = S.swabs;
-if (!sw.size) return null;
+  const sw = S.swabs;
+  if (!sw.size) return null;
 
-const isNeg = sw.has('negative');
-const isND  = sw.has('no_result');
+  const isNeg = sw.has('negative');
+  const isND  = sw.has('no_result');
 
-if (sw.has('pos_Acineto')) return { type: 'specific', pathogen: 'Acinetobacter', regimen: 'ampsulb' };
-if (sw.has('pos_KPC'))     return { type: 'specific', pathogen: 'EPC/KPC',       regimen: 'poliB' };
-if (sw.has('pos_ESBL'))    return { type: 'specific', pathogen: 'ESBL',          regimen: 'meropenem' };
+  // Direct 7-day positive swabs → specific coverage (highest priority)
+  if (sw.has('pos_Acineto')) return { type: 'specific', pathogen: 'Acinetobacter', regimen: 'ampsulb' };
+  if (sw.has('pos_KPC'))     return { type: 'specific', pathogen: 'EPC/KPC',       regimen: 'poliB' };
+  if (sw.has('pos_ESBL'))    return { type: 'specific', pathogen: 'ESBL',          regimen: 'meropenem' };
+
+  // SOFA ≥9 + sem resultado últimos 7d → verificar histórico 30 dias
+  if (isND && sofa === 'high') {
+    if (S.swab30.size === 0) return null; // aguardando resposta do bloco 30d
+    if (!S.swab30.has('none')) {
+      // Há MDR nos últimos 30 dias → tratar como positivo (prioridade: Acineto > KPC > ESBL)
+      if (S.swab30.has('pos_Acineto')) return { type: 'specific_30d', pathogen: 'Acinetobacter', regimen: 'ampsulb' };
+      if (S.swab30.has('pos_KPC'))     return { type: 'specific_30d', pathogen: 'EPC/KPC',       regimen: 'poliB' };
+      if (S.swab30.has('pos_ESBL'))    return { type: 'specific_30d', pathogen: 'ESBL',          regimen: 'meropenem' };
+    }
+    // swab30 = 'none' → cai na lógica normal de sem resultado (CP threshold)
+  }
 
   // Determine CP threshold
   let threshold;
-if (isNeg) {
-  threshold = CP_NEG;
-} else {
-  threshold = sofa === 'low' ? CP_ND_LOW : CP_ND_HIGH;
-}
+  if (isNeg) {
+    threshold = CP_NEG;
+  } else {
+    threshold = sofa === 'low' ? CP_ND_LOW : CP_ND_HIGH;
+  }
 
   // CP checks — priority: Acineto > KPC > ESBL
   const cpA = cp?.Acineto, cpK = cp?.KPC, cpE = cp?.ESBL;
@@ -607,6 +763,7 @@ const REGIMENS = {
 
 // ── RENDER ─────────────────────────────────────────────────────────────────────
 function recompute() {
+  if (!S.origin) { document.getElementById('results').innerHTML = ''; return; }
   const gnDec   = getGNDecision();
   const mrsaDec = getMRSADecision();
   const hl = t => t.replace(/Obrigatório/g, '<span class="obrig">Obrigatório</span>');
@@ -636,7 +793,9 @@ function recompute() {
   // Reason text
   let gnReason = '';
   if (gnDec.type === 'specific') gnReason = `Swab positivo para ${gnDec.pathogen} — cobertura dirigida`;
-else if (gnDec.type === 'cp')  gnReason = `CP ${gnDec.pathogen}: ${gnDec.cp?.toFixed(1)}% ≥ ${gnDec.threshold}% · SOFA ${S.sofa === 'low' ? '<9' : '≥9'}`;  else if (gnDec.type === 'narrow') {
+  else if (gnDec.type === 'specific_30d') gnReason = `Sem resultado 7d · positivo para ${gnDec.pathogen} nos últimos 30d · SOFA ≥9 — cobertura dirigida`;
+  else if (gnDec.type === 'cp')  gnReason = `CP ${gnDec.pathogen}: ${gnDec.cp?.toFixed(1)}% ≥ ${gnDec.threshold}% · SOFA ${S.sofa === 'low' ? '<9' : '≥9'}`;
+  else if (gnDec.type === 'narrow') {
     const thr = gnDec.threshold;
     const parts = [];
     if (S.cp?.Acineto != null) parts.push(`Acineto ${S.cp.Acineto.toFixed(1)}%`);
@@ -703,21 +862,38 @@ else if (gnDec.type === 'cp')  gnReason = `CP ${gnDec.pathogen}: ${gnDec.cp?.toF
 
 // ── RESET ──────────────────────────────────────────────────────────────────────
 function resetForm() {
-  S = { sofa: null, swabs: new Set(), source: null, cp: S.cp };
+  S = { origin: null, sofa: null, swabs: new Set(), swab30: new Set(), source: null, cp: S.cp };
+
+  document.getElementById('btn-origin-sim').classList.remove('sel');
+  document.getElementById('btn-origin-nao').classList.remove('sel');
+  document.getElementById('origin-warn').classList.add('hidden');
+  document.getElementById('div-origin').style.display = 'none';
 
   document.getElementById('btn-sofa-low').className  = 'sofa-btn';
   document.getElementById('btn-sofa-high').className = 'sofa-btn';
+  document.getElementById('sec-sofa').classList.add('hidden');
   document.getElementById('sec-swab').classList.add('hidden');
+  document.getElementById('sec-swab30').classList.add('hidden');
   document.getElementById('source-block').classList.add('hidden');
   document.getElementById('results').innerHTML = '';
   document.getElementById('btn-reset').style.display = 'none';
   Object.values(SWAB_IDS).forEach(id => document.getElementById(id).className = 'swab-opt');
+  Object.values(SWAB30_IDS).forEach(id => document.getElementById(id).className = 'swab-opt');
   document.getElementById('src-sim').classList.remove('sel');
   document.getElementById('src-nao').classList.remove('sel');
   document.getElementById('mrsa-block').classList.add('hidden');
   document.querySelectorAll('#mrsa-checks input[type=checkbox]').forEach(c => c.checked = false);
   document.getElementById('aviso-final').classList.add('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+  // ── MANUTENÇÃO ─────────────────────────────────────────────────────────────────
+if (MANUTENCAO) {
+  document.getElementById('aviso-manutencao').style.display = 'block';
+  document.getElementById('sec-origin').style.opacity = '0.3';
+  document.getElementById('sec-origin').style.pointerEvents = 'none';
+  document.getElementById('sec-sofa').classList.add('hidden');
+  document.getElementById('sec-swab').classList.add('hidden');
 }
 </script>
 
