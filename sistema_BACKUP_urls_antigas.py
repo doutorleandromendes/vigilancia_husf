@@ -194,10 +194,10 @@ class BuscadorInfoGripeCompleto:
     def _tentar_urls_diretas(self):
         """Tenta URLs diretas conhecidas quando busca principal falha"""
         urls_diretas = [
-            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_19.pdf",
-            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_18.pdf",
-            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_17.pdf",
-            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_16.pdf"
+            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_14_0.pdf",
+            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_13_0.pdf",
+            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_12_0.pdf",
+            "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/Resumo_InfoGripe_2026_11_0.pdf"
         ]
         
         boletins = []

@@ -1,0 +1,55 @@
+2026-05-23 12:22:48,239 - INFO - 🚀 INICIANDO BUSCA AUTOMÁTICA COMPLETA...
+2026-05-23 12:22:48,239 - INFO - 🔍 Fase 1: Buscando boletins InfoGripe...
+2026-05-23 12:22:48,239 - INFO - 🌐 Buscando em: https://agencia.fiocruz.br
+2026-05-23 12:22:48,900 - INFO - 🌐 Buscando em: https://portal.fiocruz.br
+2026-05-23 12:22:49,651 - INFO - 🌐 Buscando em: https://fiocruz.br/noticias
+2026-05-23 12:22:50,229 - INFO - 🌐 Buscando em: https://agencia.fiocruz.br/noticias
+2026-05-23 12:22:50,783 - INFO - 📋 Total encontrado: 0 boletins únicos
+2026-05-23 12:22:50,784 - WARNING - ⚠️ Nenhum boletim encontrado - tentando URLs diretas...
+2026-05-23 12:22:50,934 - ERROR - ❌ Falha total na busca - usando dados emergência
+2026-05-23 12:22:50,935 - WARNING - 🚨 USANDO DADOS EMERGÊNCIA - SISTEMA OFFLINE
+🏥 ============================================================
+   SISTEMA VIGILÂNCIA AUTOMÁTICO - HUSF
+   🤖 FETCH + PARSER + VPN + ORIENTAÇÕES
+   Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH
+🏥 ============================================================
+
+🔍 BUSCANDO DADOS MAIS RECENTES...
+
+📊 DADOS OBTIDOS:
+   📈 SE: OFFLINE/2026
+   🔬 Método: Dados conservadores de emergência
+   📊 Casos SRAG: 30,000
+   📅 Período: Sistema offline
+
+📋 CALCULANDO VPNs...
+   🔬 COVID19: 10.0% → VPN 96.7%
+   🔬 INFLUENZA_A: 35.0% → VPN 82.7%
+   🔬 INFLUENZA_B: 3.0% → VPN 98.7%
+   🔬 VSR: 25.0% → VPN 92.2%
+   🔬 RINOVIRUS: 50.0% → VPN 66.2%
+   🔬 OUTROS: 2.0% → VPN 99.3%
+
+🎯 ORIENTAÇÕES CLÍNICAS:
+--------------------------------------------------
+✅ COVID19: VPN 96.7% → LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+❌ INFLUENZA_A: VPN 82.7% → RT-PCR RECOMENDADO
+✅ INFLUENZA_B: VPN 98.7% → LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+⚠️ VSR: VPN 92.2% → CAUTELA - AVALIAR CLINICAMENTE
+❌ RINOVIRUS: VPN 66.2% → RT-PCR RECOMENDADO
+✅ OUTROS: VPN 99.3% → LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+
+📱 GERANDO RELATÓRIO...
+
+✅ SISTEMA EXECUTADO COM SUCESSO!
+📄 Arquivo: web/index.html
+🌐 Publique: https://doutorleandromendes.github.io/vigilancia_husf/
+🤖 Sistema 100% automático - sempre dados atuais!
+
+📋 RESUMO ORIENTAÇÕES:
+
+🔥 ATENÇÃO ESPECIAL:
+   ❌ Influenza A requer RT-PCR (VPN 82.7%)
+   ⚠️ VSR em CAUTELA (VPN 92.2%)
+
+🤖 SISTEMA AUTOMÁTICO ATIVO - Sempre dados atuais!
