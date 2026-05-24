@@ -1,11 +1,8 @@
 name: 🏥 HUSF Vigilância Automática
 
 on:
-  # Executa a cada 15 dias às 08:00 UTC (05:00 BRT)
   schedule:
     - cron: '0 8 */15 * *'
-  
-  # Permite execução manual
   workflow_dispatch:
     inputs:
       force_update:
@@ -50,13 +47,11 @@ jobs:
       run: |
         python3 -c "
         import requests
-        from datetime import datetime, timedelta
+        from datetime import datetime
         
-        print('🔍 Buscando SE mais recente disponível...')
+        print('🔍 Buscando SE mais recente...')
         
-        # Calcular SE atual baseado na data
         hoje = datetime.now()
-        # SE 1 de 2026 começou aproximadamente em 5 de janeiro
         inicio_2026 = datetime(2026, 1, 5)
         dias_diferenca = (hoje - inicio_2026).days
         se_teorica = min(52, max(1, dias_diferenca // 7 + 1))
@@ -72,11 +67,8 @@ jobs:
         se_mais_recente = 0
         url_mais_recente = ''
         
-        # Testar SEs de atual até 10 semanas atrás
         for se in range(int(se_teorica), max(1, int(se_teorica) - 10), -1):
-            # Testar formato sem _0 (novo)
             url_novo = f'{base_url}Resumo_InfoGripe_2026_{se:02d}.pdf'
-            # Testar formato com _0 (antigo)  
             url_antigo = f'{base_url}Resumo_InfoGripe_2026_{se:02d}_0.pdf'
             
             for url in [url_novo, url_antigo]:
@@ -84,7 +76,7 @@ jobs:
                     response = session.head(url, timeout=10)
                     if response.status_code == 200:
                         content_length = int(response.headers.get('content-length', 0))
-                        if content_length > 50000:  # > 50KB
+                        if content_length > 50000:
                             se_mais_recente = se
                             url_mais_recente = url
                             print(f'✅ SE {se:02d} encontrada: {url}')
@@ -96,8 +88,7 @@ jobs:
                 break
         
         if se_mais_recente > 0:
-            print(f'🎯 SE mais recente disponível: {se_mais_recente}')
-            # Salvar para próximo step
+            print(f'🎯 SE mais recente: {se_mais_recente}')
             with open('latest_se.txt', 'w') as f:
                 f.write(f'{se_mais_recente}\\n{url_mais_recente}')
         else:
@@ -106,7 +97,7 @@ jobs:
                 f.write('0\\n')
         "
       
-    - name: 📊 Ler SE mais recente encontrada
+    - name: 📊 Ler SE mais recente
       id: read-latest
       run: |
         if [ -f "latest_se.txt" ]; then
@@ -120,7 +111,7 @@ jobs:
           echo "latest_url=" >> $GITHUB_OUTPUT
         fi
     
-    - name: 🤖 Executar atualização se necessário
+    - name: 🤖 Executar atualização
       if: steps.read-latest.outputs.latest_se > steps.check-current.outputs.current_se || github.event.inputs.force_update == 'true'
       run: |
         CURRENT_SE="${{ steps.check-current.outputs.current_se }}"
@@ -132,7 +123,6 @@ jobs:
         
         python3 -c "
         import requests
-        import json
         import re
         from datetime import datetime
         from io import BytesIO
@@ -145,9 +135,7 @@ jobs:
             subprocess.run([sys.executable, '-m', 'pip', 'install', 'pdfplumber'], check=True)
             import pdfplumber
         
-        def processar_se_automatico(se_num, url):
-            '''Processa SE automaticamente para GitHub Actions'''
-            
+        def processar_se(se_num, url):
             print(f'📥 Baixando SE {se_num}...')
             
             session = requests.Session()
@@ -160,56 +148,46 @@ jobs:
                 if response.status_code != 200:
                     raise Exception(f'HTTP {response.status_code}')
                 
-                print(f'✅ Download concluído: {len(response.content):,} bytes')
-                
-                # Extrair dados básicos do PDF
-                print('📄 Processando PDF...')
+                print(f'✅ Download: {len(response.content):,} bytes')
                 
                 with pdfplumber.open(BytesIO(response.content)) as pdf:
                     texto = ''
                     for pagina in pdf.pages:
                         texto_pagina = pagina.extract_text()
                         if texto_pagina:
-                            texto += texto_pagina + '\n'
+                            texto += texto_pagina + '\\n'
                 
                 print('🔍 Extraindo prevalências...')
                 
-                # Buscar prevalências nas 4 últimas semanas
                 prevalencias = {}
+                linhas = texto.split('\\n')
                 
-                # Padrões para encontrar dados
-                linhas = texto.split('\n')
                 for linha in linhas:
-                    if '4 últimas semanas' in linha.lower() or 'últimas semanas epidemiológicas' in linha.lower():
-                        # Procurar nas próximas linhas
+                    if '4 últimas semanas' in linha.lower():
                         idx = linhas.index(linha)
                         texto_relevante = ' '.join(linhas[idx:idx+5])
                         
-                        # Extrair percentuais
                         influenza_a = re.search(r'(\d+,?\d*?)%.*?[Ii]nfluenza A', texto_relevante)
                         influenza_b = re.search(r'(\d+,?\d*?)%.*?[Ii]nfluenza B', texto_relevante)  
-                        vsr = re.search(r'(\d+,?\d*?)%.*?v[íi]rus sincicial|sincicial.*?(\d+,?\d*?)%', texto_relevante)
-                        rinovirus = re.search(r'(\d+,?\d*?)%.*?[Rr]inov[íi]rus', texto_relevante)
-                        covid = re.search(r'(\d+,?\d*?)%.*?COVID|SARS-CoV-2.*?(\d+,?\d*?)%', texto_relevante)
+                        vsr = re.search(r'(\d+,?\d*?)%.*?sincicial', texto_relevante)
+                        rinovirus = re.search(r'(\d+,?\d*?)%.*?[Rr]inov', texto_relevante)
+                        covid = re.search(r'(\d+,?\d*?)%.*?COVID', texto_relevante)
                         
                         if influenza_a:
                             prevalencias['INFLUENZA_A'] = float(influenza_a.group(1).replace(',', '.')) / 100
                         if influenza_b:
                             prevalencias['INFLUENZA_B'] = float(influenza_b.group(1).replace(',', '.')) / 100
                         if vsr:
-                            val = vsr.group(1) or vsr.group(2)
-                            prevalencias['VSR'] = float(val.replace(',', '.')) / 100
+                            prevalencias['VSR'] = float(vsr.group(1).replace(',', '.')) / 100
                         if rinovirus:
                             prevalencias['RINOVIRUS'] = float(rinovirus.group(1).replace(',', '.')) / 100
                         if covid:
-                            val = covid.group(1) or covid.group(2) 
-                            prevalencias['COVID19'] = float(val.replace(',', '.')) / 100
+                            prevalencias['COVID19'] = float(covid.group(1).replace(',', '.')) / 100
                         
                         break
                 
-                # Usar dados padrão se não conseguir extrair
                 if not prevalencias:
-                    print('⚠️ Usando dados padrão - extração automática falhou')
+                    print('⚠️ Usando dados padrão')
                     prevalencias = {
                         'VSR': 0.40,
                         'INFLUENZA_A': 0.25,
@@ -219,24 +197,17 @@ jobs:
                         'OUTROS': 0.02
                     }
                 else:
-                    # Calcular 'outros' se não presente
                     total = sum(prevalencias.values())
                     if total < 0.95:
                         prevalencias['OUTROS'] = max(0.01, 1.0 - total)
-                    
-                    print('✅ Prevalências extraídas:')
-                    for k, v in prevalencias.items():
-                        print(f'   {k}: {v:.1%}')
                 
                 return prevalencias
                 
             except Exception as e:
-                print(f'❌ Erro no processamento: {e}')
+                print(f'❌ Erro: {e}')
                 return None
         
         def calcular_vpns(prevalencias):
-            '''Calcula VPNs baseado nas prevalências'''
-            
             sensibilidades = {
                 'COVID19': 0.70,
                 'INFLUENZA_A': 0.62,
@@ -262,15 +233,13 @@ jobs:
             
             return vpns
         
-        def gerar_html_automatico(se_num, prevalencias, vpns):
-            '''Gera HTML para deploy automático'''
-            
+        def gerar_html(se_num, vpns):
             html = f'''<!DOCTYPE html>
 <html lang=\"pt-BR\">
 <head>
     <meta charset=\"UTF-8\">
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-    <title>HUSF Vigilância SE {se_num}/2026 - Automático</title>
+    <title>HUSF Vigilância SE {se_num}/2026</title>
     <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">
     <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\" rel=\"stylesheet\">
     
@@ -338,14 +307,6 @@ jobs:
             margin-bottom: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }}
-        
-        .resumo-dados {{
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }}
     </style>
 </head>
 
@@ -353,23 +314,17 @@ jobs:
     <div class=\"container-fluid\">
         <div class=\"header-automatico\">
             <h1 style=\"margin: 0; font-size: 1.4rem;\">
-                <i class=\"fas fa-hospital\"></i> HUSF - Vigilância de SG/SRAG
+                HUSF - Vigilância de SG/SRAG
             </h1>
-            <small>Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</small>
+            <small>Dr. Leandro Mendes - SCIH</small>
         </div>
         
         <div class=\"alert alert-success\" style=\"margin: 10px 0; padding: 15px; border-radius: 10px;\">
-            <strong><i class=\"fas fa-robot\"></i> SISTEMA AUTOMÁTICO - SE {se_num}/2026</strong>
+            <strong>🤖 SISTEMA AUTOMÁTICO - SE {se_num}/2026</strong>
         </div>
         
-        <div class='alert alert-info'>
-            <strong><i class=\"fas fa-sync-alt\"></i> Automático:</strong> Atualização GitHub Actions a cada 15 dias
-        </div>
-        
-        <!-- ORIENTAÇÕES -->
         <div class=\"orientacoes\">'''
             
-            # Gerar cards para cada patógeno
             patogenos = [
                 ('COVID19', 'COVID-19'),
                 ('INFLUENZA_A', 'Influenza A'),
@@ -388,13 +343,13 @@ jobs:
                         vpn_class = \"vpn-verde\"
                         orientacao_class = \"orientacao-verde\"
                         icone = \"fas fa-check-circle\"
-                        orientacao = \"LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO\"
+                        orientacao = \"LIBERAR ISOLAMENTO\"
                     elif vpn >= 0.90:
                         card_class = \"cautela\"
                         vpn_class = \"vpn-amarelo\"
                         orientacao_class = \"orientacao-amarelo\"
                         icone = \"fas fa-exclamation-triangle\"
-                        orientacao = \"CAUTELA - AVALIAR CLINICAMENTE\"
+                        orientacao = \"CAUTELA\"
                     else:
                         card_class = \"rtpcr\"
                         vpn_class = \"vpn-vermelho\"
@@ -416,18 +371,9 @@ jobs:
             html += f'''
         </div>
         
-        <div class=\"resumo-dados\">
-            <h5 style=\"color: #2c3e50; margin-bottom: 15px;\">
-                <i class=\"fas fa-chart-area\"></i> Resumo SE {se_num}/2026
-            </h5>
-            <div style=\"margin-top: 15px; text-align: center; color: #6c757d; font-size: 0.8rem;\">
-                Atualização automática: {datetime.now().strftime('%d/%m/%Y %H:%M')} UTC
-            </div>
-        </div>
-        
         <div style=\"text-align: center; color: white; font-size: 0.7rem; margin: 15px 0;\">
-            <i class=\"fas fa-robot\"></i> GitHub Actions - SE {se_num}/2026<br>
-            Próxima atualização automática: ~15 dias
+            🤖 GitHub Actions - SE {se_num}/2026<br>
+            Atualizado: {datetime.now().strftime('%d/%m/%Y %H:%M')}
         </div>
     </div>
 </body>
@@ -435,30 +381,22 @@ jobs:
             
             return html
         
-        # EXECUÇÃO PRINCIPAL
         se_num = int('$LATEST_SE')
         url = '$LATEST_URL'
         
-        print(f'🤖 Processando SE {se_num} automaticamente...')
+        print(f'🤖 Processando SE {se_num}...')
         
-        prevalencias = processar_se_automatico(se_num, url)
+        prevalencias = processar_se(se_num, url)
         
         if prevalencias:
-            print('🧮 Calculando VPNs...')
             vpns = calcular_vpns(prevalencias)
+            html = gerar_html(se_num, vpns)
             
-            print('🎨 Gerando HTML...')
-            html = gerar_html_automatico(se_num, prevalencias, vpns)
-            
-            # Salvar HTML
             with open('index.html', 'w', encoding='utf-8') as f:
                 f.write(html)
             
-            print('✅ HTML gerado automaticamente!')
+            print('✅ HTML gerado!')
             
-            # Mostrar resumo
-            print('')
-            print('📊 RESUMO VPNs:')
             for patogeno, vpn in vpns.items():
                 status = '✅' if vpn >= 0.95 else '⚠️' if vpn >= 0.90 else '❌'
                 nome = {
@@ -471,11 +409,11 @@ jobs:
                 }.get(patogeno, patogeno)
                 print(f'   {status} {nome}: {vpn:.0%}')
         else:
-            print('❌ Falha no processamento automático')
+            print('❌ Falha no processamento')
             exit(1)
         "
         
-    - name: 📤 Commit e Push se houve mudanças
+    - name: 📤 Commit e Push
       if: steps.read-latest.outputs.latest_se > steps.check-current.outputs.current_se || github.event.inputs.force_update == 'true'
       run: |
         LATEST_SE="${{ steps.read-latest.outputs.latest_se }}"
@@ -486,42 +424,24 @@ jobs:
         git add index.html
         
         if git diff --staged --quiet; then
-          echo "📄 Nenhuma mudança detectada no HTML"
+          echo "📄 Nenhuma mudança"
         else
-          git commit -m "🤖 Vigilância HUSF - SE $LATEST_SE/2026 - Atualização automática $(date '+%d/%m/%Y %H:%M')"
+          git commit -m "🤖 SE $LATEST_SE/2026 - $(date '+%d/%m/%Y %H:%M')"
           git push origin main
-          echo "✅ Dados atualizados e publicados automaticamente!"
+          echo "✅ Atualização publicada!"
         fi
     
-    - name: 📊 Resumo da execução
+    - name: 📊 Resumo
       run: |
         CURRENT_SE="${{ steps.check-current.outputs.current_se }}"
         LATEST_SE="${{ steps.read-latest.outputs.latest_se }}"
         
-        echo "📋 RESUMO DA EXECUÇÃO:"
+        echo "📋 RESUMO:"
         echo "   SE anterior: $CURRENT_SE"
-        echo "   SE mais recente: $LATEST_SE" 
+        echo "   SE atual: $LATEST_SE" 
         
         if [ "$LATEST_SE" -gt "$CURRENT_SE" ]; then
           echo "   ✅ Sistema atualizado!"
-          echo "   🌐 Site: https://doutorleandromendes.github.io/vigilancia_husf/"
         else
-          echo "   ✅ Sistema já está atualizado"
+          echo "   ✅ Já atualizado"
         fi
-        
-        echo "   📅 Próxima execução: ~15 dias"
-
-# Notificações em caso de falha
-  notify-failure:
-    runs-on: ubuntu-latest
-    needs: atualizar-vigilancia
-    if: failure()
-    
-    steps:
-    - name: 📧 Notificar falha (placeholder)
-      run: |
-        echo "❌ Falha na execução automática da vigilância HUSF"
-        echo "🔍 Verificar logs em: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        
-        # Aqui você pode adicionar notificações por email, Slack, etc.
-        # Exemplo: curl para webhook, envio de email, etc.
