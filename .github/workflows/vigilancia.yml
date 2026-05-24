@@ -1,304 +1,281 @@
-name: 🏥 HUSF Vigilância Automática
+name: HUSF Vigilancia Automatica
 
 on:
   schedule:
-    - cron: '0 8 */15 * *'
+    - cron: "0 8 */15 * *"
   workflow_dispatch:
-    inputs:
-      force_update:
-        description: 'Forçar atualização mesmo se dados não mudaram'
-        required: false
-        default: 'false'
-        type: boolean
 
 jobs:
-  atualizar-vigilancia:
+  atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     
     steps:
-    - name: 🔄 Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
-    - name: 🐍 Setup Python
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: "3.11"
     
-    - name: 📦 Install dependencies
+    - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install requests beautifulsoup4 pdfplumber pandas numpy lxml
+        pip install requests pdfplumber beautifulsoup4
     
-    - name: 🔍 Verificar SE atual no sistema
+    - name: Check current SE
       id: check-current
       run: |
         if [ -f "index.html" ]; then
-          CURRENT_SE=$(grep -o "SE [0-9]\+/2026" index.html | head -1 | grep -o "[0-9]\+" || echo "0")
-          echo "current_se=$CURRENT_SE" >> $GITHUB_OUTPUT
-          echo "✅ SE atual: $CURRENT_SE"
+          CURRENT_SE=$(grep -o "SE [0-9]\+" index.html | head -1 | grep -o "[0-9]\+" || echo "0")
         else
-          echo "current_se=0" >> $GITHUB_OUTPUT
-          echo "⚠️ Arquivo index.html não encontrado"
+          CURRENT_SE="0"
         fi
+        echo "current_se=$CURRENT_SE" >> $GITHUB_OUTPUT
+        echo "Current SE: $CURRENT_SE"
     
-    - name: 🔍 Buscar SE mais recente disponível
-      id: check-latest
+    - name: Find latest SE
+      id: find-latest
       run: |
-        python3 -c "
+        python3 << 'SCRIPT_END'
         import requests
         from datetime import datetime
         
-        print('🔍 Buscando SE mais recente...')
-        
         hoje = datetime.now()
         inicio_2026 = datetime(2026, 1, 5)
-        dias_diferenca = (hoje - inicio_2026).days
-        se_teorica = min(52, max(1, dias_diferenca // 7 + 1))
+        dias = (hoje - inicio_2026).days
+        se_teorica = min(52, max(1, dias // 7 + 1))
         
-        print(f'📅 SE teórica atual: {se_teorica}')
+        base_url = "https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/"
         
-        base_url = 'https://agencia.fiocruz.br/sites/agencia.fiocruz.br/files/'
-        session = requests.Session()
-        session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (compatible; HUSF-Bot/1.0)'
-        })
-        
-        se_mais_recente = 0
-        url_mais_recente = ''
+        se_encontrada = 0
+        url_encontrada = ""
         
         for se in range(int(se_teorica), max(1, int(se_teorica) - 10), -1):
-            url_novo = f'{base_url}Resumo_InfoGripe_2026_{se:02d}.pdf'
-            url_antigo = f'{base_url}Resumo_InfoGripe_2026_{se:02d}_0.pdf'
+            urls = [
+                f"{base_url}Resumo_InfoGripe_2026_{se:02d}.pdf",
+                f"{base_url}Resumo_InfoGripe_2026_{se:02d}_0.pdf"
+            ]
             
-            for url in [url_novo, url_antigo]:
+            for url in urls:
                 try:
-                    response = session.head(url, timeout=10)
+                    response = requests.head(url, timeout=10)
                     if response.status_code == 200:
-                        content_length = int(response.headers.get('content-length', 0))
-                        if content_length > 50000:
-                            se_mais_recente = se
-                            url_mais_recente = url
-                            print(f'✅ SE {se:02d} encontrada: {url}')
+                        size = int(response.headers.get("content-length", 0))
+                        if size > 50000:
+                            se_encontrada = se
+                            url_encontrada = url
+                            print(f"Found SE {se}: {url}")
                             break
                 except:
                     continue
             
-            if se_mais_recente > 0:
+            if se_encontrada > 0:
                 break
         
-        if se_mais_recente > 0:
-            print(f'🎯 SE mais recente: {se_mais_recente}')
-            with open('latest_se.txt', 'w') as f:
-                f.write(f'{se_mais_recente}\\n{url_mais_recente}')
-        else:
-            print('❌ Nenhuma SE encontrada')
-            with open('latest_se.txt', 'w') as f:
-                f.write('0\\n')
-        "
-      
-    - name: 📊 Ler SE mais recente
+        with open("latest_info.txt", "w") as f:
+            f.write(f"{se_encontrada}\n{url_encontrada}")
+        
+        print(f"Latest SE: {se_encontrada}")
+        SCRIPT_END
+    
+    - name: Read latest info
       id: read-latest
       run: |
-        if [ -f "latest_se.txt" ]; then
-          LATEST_SE=$(head -1 latest_se.txt)
-          LATEST_URL=$(tail -1 latest_se.txt)
+        if [ -f "latest_info.txt" ]; then
+          LATEST_SE=$(sed -n '1p' latest_info.txt)
+          LATEST_URL=$(sed -n '2p' latest_info.txt)
           echo "latest_se=$LATEST_SE" >> $GITHUB_OUTPUT
           echo "latest_url=$LATEST_URL" >> $GITHUB_OUTPUT
-          echo "✅ SE mais recente: $LATEST_SE"
+          echo "Latest SE found: $LATEST_SE"
         else
           echo "latest_se=0" >> $GITHUB_OUTPUT
           echo "latest_url=" >> $GITHUB_OUTPUT
         fi
     
-    - name: 🤖 Executar atualização
-      if: steps.read-latest.outputs.latest_se > steps.check-current.outputs.current_se || github.event.inputs.force_update == 'true'
+    - name: Update if needed
+      if: steps.read-latest.outputs.latest_se > steps.check-current.outputs.current_se
       run: |
-        CURRENT_SE="${{ steps.check-current.outputs.current_se }}"
-        LATEST_SE="${{ steps.read-latest.outputs.latest_se }}"
-        LATEST_URL="${{ steps.read-latest.outputs.latest_url }}"
+        SE_NUM="${{ steps.read-latest.outputs.latest_se }}"
+        PDF_URL="${{ steps.read-latest.outputs.latest_url }}"
         
-        echo "🚀 Atualizando de SE $CURRENT_SE para SE $LATEST_SE"
-        echo "📄 URL: $LATEST_URL"
+        echo "Updating from SE ${{ steps.check-current.outputs.current_se }} to SE $SE_NUM"
         
-        python3 -c "
+        python3 << 'SCRIPT_END'
         import requests
         import re
         from datetime import datetime
         from io import BytesIO
-        import sys
+        import os
+        
+        se_num = os.environ["SE_NUM"]
+        pdf_url = os.environ["PDF_URL"]
         
         try:
             import pdfplumber
         except ImportError:
             import subprocess
-            subprocess.run([sys.executable, '-m', 'pip', 'install', 'pdfplumber'], check=True)
+            import sys
+            subprocess.run([sys.executable, "-m", "pip", "install", "pdfplumber"], check=True)
             import pdfplumber
         
-        def processar_se(se_num, url):
-            print(f'📥 Baixando SE {se_num}...')
-            
-            session = requests.Session()
-            session.headers.update({
-                'User-Agent': 'Mozilla/5.0 (compatible; HUSF-Bot/1.0)'
-            })
-            
-            try:
-                response = session.get(url, timeout=60)
-                if response.status_code != 200:
-                    raise Exception(f'HTTP {response.status_code}')
+        print(f"Processing SE {se_num}...")
+        
+        # Download PDF
+        response = requests.get(pdf_url, timeout=60)
+        
+        # Extract text
+        with pdfplumber.open(BytesIO(response.content)) as pdf:
+            texto = ""
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    texto += page_text + "\n"
+        
+        # Default prevalences (will be updated if extraction works)
+        prevalencias = {
+            "COVID19": 0.03,
+            "INFLUENZA_A": 0.25,
+            "INFLUENZA_B": 0.05,
+            "VSR": 0.40,
+            "RINOVIRUS": 0.25,
+            "OUTROS": 0.02
+        }
+        
+        # Try to extract real data
+        linhas = texto.split("\n")
+        for linha in linhas:
+            if "4 últimas semanas" in linha.lower():
+                idx = linhas.index(linha)
+                texto_busca = " ".join(linhas[idx:idx+5])
                 
-                print(f'✅ Download: {len(response.content):,} bytes')
+                patterns = {
+                    "INFLUENZA_A": r"(\d+,?\d*)%.*?[Ii]nfluenza A",
+                    "INFLUENZA_B": r"(\d+,?\d*)%.*?[Ii]nfluenza B",
+                    "VSR": r"(\d+,?\d*)%.*?sincicial",
+                    "RINOVIRUS": r"(\d+,?\d*)%.*?[Rr]inov",
+                    "COVID19": r"(\d+,?\d*)%.*?COVID"
+                }
                 
-                with pdfplumber.open(BytesIO(response.content)) as pdf:
-                    texto = ''
-                    for pagina in pdf.pages:
-                        texto_pagina = pagina.extract_text()
-                        if texto_pagina:
-                            texto += texto_pagina + '\\n'
+                for pat_name, pattern in patterns.items():
+                    match = re.search(pattern, texto_busca)
+                    if match:
+                        val = float(match.group(1).replace(",", ".")) / 100
+                        prevalencias[pat_name] = val
+                        print(f"Found {pat_name}: {val:.1%}")
+                break
+        
+        # Calculate VPNs
+        sensibilidades = {
+            "COVID19": 0.70,
+            "INFLUENZA_A": 0.62,
+            "INFLUENZA_B": 0.58,
+            "VSR": 0.75,
+            "RINOVIRUS": 0.50,
+            "OUTROS": 0.65
+        }
+        especificidade = 0.98
+        
+        vpns = {}
+        for patogeno, prev in prevalencias.items():
+            if patogeno in sensibilidades:
+                sens = sensibilidades[patogeno]
+                num = especificidade * (1 - prev)
+                den = (1 - sens) * prev + especificidade * (1 - prev)
+                vpn = num / den if den > 0 else 0
+                vpns[patogeno] = vpn
+        
+        # Generate cards HTML
+        cards_html = ""
+        patogenos = [
+            ("COVID19", "COVID-19"),
+            ("INFLUENZA_A", "Influenza A"),
+            ("INFLUENZA_B", "Influenza B"),
+            ("VSR", "VSR"),
+            ("RINOVIRUS", "Rinovírus"),
+            ("OUTROS", "Outros")
+        ]
+        
+        for patogeno, nome in patogenos:
+            if patogeno in vpns:
+                vpn = vpns[patogeno]
                 
-                print('🔍 Extraindo prevalências...')
-                
-                prevalencias = {}
-                linhas = texto.split('\\n')
-                
-                for linha in linhas:
-                    if '4 últimas semanas' in linha.lower():
-                        idx = linhas.index(linha)
-                        texto_relevante = ' '.join(linhas[idx:idx+5])
-                        
-                        influenza_a = re.search(r'(\d+,?\d*?)%.*?[Ii]nfluenza A', texto_relevante)
-                        influenza_b = re.search(r'(\d+,?\d*?)%.*?[Ii]nfluenza B', texto_relevante)  
-                        vsr = re.search(r'(\d+,?\d*?)%.*?sincicial', texto_relevante)
-                        rinovirus = re.search(r'(\d+,?\d*?)%.*?[Rr]inov', texto_relevante)
-                        covid = re.search(r'(\d+,?\d*?)%.*?COVID', texto_relevante)
-                        
-                        if influenza_a:
-                            prevalencias['INFLUENZA_A'] = float(influenza_a.group(1).replace(',', '.')) / 100
-                        if influenza_b:
-                            prevalencias['INFLUENZA_B'] = float(influenza_b.group(1).replace(',', '.')) / 100
-                        if vsr:
-                            prevalencias['VSR'] = float(vsr.group(1).replace(',', '.')) / 100
-                        if rinovirus:
-                            prevalencias['RINOVIRUS'] = float(rinovirus.group(1).replace(',', '.')) / 100
-                        if covid:
-                            prevalencias['COVID19'] = float(covid.group(1).replace(',', '.')) / 100
-                        
-                        break
-                
-                if not prevalencias:
-                    print('⚠️ Usando dados padrão')
-                    prevalencias = {
-                        'VSR': 0.40,
-                        'INFLUENZA_A': 0.25,
-                        'RINOVIRUS': 0.25,
-                        'INFLUENZA_B': 0.05,
-                        'COVID19': 0.03,
-                        'OUTROS': 0.02
-                    }
+                if vpn >= 0.95:
+                    card_class = "liberar"
+                    vpn_class = "vpn-verde"
+                    orientacao_class = "orientacao-verde"
+                    icone = "fas fa-check-circle"
+                    orientacao = "LIBERAR ISOLAMENTO"
+                elif vpn >= 0.90:
+                    card_class = "cautela"
+                    vpn_class = "vpn-amarelo"
+                    orientacao_class = "orientacao-amarelo"
+                    icone = "fas fa-exclamation-triangle"
+                    orientacao = "CAUTELA"
                 else:
-                    total = sum(prevalencias.values())
-                    if total < 0.95:
-                        prevalencias['OUTROS'] = max(0.01, 1.0 - total)
+                    card_class = "rtpcr"
+                    vpn_class = "vpn-vermelho"
+                    orientacao_class = "orientacao-vermelho"
+                    icone = "fas fa-times-circle"
+                    orientacao = "RT-PCR RECOMENDADO"
                 
-                return prevalencias
-                
-            except Exception as e:
-                print(f'❌ Erro: {e}')
-                return None
+                cards_html += f"""
+                <div class="card-patogeno {card_class}">
+                    <div class="patogeno-header">
+                        <div class="patogeno-nome">{nome}</div>
+                        <div class="vpn-badge {vpn_class}">VPN {vpn:.0%}</div>
+                    </div>
+                    <div class="orientacao {orientacao_class}">
+                        <i class="{icone}"></i> {orientacao}
+                    </div>
+                </div>"""
         
-        def calcular_vpns(prevalencias):
-            sensibilidades = {
-                'COVID19': 0.70,
-                'INFLUENZA_A': 0.62,
-                'INFLUENZA_B': 0.58,
-                'VSR': 0.75,
-                'RINOVIRUS': 0.50,
-                'OUTROS': 0.65
-            }
-            especificidade = 0.98
-            
-            vpns = {}
-            
-            for patogeno in sensibilidades.keys():
-                if patogeno in prevalencias:
-                    prev = prevalencias[patogeno]
-                    sens = sensibilidades[patogeno]
-                    
-                    num = especificidade * (1 - prev)
-                    den = (1 - sens) * prev + especificidade * (1 - prev)
-                    
-                    vpn = num / den if den > 0 else 0
-                    vpns[patogeno] = vpn
-            
-            return vpns
-        
-        def gerar_html(se_num, vpns):
-            html = f'''<!DOCTYPE html>
-<html lang=\"pt-BR\">
-<head>
-    <meta charset=\"UTF-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-    <title>HUSF Vigilância SE {se_num}/2026</title>
-    <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">
-    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\" rel=\"stylesheet\">
-    
-    <style>
-        body {{
+        # CSS styles
+        css = """
+        body {
             font-family: system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 10px;
             margin: 0;
-        }}
-        
-        .card-patogeno {{
+        }
+        .card-patogeno {
             background: white;
             margin: 8px 0;
             border-radius: 12px;
             padding: 15px;
             box-shadow: 0 3px 15px rgba(0,0,0,0.2);
             border-left: 5px solid #ddd;
-        }}
-        
-        .liberar {{ border-left-color: #28a745; }}
-        .cautela {{ border-left-color: #ffc107; }}
-        .rtpcr {{ border-left-color: #dc3545; }}
-        
-        .patogeno-header {{
+        }
+        .liberar { border-left-color: #28a745; }
+        .cautela { border-left-color: #ffc107; }
+        .rtpcr { border-left-color: #dc3545; }
+        .patogeno-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-        }}
-        
-        .patogeno-nome {{
+        }
+        .patogeno-nome {
             font-weight: 700;
             font-size: 1.1rem;
             color: #2c3e50;
-        }}
-        
-        .vpn-badge {{
+        }
+        .vpn-badge {
             padding: 6px 12px;
             border-radius: 20px;
             font-weight: 700;
             color: white;
             font-size: 0.9rem;
-        }}
-        
-        .vpn-verde {{ background: #28a745; }}
-        .vpn-amarelo {{ background: #ffc107; color: #000; }}
-        .vpn-vermelho {{ background: #dc3545; }}
-        
-        .orientacao {{
+        }
+        .vpn-verde { background: #28a745; }
+        .vpn-amarelo { background: #ffc107; color: #000; }
+        .vpn-vermelho { background: #dc3545; }
+        .orientacao {
             font-weight: 600;
             font-size: 0.9rem;
-        }}
-        
-        .orientacao-verde {{ color: #28a745; }}
-        .orientacao-amarelo {{ color: #d39e00; }}
-        .orientacao-vermelho {{ color: #dc3545; }}
-        
-        .header-automatico {{
+        }
+        .orientacao-verde { color: #28a745; }
+        .orientacao-amarelo { color: #d39e00; }
+        .orientacao-vermelho { color: #dc3545; }
+        .header-automatico {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
             padding: 20px;
@@ -306,142 +283,77 @@ jobs:
             text-align: center;
             margin-bottom: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }}
-    </style>
-</head>
-
-<body>
-    <div class=\"container-fluid\">
-        <div class=\"header-automatico\">
-            <h1 style=\"margin: 0; font-size: 1.4rem;\">
-                HUSF - Vigilância de SG/SRAG
-            </h1>
-            <small>Dr. Leandro Mendes - SCIH</small>
-        </div>
+        }
+        """
         
-        <div class=\"alert alert-success\" style=\"margin: 10px 0; padding: 15px; border-radius: 10px;\">
-            <strong>🤖 SISTEMA AUTOMÁTICO - SE {se_num}/2026</strong>
-        </div>
-        
-        <div class=\"orientacoes\">'''
-            
-            patogenos = [
-                ('COVID19', 'COVID-19'),
-                ('INFLUENZA_A', 'Influenza A'),
-                ('INFLUENZA_B', 'Influenza B'),
-                ('VSR', 'VSR'),
-                ('RINOVIRUS', 'Rinovírus'),
-                ('OUTROS', 'Outros')
-            ]
-            
-            for patogeno, nome in patogenos:
-                if patogeno in vpns:
-                    vpn = vpns[patogeno]
-                    
-                    if vpn >= 0.95:
-                        card_class = \"liberar\"
-                        vpn_class = \"vpn-verde\"
-                        orientacao_class = \"orientacao-verde\"
-                        icone = \"fas fa-check-circle\"
-                        orientacao = \"LIBERAR ISOLAMENTO\"
-                    elif vpn >= 0.90:
-                        card_class = \"cautela\"
-                        vpn_class = \"vpn-amarelo\"
-                        orientacao_class = \"orientacao-amarelo\"
-                        icone = \"fas fa-exclamation-triangle\"
-                        orientacao = \"CAUTELA\"
-                    else:
-                        card_class = \"rtpcr\"
-                        vpn_class = \"vpn-vermelho\"
-                        orientacao_class = \"orientacao-vermelho\"
-                        icone = \"fas fa-times-circle\"
-                        orientacao = \"RT-PCR RECOMENDADO\"
-                    
-                    html += f'''
-            <div class=\"card-patogeno {card_class}\">
-                <div class=\"patogeno-header\">
-                    <div class=\"patogeno-nome\">{nome}</div>
-                    <div class=\"vpn-badge {vpn_class}\">VPN {vpn:.0%}</div>
+        # Generate complete HTML
+        html = f"""<!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>HUSF Vigilância SE {se_num}/2026</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+            <style>{css}</style>
+        </head>
+        <body>
+            <div class="container-fluid">
+                <div class="header-automatico">
+                    <h1 style="margin: 0; font-size: 1.4rem;">HUSF - Vigilância de SG/SRAG</h1>
+                    <small>Dr. Leandro Mendes - SCIH</small>
                 </div>
-                <div class=\"orientacao {orientacao_class}\">
-                    <i class=\"{icone}\"></i> {orientacao}
+                <div class="alert alert-success" style="margin: 10px 0; padding: 15px; border-radius: 10px;">
+                    <strong>🤖 SISTEMA AUTOMÁTICO - SE {se_num}/2026</strong>
                 </div>
-            </div>'''
-            
-            html += f'''
-        </div>
+                <div class="orientacoes">{cards_html}</div>
+                <div style="text-align: center; color: white; font-size: 0.7rem; margin: 15px 0;">
+                    🤖 GitHub Actions - SE {se_num}/2026<br>
+                    Atualizado: {datetime.now().strftime("%d/%m/%Y %H:%M")}
+                </div>
+            </div>
+        </body>
+        </html>"""
         
-        <div style=\"text-align: center; color: white; font-size: 0.7rem; margin: 15px 0;\">
-            🤖 GitHub Actions - SE {se_num}/2026<br>
-            Atualizado: {datetime.now().strftime('%d/%m/%Y %H:%M')}
-        </div>
-    </div>
-</body>
-</html>'''
-            
-            return html
+        # Save HTML
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(html)
         
-        se_num = int('$LATEST_SE')
-        url = '$LATEST_URL'
+        print(f"HTML generated for SE {se_num}")
         
-        print(f'🤖 Processando SE {se_num}...')
+        # Print summary
+        for patogeno, vpn in vpns.items():
+            status = "✅" if vpn >= 0.95 else "⚠️" if vpn >= 0.90 else "❌"
+            nomes = {
+                "COVID19": "COVID-19",
+                "INFLUENZA_A": "Influenza A",
+                "INFLUENZA_B": "Influenza B", 
+                "VSR": "VSR",
+                "RINOVIRUS": "Rinovírus",
+                "OUTROS": "Outros"
+            }
+            nome = nomes.get(patogeno, patogeno)
+            print(f"{status} {nome}: {vpn:.0%}")
+        SCRIPT_END
+      env:
+        SE_NUM: ${{ steps.read-latest.outputs.latest_se }}
+        PDF_URL: ${{ steps.read-latest.outputs.latest_url }}
         
-        prevalencias = processar_se(se_num, url)
-        
-        if prevalencias:
-            vpns = calcular_vpns(prevalencias)
-            html = gerar_html(se_num, vpns)
-            
-            with open('index.html', 'w', encoding='utf-8') as f:
-                f.write(html)
-            
-            print('✅ HTML gerado!')
-            
-            for patogeno, vpn in vpns.items():
-                status = '✅' if vpn >= 0.95 else '⚠️' if vpn >= 0.90 else '❌'
-                nome = {
-                    'COVID19': 'COVID-19',
-                    'INFLUENZA_A': 'Influenza A',
-                    'INFLUENZA_B': 'Influenza B', 
-                    'VSR': 'VSR',
-                    'RINOVIRUS': 'Rinovírus',
-                    'OUTROS': 'Outros'
-                }.get(patogeno, patogeno)
-                print(f'   {status} {nome}: {vpn:.0%}')
-        else:
-            print('❌ Falha no processamento')
-            exit(1)
-        "
-        
-    - name: 📤 Commit e Push
-      if: steps.read-latest.outputs.latest_se > steps.check-current.outputs.current_se || github.event.inputs.force_update == 'true'
+    - name: Commit and push
+      if: steps.read-latest.outputs.latest_se > steps.check-current.outputs.current_se
       run: |
-        LATEST_SE="${{ steps.read-latest.outputs.latest_se }}"
-        
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        
         git add index.html
-        
-        if git diff --staged --quiet; then
-          echo "📄 Nenhuma mudança"
-        else
-          git commit -m "🤖 SE $LATEST_SE/2026 - $(date '+%d/%m/%Y %H:%M')"
+        if ! git diff --staged --quiet; then
+          git commit -m "🤖 SE ${{ steps.read-latest.outputs.latest_se }}/2026 - $(date '+%d/%m/%Y')"
           git push origin main
-          echo "✅ Atualização publicada!"
+          echo "Updated and published successfully"
         fi
     
-    - name: 📊 Resumo
+    - name: Summary
       run: |
-        CURRENT_SE="${{ steps.check-current.outputs.current_se }}"
-        LATEST_SE="${{ steps.read-latest.outputs.latest_se }}"
-        
-        echo "📋 RESUMO:"
-        echo "   SE anterior: $CURRENT_SE"
-        echo "   SE atual: $LATEST_SE" 
-        
-        if [ "$LATEST_SE" -gt "$CURRENT_SE" ]; then
-          echo "   ✅ Sistema atualizado!"
-        else
-          echo "   ✅ Já atualizado"
-        fi
+        echo "SUMMARY:"
+        echo "Previous SE: ${{ steps.check-current.outputs.current_se }}"
+        echo "Latest SE: ${{ steps.read-latest.outputs.latest_se }}"
+        echo "Status: Complete"
