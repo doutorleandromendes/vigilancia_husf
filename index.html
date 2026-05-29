@@ -2,163 +2,224 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HUSF - Vigilância Respiratória SE 20/2026</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HUSF — Vigilância Respiratória SE 17–20/2026</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-    body{font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);padding:10px;margin:0;min-height:100vh}
-    .card-patogeno{background:#fff;margin:8px 0;border-radius:12px;padding:15px;box-shadow:0 3px 15px rgba(0,0,0,.2);border-left:5px solid #ddd}
-    .liberar{border-left-color:#28a745}.cautela{border-left-color:#ffc107}.rtpcr{border-left-color:#dc3545}
-    .patogeno-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    .patogeno-nome{font-weight:700;font-size:1.1rem;color:#2c3e50}
-    .vpn-badge{padding:6px 12px;border-radius:20px;font-weight:700;color:#fff;font-size:.9rem}
-    .vpn-verde{background:#28a745}.vpn-amarelo{background:#ffc107;color:#000}.vpn-vermelho{background:#dc3545}
-    .orientacao{font-weight:600;font-size:.85rem;margin-bottom:4px}
-    .orientacao-verde{color:#28a745}.orientacao-amarelo{color:#d39e00}.orientacao-vermelho{color:#dc3545}
-    .prevalencia-info{font-size:.75rem;color:#6c757d;margin-top:4px}
-    .header-automatico{background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff;padding:20px;border-radius:15px;text-align:center;margin-bottom:15px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-    .criterio-box{background:#fff;border-radius:10px;padding:12px 15px;margin:10px 0;font-size:.8rem}
-    .criterio-item{display:flex;align-items:center;margin:4px 0}
-    .dot{width:12px;height:12px;border-radius:50%;margin-right:8px;flex-shrink:0}
-    .collapsible-section{background:#fff;border-radius:10px;margin:10px 0;overflow:hidden}
-    .collapsible-header{padding:12px 15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:.85rem;color:#2c3e50;background:#f8f9fa}
-    .collapsible-content{display:none;padding:12px 15px;font-size:.8rem}
-    .collapsible-content.open{display:block}
-    .badge-pathogen{display:inline-block;padding:3px 8px;border-radius:10px;margin:2px;font-size:.75rem;background:#e9ecef;color:#495057}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,sans-serif;
+         background:linear-gradient(135deg,#667eea,#764ba2);
+         margin:0;padding:10px;min-height:100vh}
+    .wrap{max-width:600px;margin:0 auto}
+    .header{background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff;
+            padding:18px;border-radius:14px;text-align:center;
+            margin-bottom:12px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .header h1{margin:0;font-size:1.25rem;font-weight:700}
+    .header p{margin:4px 0 0;font-size:.82rem;opacity:.85}
+    .info-bar{background:#fff;border-radius:10px;padding:10px 14px;
+              font-size:.82rem;margin-bottom:10px;
+              display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+    .info-bar strong{color:#2c3e50}
+    .criterio-box{background:#fff;border-radius:10px;padding:12px 14px;
+                  margin-bottom:10px;font-size:.8rem}
+    .criterio-row{display:flex;align-items:center;margin:4px 0}
+    .dot{width:11px;height:11px;border-radius:50%;margin-right:8px;flex-shrink:0}
+    .card-patogeno{background:#fff;margin:8px 0;border-radius:12px;
+                   padding:14px;box-shadow:0 3px 12px rgba(0,0,0,.18);
+                   border-left:5px solid #ddd}
+    .liberar{border-left-color:#28a745}
+    .cautela{border-left-color:#ffc107}
+    .rtpcr  {border-left-color:#dc3545}
+    .patogeno-header{display:flex;justify-content:space-between;
+                     align-items:center;margin-bottom:8px}
+    .patogeno-nome{font-weight:700;font-size:1.05rem;color:#2c3e50}
+    .vpn-badge{padding:5px 11px;border-radius:20px;font-weight:700;
+               color:#fff;font-size:.88rem}
+    .vpn-verde  {background:#28a745}
+    .vpn-amarelo{background:#ffc107;color:#000}
+    .vpn-vermelho{background:#dc3545}
+    .orientacao{font-weight:600;font-size:.84rem;margin-bottom:3px}
+    .orientacao-verde  {color:#28a745}
+    .orientacao-amarelo{color:#d39e00}
+    .orientacao-vermelho{color:#dc3545}
+    .prevalencia-info{font-size:.74rem;color:#6c757d;margin-top:3px}
+    .collapsible{background:#fff;border-radius:10px;margin:10px 0;overflow:hidden}
+    .coll-header{padding:11px 14px;cursor:pointer;
+                 display:flex;justify-content:space-between;align-items:center;
+                 font-weight:600;font-size:.83rem;color:#2c3e50;background:#f8f9fa;
+                 border:none;width:100%;text-align:left}
+    .coll-header i.fa-chevron-down{transition:transform .25s}
+    .coll-content{display:none;padding:12px 14px;font-size:.79rem}
+    .coll-content.open{display:block}
+    .badge-pathogen{display:inline-block;padding:3px 8px;border-radius:10px;
+                    margin:2px;font-size:.74rem;background:#e9ecef;color:#495057}
+    .footer{text-align:center;color:rgba(255,255,255,.65);
+            font-size:.68rem;margin:14px 0 20px;line-height:1.6}
+    h6{color:#fff;margin:14px 0 6px;font-weight:700;font-size:.9rem}
     </style>
 </head>
 <body>
-<div class="container-fluid" style="max-width:600px;margin:0 auto">
+<div class="wrap">
 
-<div class="header-automatico">
-<h1 style="margin:0;font-size:1.3rem;font-weight:700">Hospital Universitário São Francisco</h1>
-<p style="margin:4px 0 0;font-size:.85rem;opacity:.9">Vigilância de SG/SRAG - Bragança Paulista, SP</p>
-<p style="margin:4px 0 0;font-size:.8rem;opacity:.8">Dr. Leandro Mendes - Médico Infectologista e Epidemiologista - SCIH</p>
-</div>
+  <div class="header">
+    <h1>Hospital Universitário São Francisco</h1>
+    <p>Vigilância de SG/SRAG — Bragança Paulista, SP</p>
+    <p>Dr. Leandro Mendes — Médico Infectologista e Epidemiologista — SCIH</p>
+  </div>
 
-<div class="alert alert-info" style="border-radius:10px;font-size:.85rem;padding:10px 15px">
-<strong>SE 20/2026</strong> &nbsp;|&nbsp; Fonte: InfoGripe/Fiocruz &nbsp;|&nbsp; Atualizado: 29/05/2026 10:57
-</div>
+  <div class="info-bar">
+    <strong>Dados:</strong> SIVEP-Gripe (dados abertos) &nbsp;|&nbsp;
+    <strong>Período:</strong> SE 17–20/2026 &nbsp;|&nbsp;
+    <strong>Positivos analisados:</strong> 10,287 &nbsp;|&nbsp;
+    <strong>Atualizado:</strong> 29/05/2026 11:43
+  </div>
 
-<div class="criterio-box">
-<strong style="font-size:.85rem">Critério de decisão (VPN do teste de antígeno):</strong>
-<div class="criterio-item" style="margin-top:6px"><div class="dot" style="background:#28a745"></div><span><strong>&ge;95%</strong> &rarr; Liberar isolamento com antígeno negativo</span></div>
-<div class="criterio-item"><div class="dot" style="background:#ffc107"></div><span><strong>90-95%</strong> &rarr; Cautela - avaliar clinicamente</span></div>
-<div class="criterio-item"><div class="dot" style="background:#dc3545"></div><span><strong>&lt;90%</strong> &rarr; RT-PCR recomendado</span></div>
-</div>
+  <div class="criterio-box">
+    <strong style="font-size:.84rem">Critério — VPN do teste de antígeno:</strong>
+    <div class="criterio-row" style="margin-top:6px">
+      <div class="dot" style="background:#28a745"></div>
+      <span><strong>&ge; 95%</strong> &rarr; Liberar isolamento com antígeno negativo</span>
+    </div>
+    <div class="criterio-row">
+      <div class="dot" style="background:#ffc107"></div>
+      <span><strong>90–95%</strong> &rarr; Cautela — avaliar clinicamente</span>
+    </div>
+    <div class="criterio-row">
+      <div class="dot" style="background:#dc3545"></div>
+      <span><strong>&lt; 90%</strong> &rarr; RT-PCR recomendado</span>
+    </div>
+  </div>
 
-<h6 style="color:#fff;margin:15px 0 8px;font-weight:700">Orientações de Liberação de Isolamento</h6>
-
+  <h6>Orientações de Liberação de Isolamento</h6>
+  
         <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">COVID-19</div>
-                <div class="vpn-badge vpn-verde">VPN 99%</div>
-            </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-            </div>
-            <div class="prevalencia-info">Positividade regional: 3.0%</div>
-        </div>
-        <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Influenza A</div>
-                <div class="vpn-badge vpn-verde">VPN 98%</div>
-            </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-            </div>
-            <div class="prevalencia-info">Positividade regional: 4.7%</div>
-        </div>
-        <div class="card-patogeno rtpcr">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Influenza B</div>
-                <div class="vpn-badge vpn-vermelho">VPN 72%</div>
-            </div>
-            <div class="orientacao orientacao-vermelho">
-                <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
-            </div>
-            <div class="prevalencia-info">Positividade regional: 47.6%</div>
+          <div class="patogeno-header">
+            <div class="patogeno-nome">COVID-19</div>
+            <div class="vpn-badge vpn-verde">VPN 99%</div>
+          </div>
+          <div class="orientacao orientacao-verde">
+            <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+          </div>
+          <div class="prevalencia-info">
+            Positividade regional (4 sem.): 1.7%
+          </div>
         </div>
         <div class="card-patogeno cautela">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">VSR</div>
-                <div class="vpn-badge vpn-amarelo">VPN 93%</div>
-            </div>
-            <div class="orientacao orientacao-amarelo">
-                <i class="fas fa-exclamation-triangle"></i> CAUTELA - AVALIAR CLINICAMENTE
-            </div>
-            <div class="prevalencia-info">Positividade regional: 23.9%</div>
+          <div class="patogeno-header">
+            <div class="patogeno-nome">Influenza A</div>
+            <div class="vpn-badge vpn-amarelo">VPN 92%</div>
+          </div>
+          <div class="orientacao orientacao-amarelo">
+            <i class="fas fa-exclamation-triangle"></i> CAUTELA — AVALIAR CLINICAMENTE
+          </div>
+          <div class="prevalencia-info">
+            Positividade regional (4 sem.): 17.5%
+          </div>
         </div>
         <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Rinovírus</div>
-                <div class="vpn-badge vpn-verde">VPN 99%</div>
-            </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-            </div>
-            <div class="prevalencia-info">Positividade regional: 2.3%</div>
+          <div class="patogeno-header">
+            <div class="patogeno-nome">Influenza B</div>
+            <div class="vpn-badge vpn-verde">VPN 99%</div>
+          </div>
+          <div class="orientacao orientacao-verde">
+            <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+          </div>
+          <div class="prevalencia-info">
+            Positividade regional (4 sem.): 3.4%
+          </div>
+        </div>
+        <div class="card-patogeno rtpcr">
+          <div class="patogeno-header">
+            <div class="patogeno-nome">VSR</div>
+            <div class="vpn-badge vpn-vermelho">VPN 86%</div>
+          </div>
+          <div class="orientacao orientacao-vermelho">
+            <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
+          </div>
+          <div class="prevalencia-info">
+            Positividade regional (4 sem.): 38.9%
+          </div>
+        </div>
+        <div class="card-patogeno rtpcr">
+          <div class="patogeno-header">
+            <div class="patogeno-nome">Rinovírus</div>
+            <div class="vpn-badge vpn-vermelho">VPN 84%</div>
+          </div>
+          <div class="orientacao orientacao-vermelho">
+            <i class="fas fa-times-circle"></i> RT-PCR RECOMENDADO
+          </div>
+          <div class="prevalencia-info">
+            Positividade regional (4 sem.): 27.0%
+          </div>
         </div>
         <div class="card-patogeno liberar">
-            <div class="patogeno-header">
-                <div class="patogeno-nome">Outros</div>
-                <div class="vpn-badge vpn-verde">VPN 99%</div>
-            </div>
-            <div class="orientacao orientacao-verde">
-                <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
-            </div>
-            <div class="prevalencia-info">Positividade regional: 2.0%</div>
+          <div class="patogeno-header">
+            <div class="patogeno-nome">Outros vírus</div>
+            <div class="vpn-badge vpn-verde">VPN 96%</div>
+          </div>
+          <div class="orientacao orientacao-verde">
+            <i class="fas fa-check-circle"></i> LIBERAR ISOLAMENTO COM ANTÍGENO NEGATIVO
+          </div>
+          <div class="prevalencia-info">
+            Positividade regional (4 sem.): 11.6%
+          </div>
         </div>
 
-<div class="collapsible-section">
-<div class="collapsible-header" onclick="toggle('positividade')">
-<span><i class="fas fa-chart-bar" style="margin-right:6px"></i>Taxa de Positividade por Patógeno (SE 20/2026)</span>
-<i class="fas fa-chevron-down" id="icon-positividade"></i>
-</div>
-<div class="collapsible-content" id="positividade">
-<p style="color:#6c757d;margin-bottom:8px">Distribuição entre casos positivos - 4 últimas semanas (InfoGripe/Fiocruz):</p>
-<span class="badge-pathogen">COVID-19: 3.0%</span><span class="badge-pathogen">Influenza A: 4.7%</span><span class="badge-pathogen">Influenza B: 47.6%</span><span class="badge-pathogen">VSR: 23.9%</span><span class="badge-pathogen">Rinovírus: 2.3%</span><span class="badge-pathogen">Outros: 2.0%</span>
-</div>
-</div>
+  <div class="collapsible">
+    <button class="coll-header" onclick="toggle('posit')">
+      <span><i class="fas fa-chart-bar" style="margin-right:6px"></i>
+        Taxa de Positividade por Patógeno (SE 17–20/2026)</span>
+      <i class="fas fa-chevron-down" id="icon-posit"></i>
+    </button>
+    <div class="coll-content" id="posit">
+      <p style="color:#6c757d;margin-bottom:8px;font-size:.78rem">
+        Distribuição entre casos positivos confirmados por laboratório —
+        4 semanas mais recentes com dados estáveis. Fonte: SIVEP-Gripe/MS.
+      </p>
+      <span class="badge-pathogen">COVID-19: 1.7%</span><span class="badge-pathogen">Influenza A: 17.5%</span><span class="badge-pathogen">Influenza B: 3.4%</span><span class="badge-pathogen">VSR: 38.9%</span><span class="badge-pathogen">Rinovírus: 27.0%</span><span class="badge-pathogen">Outros vírus: 11.6%</span>
+    </div>
+  </div>
 
-<div class="collapsible-section">
-<div class="collapsible-header" onclick="toggle('base-cientifica')">
-<span><i class="fas fa-flask" style="margin-right:6px"></i>Base Científica e Parâmetros do Sistema</span>
-<i class="fas fa-chevron-down" id="icon-base-cientifica"></i>
-</div>
-<div class="collapsible-content" id="base-cientifica">
-<strong>Sensibilidades dos testes (meta-análises):</strong>
-<ul style="margin:6px 0 10px;padding-left:20px">
-<li>COVID-19: 70% (Arshadi et al., 2022 - 60 estudos)</li>
-<li>Influenza A: 62% (Chartrand et al., 2012 - 159 estudos)</li>
-<li>Influenza B: 58% (Chartrand et al., 2012 - 159 estudos)</li>
-<li>VSR: 75% (literatura disponível)</li>
-<li>Rinovírus: 50% (estimativa conservadora)</li>
-<li>Outros: 65% (estimativa)</li>
-</ul>
-<strong>Parâmetros do sistema HUSF:</strong>
-<ul style="margin:6px 0 0;padding-left:20px">
-<li>Especificidade: 98% (todos os testes)</li>
-<li>Critério de liberação: VPN &ge; 95%</li>
-<li>Fonte epidemiológica: InfoGripe/Fiocruz</li>
-<li>Atualização: automática a cada 15 dias (GitHub Actions)</li>
-</ul>
-</div>
-</div>
+  <div class="collapsible">
+    <button class="coll-header" onclick="toggle('base')">
+      <span><i class="fas fa-flask" style="margin-right:6px"></i>
+        Base Científica e Parâmetros do Sistema</span>
+      <i class="fas fa-chevron-down" id="icon-base"></i>
+    </button>
+    <div class="coll-content" id="base">
+      
+        <strong>Sensibilidades dos testes (meta-análises):</strong>
+        <ul style="margin:6px 0 10px;padding-left:20px">
+          <li>COVID-19: 70% — Arshadi et al., 2022 (60 estudos)</li>
+          <li>Influenza A: 62% — Chartrand et al., 2012 (159 estudos)</li>
+          <li>Influenza B: 58% — Chartrand et al., 2012 (159 estudos)</li>
+          <li>VSR: 75% — literatura disponível</li>
+          <li>Rinovírus: 50% — estimativa conservadora</li>
+          <li>Outros vírus: 65% — estimativa</li>
+        </ul>
+        <strong>Parâmetros do sistema HUSF:</strong>
+        <ul style="margin:6px 0 0;padding-left:20px">
+          <li>Especificidade: 98% (todos os testes)</li>
+          <li>Critério de liberação: VPN &ge; 95%</li>
+          <li>Fonte: SIVEP-Gripe dados abertos (atualizado semanalmente)</li>
+          <li>Atualização automática via GitHub Actions (a cada 15 dias)</li>
+        </ul>
+    </div>
+  </div>
 
-<div style="text-align:center;color:rgba(255,255,255,.7);font-size:.7rem;margin:15px 0;padding-bottom:20px">
-Sistema automático de vigilância epidemiológica<br>
-HUSF - Bragança Paulista &nbsp;|&nbsp; SE 20/2026
-</div>
+  <div class="footer">
+    Sistema automático de vigilância epidemiológica<br>
+    HUSF — Bragança Paulista &nbsp;|&nbsp; SE 17–20/2026
+  </div>
 
 </div>
 <script>
 function toggle(id){
-var c=document.getElementById(id);
-var i=document.getElementById("icon-"+id);
-c.classList.toggle("open");
-i.style.transform=c.classList.contains("open")?"rotate(180deg)":"";
+  var c=document.getElementById(id);
+  var i=document.getElementById("icon-"+id);
+  c.classList.toggle("open");
+  i.style.transform=c.classList.contains("open")?"rotate(180deg)":"";
 }
 </script>
 </body>
