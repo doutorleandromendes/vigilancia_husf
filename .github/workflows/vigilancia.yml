@@ -23,9 +23,9 @@ jobs:
         python-version: "3.11"
 
     - name: Install dependencies
-      run: pip install requests pdfplumber
+      run: pip install pyarrow pandas requests
 
-    - name: Find latest SE and update
+    - name: Run update
       run: python3 husf_update.py
 
     - name: Commit and push
@@ -36,7 +36,7 @@ jobs:
         if ! git diff --staged --quiet; then
           git commit -m "SE auto-update $(date '+%d/%m/%Y')"
           git push origin main
-          echo "Updated successfully"
+          echo "Atualizado com sucesso"
         else
-          echo "No update needed"
+          echo "Sem novidades — site ja esta atualizado"
         fi
