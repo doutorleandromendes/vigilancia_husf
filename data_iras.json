@@ -101,16 +101,6 @@
     "status": "endemico",
     "infSeries": [
       {
-        "ac": 1,
-        "itu": 0,
-        "pneu": 4,
-        "isc": 0,
-        "pd": 727,
-        "total": 5,
-        "p": "mai/26",
-        "c": 1
-      },
-      {
         "p": "jan/24",
         "ac": 2,
         "itu": 1,
@@ -325,6 +315,16 @@
         "isc": 0,
         "pd": 662,
         "total": 12
+      },
+      {
+        "ac": 1,
+        "itu": 0,
+        "pneu": 4,
+        "isc": 0,
+        "pd": 727,
+        "total": 5,
+        "p": "mai/26",
+        "c": 1
       }
     ]
   },
@@ -382,16 +382,6 @@
     },
     "status": "endemico",
     "infSeries": [
-      {
-        "ac": 4,
-        "itu": 2,
-        "pneu": 7,
-        "isc": 6,
-        "pd": 844,
-        "total": 19,
-        "p": "mai/26",
-        "c": 1
-      },
       {
         "p": "jan/24",
         "ac": 4,
@@ -607,6 +597,16 @@
         "isc": 6,
         "pd": 791,
         "total": 17
+      },
+      {
+        "ac": 4,
+        "itu": 2,
+        "pneu": 7,
+        "isc": 6,
+        "pd": 844,
+        "total": 19,
+        "p": "mai/26",
+        "c": 1
       }
     ]
   },
@@ -664,16 +664,6 @@
     },
     "status": "endemico",
     "infSeries": [
-      {
-        "ac": 0,
-        "itu": 1,
-        "pneu": 1,
-        "isc": 2,
-        "pd": 493,
-        "total": 4,
-        "p": "mai/26",
-        "c": 1
-      },
       {
         "p": "jan/24",
         "ac": 2,
@@ -889,6 +879,16 @@
         "isc": 1,
         "pd": 544,
         "total": 3
+      },
+      {
+        "ac": 0,
+        "itu": 1,
+        "pneu": 1,
+        "isc": 2,
+        "pd": 493,
+        "total": 4,
+        "p": "mai/26",
+        "c": 1
       }
     ]
   },

@@ -1,0 +1,689 @@
+{
+  "meta": {
+    "gerado_em": "2026-06-12T10:42:09",
+    "periodo": "Maio 2026",
+    "script": "husf_stats.R v4.1",
+    "n_meses_dot": 16,
+    "n_meses_mdr": 13,
+    "hist_disponivel": true,
+    "ccf_ativo": false
+  },
+  "dot_mensal_por_par": {
+    "cef_utiab": {
+      "mann_kendall": {
+        "tau": -0.317,
+        "Z": -1.666,
+        "p": 0.0957,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.5026
+      }
+    },
+    "cef_utic": {
+      "mann_kendall": {
+        "tau": 0.283,
+        "Z": 1.486,
+        "p": 0.1373,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 3,
+        "ci_l": 3,
+        "ci_u": 12,
+        "sb": 20.44,
+        "sa": -0.463,
+        "p": 0.078
+      }
+    },
+    "cef_clin": {
+      "mann_kendall": {
+        "tau": -0.217,
+        "Z": -1.126,
+        "p": 0.2604,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3621
+      }
+    },
+    "cef_cir": {
+      "mann_kendall": {
+        "tau": 0.033,
+        "Z": 0.135,
+        "p": 0.8926,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2725
+      }
+    },
+    "cef_apto": {
+      "mann_kendall": {
+        "tau": -0.367,
+        "Z": -1.936,
+        "p": 0.0529,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3271
+      }
+    },
+    "cef_epm": {
+      "mann_kendall": {
+        "tau": -0.067,
+        "Z": -0.315,
+        "p": 0.7526,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.267
+      }
+    },
+    "pip_utiab": {
+      "mann_kendall": {
+        "tau": -0.15,
+        "Z": -0.765,
+        "p": 0.444,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2246
+      }
+    },
+    "pip_utic": {
+      "mann_kendall": {
+        "tau": 0.067,
+        "Z": 0.315,
+        "p": 0.7526,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3446
+      }
+    },
+    "pip_clin": {
+      "mann_kendall": {
+        "tau": -0.383,
+        "Z": -2.026,
+        "p": 0.0428,
+        "tendencia": "decrescente",
+        "sig": true
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.416
+      }
+    },
+    "pip_cir": {
+      "mann_kendall": {
+        "tau": 0.333,
+        "Z": 1.756,
+        "p": 0.0791,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 14,
+        "ci_l": 4.95,
+        "ci_u": 14,
+        "sb": 3.577,
+        "sa": -23.432,
+        "p": 0.0095
+      }
+    },
+    "pip_apto": {
+      "mann_kendall": {
+        "tau": -0.308,
+        "Z": -1.621,
+        "p": 0.1051,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2996
+      }
+    },
+    "pip_epm": {
+      "mann_kendall": {
+        "tau": -0.308,
+        "Z": -1.621,
+        "p": 0.1051,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3657
+      }
+    },
+    "cbp_utiab": {
+      "mann_kendall": {
+        "tau": -0.15,
+        "Z": -0.765,
+        "p": 0.444,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.1966
+      }
+    },
+    "cbp_utic": {
+      "mann_kendall": {
+        "tau": -0.183,
+        "Z": -0.945,
+        "p": 0.3444,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.1136
+      }
+    },
+    "cbp_clin": {
+      "mann_kendall": {
+        "tau": 0.117,
+        "Z": 0.585,
+        "p": 0.5584,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.291
+      }
+    },
+    "cbp_cir": {
+      "mann_kendall": {
+        "tau": -0.183,
+        "Z": -0.945,
+        "p": 0.3444,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.1914
+      }
+    },
+    "cbp_epm": {
+      "mann_kendall": {
+        "tau": 0.008,
+        "Z": 0,
+        "p": 1,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2541
+      }
+    },
+    "gpp_utiab": {
+      "mann_kendall": {
+        "tau": 0.067,
+        "Z": 0.315,
+        "p": 0.7526,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2913
+      }
+    },
+    "gpp_utic": {
+      "mann_kendall": {
+        "tau": -0.467,
+        "Z": -2.476,
+        "p": 0.0133,
+        "tendencia": "decrescente",
+        "sig": true
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3443
+      }
+    },
+    "gpp_clin": {
+      "mann_kendall": {
+        "tau": 0.183,
+        "Z": 0.945,
+        "p": 0.3444,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 11,
+        "ci_l": 6.95,
+        "ci_u": 13,
+        "sb": 4.567,
+        "sa": -9.089,
+        "p": 0.0263
+      }
+    },
+    "gpp_cir": {
+      "mann_kendall": {
+        "tau": 0.15,
+        "Z": 0.765,
+        "p": 0.444,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2975
+      }
+    },
+    "gpp_apto": {
+      "mann_kendall": {
+        "tau": -0.183,
+        "Z": -0.945,
+        "p": 0.3444,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.5102
+      }
+    },
+    "gpp_epm": {
+      "mann_kendall": {
+        "tau": -0.183,
+        "Z": -0.945,
+        "p": 0.3444,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 7,
+        "ci_l": 3,
+        "ci_u": 10,
+        "sb": 4.966,
+        "sa": -3.964,
+        "p": 0.0831
+      }
+    },
+    "pb_utiab": {
+      "mann_kendall": {
+        "tau": 0.233,
+        "Z": 1.216,
+        "p": 0.2241,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 3,
+        "ci_l": 3,
+        "ci_u": 14,
+        "sb": -22.482,
+        "sa": 3.13,
+        "p": 0.0482
+      }
+    },
+    "pb_utic": {
+      "mann_kendall": {
+        "tau": -0.4,
+        "Z": -2.116,
+        "p": 0.0343,
+        "tendencia": "decrescente",
+        "sig": true
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3562
+      }
+    },
+    "pb_cir": {
+      "mann_kendall": {
+        "tau": 0.25,
+        "Z": 1.306,
+        "p": 0.1917,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 14,
+        "ci_l": 4,
+        "ci_u": 14,
+        "sb": 2.248,
+        "sa": -14.927,
+        "p": 0.0357
+      }
+    }
+  },
+  "dot_institucional": [],
+  "mdr_anual": {
+    "utiAB": {
+      "e": {
+        "mann_kendall": {
+          "tau": 0.429,
+          "Z": 1.202,
+          "p": 0.2296,
+          "tendencia": "crescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": 0.2834
+        }
+      },
+      "k": {
+        "mann_kendall": {
+          "tau": -0.381,
+          "Z": -1.051,
+          "p": 0.2931,
+          "tendencia": "decrescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": 0.3145
+        }
+      },
+      "a": {
+        "mann_kendall": {
+          "tau": 0.095,
+          "Z": 0.15,
+          "p": 0.8806,
+          "tendencia": "crescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": 0.5917
+        }
+      }
+    },
+    "utic": {
+      "e": {
+        "mann_kendall": {
+          "tau": -0.6,
+          "Z": -1.225,
+          "p": 0.2207,
+          "tendencia": "decrescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": {}
+        }
+      },
+      "k": {
+        "mann_kendall": {
+          "tau": 0.2,
+          "Z": 0.245,
+          "p": 0.8065,
+          "tendencia": "crescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": {}
+        }
+      },
+      "a": {
+        "mann_kendall": {
+          "tau": 0.4,
+          "Z": 0.735,
+          "p": 0.4624,
+          "tendencia": "crescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": {}
+        }
+      }
+    },
+    "inst": {
+      "e": {
+        "mann_kendall": {
+          "tau": 0.8,
+          "Z": 3.348,
+          "p": 0.0008,
+          "tendencia": "crescente",
+          "sig": true
+        },
+        "joinpoint": {
+          "jp": {},
+          "p": 0.1293
+        }
+      },
+      "k": {
+        "mann_kendall": {
+          "tau": 0.145,
+          "Z": 0.545,
+          "p": 0.5858,
+          "tendencia": "crescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp_lbl": 2022,
+          "ci_l": 2020.95,
+          "ci_u": 2023,
+          "sb": 2.85,
+          "sa": -7.091,
+          "p": 0.0055
+        }
+      },
+      "a": {
+        "mann_kendall": {
+          "tau": 0.473,
+          "Z": 1.946,
+          "p": 0.0516,
+          "tendencia": "crescente",
+          "sig": false
+        },
+        "joinpoint": {
+          "jp_lbl": 2022,
+          "ci_l": 2017,
+          "ci_u": 2022,
+          "sb": 3.016,
+          "sa": -4.591,
+          "p": 0.0553
+        }
+      }
+    }
+  },
+  "mdr_mensal": {
+    "utiAB_kpc": {
+      "mann_kendall": {
+        "tau": 0.295,
+        "Z": 1.342,
+        "p": 0.1795,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.186
+      }
+    },
+    "utiAB_esbl": {
+      "mann_kendall": {
+        "tau": -0.41,
+        "Z": -1.891,
+        "p": 0.0586,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.1307
+      }
+    },
+    "utiAB_acin": {
+      "mann_kendall": {
+        "tau": 0.026,
+        "Z": 0.061,
+        "p": 0.9514,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.1622
+      }
+    },
+    "utic_kpc": {
+      "mann_kendall": {
+        "tau": 0.795,
+        "Z": 3.722,
+        "p": 0.0002,
+        "tendencia": "crescente",
+        "sig": true
+      },
+      "joinpoint": {
+        "jp_lbl": 9,
+        "ci_l": 8,
+        "ci_u": 10,
+        "sb": 0.201,
+        "sa": 1.458,
+        "p": 0.0003
+      }
+    },
+    "utic_esbl": {
+      "mann_kendall": {
+        "tau": 0.205,
+        "Z": 0.915,
+        "p": 0.3601,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 9,
+        "ci_l": 7,
+        "ci_u": 10,
+        "sb": -0.181,
+        "sa": 2.897,
+        "p": 0.0016
+      }
+    },
+    "utic_acin": {
+      "mann_kendall": {
+        "tau": 0.013,
+        "Z": 0,
+        "p": 1,
+        "tendencia": "crescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 11,
+        "ci_l": 6,
+        "ci_u": 11,
+        "sb": 0.131,
+        "sa": -1.233,
+        "p": 0.0591
+      }
+    }
+  },
+  "cusum": {
+    "utiAB": {
+      "esbl": {
+        "mu0": 17.03,
+        "s0": 7.44,
+        "h": 29.76,
+        "S": 0,
+        "alarme": false
+      },
+      "kpc": {
+        "mu0": 5.23,
+        "s0": 3.52,
+        "h": 14.09,
+        "S": 0,
+        "alarme": false
+      },
+      "acin": {
+        "mu0": 7,
+        "s0": 4.8,
+        "h": 19.19,
+        "S": 0,
+        "alarme": false
+      }
+    },
+    "utic": {
+      "esbl": {
+        "mu0": 3.45,
+        "s0": 3.77,
+        "h": 15.08,
+        "S": 4.866,
+        "alarme": false
+      },
+      "kpc": {
+        "mu0": 1.6,
+        "s0": 2.06,
+        "h": 8.22,
+        "S": 4.171,
+        "alarme": false
+      },
+      "acin": {
+        "mu0": 1.32,
+        "s0": 1.1,
+        "h": 4.38,
+        "S": 0,
+        "alarme": false
+      }
+    }
+  },
+  "ic_poisson_2026": {
+    "utiAB": {
+      "esbl": {
+        "taxa": 6.44,
+        "ic95_l": 3.52,
+        "ic95_u": 10.81
+      },
+      "kpc": {
+        "taxa": 7.82,
+        "ic95_l": 4.56,
+        "ic95_u": 12.53
+      },
+      "acin": {
+        "taxa": 7.36,
+        "ic95_l": 4.21,
+        "ic95_u": 11.96
+      }
+    },
+    "utic": {
+      "esbl": {
+        "taxa": 10.77,
+        "ic95_l": 4.92,
+        "ic95_u": 20.44
+      },
+      "kpc": {
+        "taxa": 5.98,
+        "ic95_l": 1.94,
+        "ic95_u": 13.96
+      },
+      "acin": {
+        "taxa": 1.2,
+        "ic95_l": 0.03,
+        "ic95_u": 6.66
+      }
+    }
+  },
+  "ccf": {
+    "status": "aguardando",
+    "n": 13
+  }
+}
