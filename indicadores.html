@@ -1016,12 +1016,12 @@ function ClinicaSection(props){
     lastInf?h('div',{},
       h(SH,{t:'Infecções — Competência Atual · '+( lastInf.p||'—')}),
       h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}},
-        h(KpiChip,'IPCS',lastInf.ac,null,lastInf.ac>0?BLUE:null),
-        h(KpiChip,'ITU',lastInf.itu,null,lastInf.itu>0?AMBER:null),
-        h(KpiChip,'Pneumonia',lastInf.pneu,null,lastInf.pneu>0?RED:null),
-        hasIsc?h(KpiChip,'ISC',lastInf.isc||0,null,(lastInf.isc||0)>0?PURPLE:null):null,
-        h(KpiChip,'Total',lastInf.total,null,null),
-        h(KpiChip,'Pac-dia',lastInf.pd,'internações',null)
+        KpiChip('IPCS',lastInf.ac,null,lastInf.ac>0?BLUE:null),
+        KpiChip('ITU',lastInf.itu,null,lastInf.itu>0?AMBER:null),
+        KpiChip('Pneumonia',lastInf.pneu,null,lastInf.pneu>0?RED:null),
+        hasIsc?KpiChip('ISC',lastInf.isc||0,null,(lastInf.isc||0)>0?PURPLE:null):null,
+        KpiChip('Total',lastInf.total,null,null),
+        KpiChip('Pac-dia',lastInf.pd,'internações',null)
       )
     ):null,
 
