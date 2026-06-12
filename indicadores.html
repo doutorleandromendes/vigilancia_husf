@@ -61,6 +61,7 @@ var GRID='#e2e6ea';
 
 // ── SAHE global ───────────────────────────────────────────────────────────────
 var SAHE=null;
+var STATS=null;
 var SAHE_TXT={
   pct:{
     endemica:{b:'O valor deste mês está dentro da faixa historicamente esperada — compatível com o comportamento normal da unidade.',t:'Zona endêmica: situação sob controle. Manter as práticas atuais de prevenção.'},
@@ -1404,6 +1405,10 @@ function App(){
     fetch('./data_sahe.json?t='+Date.now())
       .then(function(r){return r.ok?r.json():null;})
       .then(function(d){if(d){SAHE=d;}})
+      .catch(function(){});
+   fetch('./data_stats.json?t='+Date.now())
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){if(d){STATS=d;}})
       .catch(function(){});
     fetch('./data_iras.json?t='+Date.now())
       .then(function(r){return r.json();})
