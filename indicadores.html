@@ -713,12 +713,46 @@ function UtiSection(props){
       h(BarS,{title:'TOT / TQT',data:ud.tot,unit:'%',maxY:100})
     ),
     h(SH,{t:'Consumo de Antimicrobianos (DDD/1000 pac-dia)'}),
-    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
-      h(BarS,{title:'Pip/Tazo',data:ud.dddPip,maxY:300}),
-      h(BarS,{title:'Carbapenêmicos',data:ud.dddCarba,maxY:400}),
-      h(BarS,{title:'Glicopeptídeos',data:ud.dddGlico,maxY:320}),
-      h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200})
-    ),
+    (function(){
+      var sfx=props.u==='utiAB'?'utiab':'utic';
+      var dp=STATS&&STATS.dot_mensal_por_par||{};
+      function mk(key){
+        var d=dp[key]; if(!d||!d.mann_kendall)return null;
+        var m=d.mann_kendall;
+        var up=m.tendencia==='crescente';
+        var col=m.sig?(up?RED:GREEN):'#9eaab8';
+        var p=m.p<0.001?'<0,001':String(m.p).replace('.',',');
+        return h('div',{style:{fontSize:7,color:col,fontWeight:m.sig?700:400,
+          fontFamily:"'IBM Plex Mono',monospace",padding:'3px 6px',textAlign:'center'}},
+          (up?'↑ ':'↓ ')+'τ='+m.tau+' · p='+p+(m.sig?' ✱':''));
+      }
+      return h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+        h('div',null,h(BarS,{title:'Pip/Tazo',data:ud.dddPip,maxY:300}),mk('pip_'+sfx)),
+        h('div',null,h(BarS,{title:'Carbapenêmicos',data:ud.dddCarba,maxY:400}),mk('cbp_'+sfx)),
+        h('div',null,h(BarS,{title:'Glicopeptídeos',data:ud.dddGlico,maxY:320}),mk('gpp_'+sfx)),
+        h('div',null,h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200}),mk('pb_'+sfx))
+      );
+    })(),
+    (function(){
+      var sfx=props.u==='utiAB'?'utiab':'utic';
+      var dp=STATS&&STATS.dot_mensal_por_par||{};
+      function mk(key){
+        var d=dp[key]; if(!d||!d.mann_kendall)return null;
+        var m=d.mann_kendall;
+        var up=m.tendencia==='crescente';
+        var col=m.sig?(up?RED:GREEN):'#9eaab8';
+        var p=m.p<0.001?'<0,001':String(m.p).replace('.',',');
+        return h('div',{style:{fontSize:7,color:col,fontWeight:m.sig?700:400,
+          fontFamily:"'IBM Plex Mono',monospace",padding:'3px 6px',textAlign:'center'}},
+          (up?'↑ ':'↓ ')+'τ='+m.tau+' · p='+p+(m.sig?' ✱':''));
+      }
+      return h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+        h('div',null,h(BarS,{title:'Pip/Tazo',data:ud.dddPip,maxY:300}),mk('pip_'+sfx)),
+        h('div',null,h(BarS,{title:'Carbapenêmicos',data:ud.dddCarba,maxY:400}),mk('cbp_'+sfx)),
+        h('div',null,h(BarS,{title:'Glicopeptídeos',data:ud.dddGlico,maxY:320}),mk('gpp_'+sfx)),
+        h('div',null,h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200}),mk('pb_'+sfx))
+      );
+    })(),
     h(SH,{t:'MDR · Clopper-Pearson'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:10}},
       h(LineMDR,{title:'MDR — Densidade (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
