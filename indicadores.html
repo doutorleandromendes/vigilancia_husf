@@ -1039,7 +1039,10 @@ function ClinicaSection(props){
         hasIsc&&iscData.length>0?h(BarS,{title:'ISC',data:iscData,maxY:20,h:140}):null
       )
     ):null,
-
+// ── HM Álcool gel ──────────────────────────────────────────────────
+cd.hm&&cd.hm.length>0?h(BarS,{title:'Higiene das Mãos — Álcool Gel (ml/pac-dia)',
+  data:cd.hm,unit:'ml',refY:20,refLbl:'OMS',maxY:60,h:160,
+  note:'Referência OMS: ≥ 20 ml/pac-dia'}):null,
     // ── Checklist CVC ──────────────────────────────────────────────────
     (which==='clinicaMedica'||which==='clinicaCirurgica')
       ?h(ChecklistCVCBlock,{D:D,sectorKey:chkKey}):null
