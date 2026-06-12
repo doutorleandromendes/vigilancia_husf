@@ -803,11 +803,14 @@ function UtiNeoSection(props){
 
 function HdSection(props){
   var D=props.D;
+  var hasAccess=(D.hd.ilavTemp&&D.hd.ilavTemp.length>0)||(D.hd.ilavPerm&&D.hd.ilavPerm.length>0);
+  var ilavData=D.hd.ilav||D.hd.ilavTemp||[];
+  var bactData=D.hd.bact||D.hd.bactTemp||[];
   return h('div',{className:'fi'},
     h(SH,{t:'Infecções Relacionadas ao Cateter de Hemodiálise · Clopper-Pearson'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
-      h(BarS,{title:'ILAV — Infecção Local/Externa · Total (/1000 cat-dia)',data:D.hd.ilav,badge:'ENDÊMICA',maxY:35}),
-      h(BarS,{title:'Bacteremia / ICS · Total (/1000 cat-dia)',data:D.hd.bact,badge:'ENDÊMICA',maxY:35})
+      ilavData.length>0?h(BarS,{title:'ILAV — Infecção Local/Externa · Total (/1000 cat-dia)',data:ilavData,badge:'ENDÊMICA',maxY:35}):null,
+      bactData.length>0?h(BarS,{title:'Bacteremia / ICS · Total (/1000 cat-dia)',data:bactData,badge:'ENDÊMICA',maxY:35}):null
     ),
     hasAccess?h('div',null,
       h(SH,{t:'Por Tipo de Acesso · /1000 cat-dia · Cateter Temporário vs Permanente'}),
@@ -832,7 +835,7 @@ function HdSection(props){
       h(BarS,{title:'Pacientes em uso de Vancomicina (%)',data:D.hd.vanco,unit:'%',maxY:20}),
       D.hd.cvc3m?h(BarS,{title:'Cateter Rígido > 3 meses (/1000 cat-dia)',data:D.hd.cvc3m,maxY:8}):null
     ),
-    h(AuditCard,{data:D.hd.audit}),
+    D.hd.audit?h(AuditCard,{data:D.hd.audit}):null,
     h(ChecklistCVCBlock,{D:D,sectorKey:'hd',
       title:'Checklist de Inserção de CVC — Planilha de Controles (cobertura/conformidade)'})
   );
@@ -1007,7 +1010,7 @@ function ClinicaSection(props){
 
   return h('div',{className:'fi'},
     // ── Taxa IH ────────────────────────────────────────────────────────
-    h(BarS,{title:'Taxa IH — '+lbl,data:cd.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8,h:200}),
+    cd.taxaIH&&cd.taxaIH.length>0?h(BarS,{title:'Taxa IH — '+lbl,data:cd.taxaIH,unit:'%',badge:'ENDÊMICA',maxY:8,h:200}):null,
 
     // ── KPI corrente ───────────────────────────────────────────────────
     lastInf?h('div',{},
