@@ -824,6 +824,11 @@ function HdSection(props){
   var hasAccess=(D.hd.ilavTemp&&D.hd.ilavTemp.length>0)||(D.hd.ilavPerm&&D.hd.ilavPerm.length>0);
   var ilavData=D.hd.ilav||D.hd.ilavTemp||[];
   var bactData=D.hd.bact||D.hd.bactTemp||[];
+  var sHD=SAHE&&SAHE.hd?SAHE.hd:null;
+  function sp(k){
+    if(!sHD||!sHD[k])return null;
+    return Object.assign({},sHD[k],{ref_inicio:sHD.ref_inicio,ref_fim:sHD.ref_fim});
+  }
   return h('div',{className:'fi'},
     h(SH,{t:'Infecções Relacionadas ao Cateter de Hemodiálise · Clopper-Pearson'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
@@ -834,18 +839,18 @@ function HdSection(props){
       h(SH,{t:'Por Tipo de Acesso · /1000 cat-dia · Cateter Temporário vs Permanente'}),
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
         h(BarS,{title:'ILAV · Cateter Temporário (/1000 cat-dia)',
-          data:D.hd.ilavTemp||[],
+          data:D.hd.ilavTemp||[],sahe:sp('ilavTemp'),
           note:'Cateter não-tunelizado',maxY:20}),
         h(BarS,{title:'ILAV · Cateter Permanente (/1000 cat-dia)',
-          data:D.hd.ilavPerm||[],
+          data:D.hd.ilavPerm||[],sahe:sp('ilavPerm'),
           note:'Cateter tunelizado',maxY:20})
       ),
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
         h(BarS,{title:'Bacteremia · Cateter Temporário (/1000 cat-dia)',
-          data:D.hd.bactTemp||[],
+          data:D.hd.bactTemp||[],sahe:sp('bactTemp'),
           note:'Cateter não-tunelizado',maxY:35}),
         h(BarS,{title:'Bacteremia · Cateter Permanente (/1000 cat-dia)',
-          data:D.hd.bactPerm||[],
+          data:D.hd.bactPerm||[],sahe:sp('bactPerm'),
           note:'Cateter tunelizado',maxY:35})
       )
     ):null,
