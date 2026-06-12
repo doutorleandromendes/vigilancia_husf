@@ -6176,5 +6176,221 @@
         "c": 1
       }
     ]
+  },
+  "isolamentos": {
+    "novos_total": {
+      "clinicaMedica": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ],
+      "clinicaCirurgica": [
+        {
+          "p": "abr/26",
+          "n": 12,
+          "pct": null
+        }
+      ],
+      "epm": [],
+      "apartamento": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ],
+      "utiAB": [
+        {
+          "p": "abr/26",
+          "n": 13,
+          "pct": null
+        }
+      ],
+      "utic": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ],
+      "utiNeo": [
+        {
+          "p": "abr/26",
+          "n": 1,
+          "pct": null
+        }
+      ],
+      "pediatria": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ]
+    },
+    "confirmados_total": {
+      "clinicaMedica": [
+        {
+          "p": "abr/26",
+          "n": 29,
+          "pct": null
+        }
+      ],
+      "clinicaCirurgica": [
+        {
+          "p": "abr/26",
+          "n": 56,
+          "pct": null
+        }
+      ],
+      "epm": [
+        {
+          "p": "abr/26",
+          "n": 14,
+          "pct": null
+        }
+      ],
+      "apartamento": [
+        {
+          "p": "abr/26",
+          "n": 1,
+          "pct": null
+        }
+      ],
+      "utiAB": [
+        {
+          "p": "abr/26",
+          "n": 91,
+          "pct": null
+        }
+      ],
+      "utic": [
+        {
+          "p": "abr/26",
+          "n": 54,
+          "pct": null
+        }
+      ],
+      "utiNeo": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ],
+      "pediatria": [
+        {
+          "p": "abr/26",
+          "n": 23,
+          "pct": null
+        }
+      ]
+    },
+    "novos_pc": {
+      "clinicaMedica": [
+        {
+          "p": "abr/26",
+          "n": 1,
+          "pct": null
+        }
+      ],
+      "clinicaCirurgica": [
+        {
+          "p": "abr/26",
+          "n": 10,
+          "pct": null
+        }
+      ],
+      "epm": [],
+      "apartamento": [],
+      "utiAB": [
+        {
+          "p": "abr/26",
+          "n": 9,
+          "pct": null
+        }
+      ],
+      "utic": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ],
+      "utiNeo": [
+        {
+          "p": "abr/26",
+          "n": 1,
+          "pct": null
+        }
+      ],
+      "pediatria": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ]
+    },
+    "confirmados_pc": {
+      "clinicaMedica": [
+        {
+          "p": "abr/26",
+          "n": 29,
+          "pct": null
+        }
+      ],
+      "clinicaCirurgica": [
+        {
+          "p": "abr/26",
+          "n": 56,
+          "pct": null
+        }
+      ],
+      "epm": [
+        {
+          "p": "abr/26",
+          "n": 13,
+          "pct": null
+        }
+      ],
+      "apartamento": [
+        {
+          "p": "abr/26",
+          "n": 1,
+          "pct": null
+        }
+      ],
+      "utiAB": [
+        {
+          "p": "abr/26",
+          "n": 87,
+          "pct": null
+        }
+      ],
+      "utic": [
+        {
+          "p": "abr/26",
+          "n": 54,
+          "pct": null
+        }
+      ],
+      "utiNeo": [
+        {
+          "p": "abr/26",
+          "n": 2,
+          "pct": null
+        }
+      ],
+      "pediatria": [
+        {
+          "p": "abr/26",
+          "n": 23,
+          "pct": null
+        }
+      ]
+    }
   }
 }
