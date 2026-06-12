@@ -101,6 +101,16 @@
     "status": "endemico",
     "infSeries": [
       {
+        "ac": 1,
+        "itu": 0,
+        "pneu": 4,
+        "isc": 0,
+        "pd": 727,
+        "total": 5,
+        "p": "mai/26",
+        "c": 1
+      },
+      {
         "p": "jan/24",
         "ac": 2,
         "itu": 1,
@@ -315,16 +325,6 @@
         "isc": 0,
         "pd": 662,
         "total": 12
-      },
-      {
-        "ac": 1,
-        "itu": 0,
-        "pneu": 4,
-        "isc": 0,
-        "pd": 727,
-        "total": 5,
-        "p": "mai/26",
-        "c": 1
       }
     ]
   },
@@ -382,6 +382,16 @@
     },
     "status": "endemico",
     "infSeries": [
+      {
+        "ac": 4,
+        "itu": 2,
+        "pneu": 7,
+        "isc": 6,
+        "pd": 844,
+        "total": 19,
+        "p": "mai/26",
+        "c": 1
+      },
       {
         "p": "jan/24",
         "ac": 4,
@@ -597,16 +607,6 @@
         "isc": 6,
         "pd": 791,
         "total": 17
-      },
-      {
-        "ac": 4,
-        "itu": 2,
-        "pneu": 7,
-        "isc": 6,
-        "pd": 844,
-        "total": 19,
-        "p": "mai/26",
-        "c": 1
       }
     ]
   },
@@ -664,6 +664,16 @@
     },
     "status": "endemico",
     "infSeries": [
+      {
+        "ac": 0,
+        "itu": 1,
+        "pneu": 1,
+        "isc": 2,
+        "pd": 493,
+        "total": 4,
+        "p": "mai/26",
+        "c": 1
+      },
       {
         "p": "jan/24",
         "ac": 2,
@@ -879,16 +889,6 @@
         "isc": 1,
         "pd": 544,
         "total": 3
-      },
-      {
-        "ac": 0,
-        "itu": 1,
-        "pneu": 1,
-        "isc": 2,
-        "pd": 493,
-        "total": 4,
-        "p": "mai/26",
-        "c": 1
       }
     ]
   },
@@ -3917,14 +3917,6 @@
       }
     }
   },
-  "sura": {
-    "sol": 153,
-    "neg": 95,
-    "mantido": 32,
-    "semAtb": 9,
-    "troca": 22,
-    "alta": 19
-  },
   "checklistCVC": {
     "utiAB": [
       {
@@ -6036,6 +6028,21 @@
         "nc_puncao": 0,
         "cobertura": null,
         "conformidade": null,
+        "p": "mai/26",
+        "c": 1
+      }
+    ]
+  },
+  "sura": {
+    "s": [
+      {
+        "sol": 153,
+        "neg": 95,
+        "mantido": 32,
+        "semAtb": 9,
+        "troca": 22,
+        "alta": 19,
+        "obito": 0,
         "p": "mai/26",
         "c": 1
       }
