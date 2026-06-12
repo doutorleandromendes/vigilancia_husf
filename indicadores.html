@@ -1185,6 +1185,89 @@ function MetodFooter(){
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
+ // ── IsolamentosSection ────────────────────────────────────────────────────────
+function IsolamentosSection(props){
+  var D=props.D;
+  var isol=D.isolamentos||{};
+  var conf=isol.confirmados_pc||{};
+  var novos=isol.novos_total||{};
+
+  var UNITS=[
+    {key:'utiAB',           label:'UTI A/B',          col:'#c62828'},
+    {key:'utic',            label:'UTI C',             col:'#1565c0'},
+    {key:'utiNeo',          label:'UTI Neo/CI',        col:'#4527a0'},
+    {key:'clinicaMedica',   label:'Clínica Médica',    col:'#2e7d32'},
+    {key:'clinicaCirurgica',label:'Clínica Cirúrgica', col:'#e65100'},
+    {key:'epm',             label:'EPM',               col:'#00695c'},
+    {key:'apartamento',     label:'Apartamento',       col:'#5d4037'},
+    {key:'pediatria',       label:'Pediatria/BR',      col:'#6a1b9a'},
+  ];
+
+  function lastPt(series){ return(series&&series.length)?series[series.length-1]:null; }
+
+  // KPI card por unidade
+  function UnitCard(u){
+    var cPts=conf[u.key]||[];
+    var nPts=novos[u.key]||[];
+    var cLast=lastPt(cPts);
+    var nLast=lastPt(nPts);
+    var pct=cLast?cLast.pct:null;
+    var border=pct!=null&&pct>20?'2px solid '+u.col:'1px solid '+BRDR;
+    return h('div',{style:{background:WHITE,border:border,borderRadius:8,
+      padding:'12px 14px',boxShadow:'0 1px 3px rgba(0,0,0,.06)'}},
+      h('div',{style:{fontSize:9,color:u.col,fontWeight:600,marginBottom:6,
+        letterSpacing:.3,textTransform:'uppercase'}},u.label),
+      h('div',{style:{display:'flex',alignItems:'baseline',gap:6,marginBottom:4}},
+        h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:24,
+          fontWeight:700,color:pct!=null&&pct>20?u.col:SLATE,lineHeight:1}},
+          pct!=null?pct.toFixed(1)+'%':'—'),
+        h('span',{style:{fontSize:9,color:MUTED}},'pac-dia em PC')
+      ),
+      h('div',{style:{fontSize:9,color:MUTED}},
+        nLast?'↑ '+nLast.n+' casos novos ('+nLast.p+')':'sem dados'
+      ),
+      // mini trend bar
+      cPts.length>1?h('div',{style:{display:'flex',alignItems:'flex-end',gap:2,
+        marginTop:8,height:28}},
+        cPts.map(function(pt,i){
+          var h_=Math.max(2,Math.round((pt.pct||0)/40*28));
+          var isCurr=pt.c||i===cPts.length-1;
+          return h('div',{key:i,title:pt.p+': '+pt.pct+'%',
+            style:{flex:1,height:h_,borderRadius:'2px 2px 0 0',
+              background:u.col,opacity:isCurr?1:.35}});
+        })
+      ):null
+    );
+  }
+
+  // Série histórica de % pac-dia por unidade (BarS)
+  function toPct(series){
+    return (series||[]).map(function(pt){return{p:pt.p,v:pt.pct,c:pt.c};});
+  }
+
+  return h('div',{className:'fi'},
+    h(SH,{t:'Precaução de Contato — % Pac-Dia · Competência Atual'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:16}},
+      UNITS.map(function(u){return h('div',{key:u.key},UnitCard(u));})
+    ),
+    h(SH,{t:'Série Histórica — % Pac-Dia em Precaução de Contato (MDR + Outros)'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:16}},
+      UNITS.map(function(u){
+        var pts=toPct(conf[u.key]);
+        return pts.length>0?h(BarS,{key:u.key,title:u.label,
+          data:pts,unit:'%',maxY:50,h:160}):null;
+      })
+    ),
+    h(SH,{t:'Casos Novos em Qualquer Precaução / Isolamento — n por mês'}),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+      UNITS.map(function(u){
+        var pts=(novos[u.key]||[]).map(function(pt){return{p:pt.p,v:pt.n,c:pt.c};});
+        return pts.length>0?h(BarS,{key:u.key,title:u.label,
+          data:pts,maxY:20,h:140}):null;
+      })
+    )
+  );
+}
 // ── SuraSection ───────────────────────────────────────────────────────────────
 function SuraSection(props){
   var D=props.D;
@@ -1402,13 +1485,15 @@ var NAV=[
   {id:'clinicaCirurgica',l:'Clínica Cirúrgica',g:'Enfermarias',ic:'▤'},
   {id:'epm',l:'EPM / Apartamentos',g:'Enfermarias',ic:'▤'},
   {id:'diarreia',l:'Diarreia Hospitalar',g:'Vigilâncias Especiais',ic:'◎'},
-  {id:'sura',l:'Uso Racional de ATB',g:'Stewardship',ic:'◑'}
+  {id:'sura',l:'Uso Racional de ATB',g:'Stewardship',ic:'◑'},
+  {id:'isolamentos',l:'Precauções de Contato',g:'Stewardship',ic:'⊘'}
 ];
 var TITLES={overview:'Visão Geral — IrAS & MDR',mdrInst:'Multirresistentes — Institucional',
   abio:'Antibiograma Institucional',utiAB:'UTI A/B',utic:'UTI C',
   utiNeo:'UTI Neonatal',hd:'Hemodiálise / Nefrologia',clinicaMedica:'Clínica Médica',
   clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos',
-  diarreia:'Diarreia Hospitalar',sura:'Sistema de Uso Racional de ATB'};
+  diarreia:'Diarreia Hospitalar',sura:'Sistema de Uso Racional de ATB',
+  isolamentos:'Precauções de Contato e Isolamentos'};
 var groups=NAV.reduce(function(acc,n){if(n.g&&acc.indexOf(n.g)===-1)acc.push(n.g);return acc;},[]);
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -1636,6 +1721,7 @@ function App(){
       case 'epm':              return h(ClinicaSection,{D:D,which:'epm'});
       case 'diarreia':         return h(DiarreiaSection,{D:D});
       case 'sura':             return h(SuraSection,{D:D});
+      case 'isolamentos':      return h(IsolamentosSection,{D:D});
       default: return null;
     }
   }
