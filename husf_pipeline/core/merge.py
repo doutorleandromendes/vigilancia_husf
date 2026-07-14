@@ -201,6 +201,40 @@ def build_month(prev_json, label, parsers_out, manual):
     d['mdrInst']['s'] = appMDR(d['mdrInst'].get('s', []), label,
         e=inst_rate('esbl'), k=inst_rate('kpc'), a=inst_rate('acin'))
 
+    # ── MDR Mensal (para mdr_mensal.html) ─────────────────────────────────
+    # Estrutura: mdrMensal[unit][org] = série {p,v,c}; mdrMensal[unit].pd = série;
+    # mdrMensal[unit].counts[org] = array paralelo de contagens absolutas.
+    d.setdefault('mdrMensal', {})
+    for _ukey, _mkey in [('utiAB','ab'), ('utic','uc'), ('utiNeo','neo')]:
+        _u = mdr.get(_mkey, {})
+        if not _u:
+            continue
+        _mm = d['mdrMensal'].setdefault(_ukey, {})
+        # normaliza séries legadas (listas de int puro → descarta, recomeça limpo)
+        def _clean(seq):
+            if not isinstance(seq, list): return []
+            return [pt for pt in seq if isinstance(pt, dict)]
+        for _org in ('esbl','kpc','acin','pseu'):
+            _mm[_org] = appS(_clean(_mm.get(_org, [])), label, _u.get(f'{_org}_r'))
+        _mm['pd'] = appS(_clean(_mm.get('pd', [])), label, _u.get('pd'))
+        # counts: arrays paralelos de contagens absolutas, 1:1 com a série do organismo.
+        # Reconstrói a partir da série (fonte da verdade) para garantir alinhamento
+        # mesmo após limpeza de dados legados.
+        _mm.setdefault('counts', {})
+        for _org in ('esbl','kpc','acin','pseu'):
+            _series = _mm.get(_org, [])
+            _prev_counts = _mm['counts'].get(_org, [])
+            _n_atual = int(_u.get(f'{_org}_n', 0) or 0)
+            _new_counts = []
+            for _i, _pt in enumerate(_series):
+                if _pt.get('p') == label:
+                    _new_counts.append(_n_atual)
+                elif _i < len(_prev_counts) and isinstance(_prev_counts[_i], int):
+                    _new_counts.append(_prev_counts[_i])
+                else:
+                    _new_counts.append(0)
+            _mm['counts'][_org] = _new_counts
+
     # ── Enfermarias — contagens + taxaIH ─────────────────────────────────
     for wk in ('clinicaMedica','clinicaCirurgica','epm'):
         wp = man(wk)
