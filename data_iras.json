@@ -52,7 +52,8 @@
         "c": 1
       }
     ],
-    "status": "endemico"
+    "status": "endemic",
+    "statusTrend": "descendo"
   },
   "clinicaMedica": {
     "taxaIH": [
@@ -114,7 +115,7 @@
       "total": 5,
       "pd": 678
     },
-    "status": "endemico",
+    "status": "endemic",
     "infSeries": [
       {
         "p": "jan/24",
@@ -407,7 +408,8 @@
         "v": 15.7,
         "c": 1
       }
-    ]
+    ],
+    "statusTrend": "descendo"
   },
   "clinicaCirurgica": {
     "taxaIH": [
@@ -469,7 +471,7 @@
       "total": 20,
       "pd": 767
     },
-    "status": "endemico",
+    "status": "endemic",
     "infSeries": [
       {
         "p": "jan/24",
@@ -762,7 +764,8 @@
         "v": 12.2,
         "c": 1
       }
-    ]
+    ],
+    "statusTrend": "descendo"
   },
   "epm": {
     "taxaIH": [
@@ -824,7 +827,7 @@
       "total": 8,
       "pd": 519
     },
-    "status": "endemico",
+    "status": "endemic",
     "infSeries": [
       {
         "p": "jan/24",
@@ -1117,7 +1120,8 @@
         "v": 28.3,
         "c": 1
       }
-    ]
+    ],
+    "statusTrend": "estável"
   },
   "hd": {
     "ilav": [
@@ -3216,7 +3220,7 @@
       },
       {
         "p": "jul/26",
-        "e": 23.41137124,
+        "e": 26.75585284,
         "k": 10.03344482,
         "a": 6.688963211,
         "c": 1
@@ -3526,7 +3530,7 @@
       },
       {
         "p": "jul/26",
-        "e": 18.47,
+        "e": 19.35,
         "k": 6.16,
         "a": 7.92,
         "c": 1
@@ -7803,7 +7807,17 @@
         "troca": 10,
         "alta": 11,
         "obito": 0,
-        "p": "jun/26",
+        "p": "jun/26"
+      },
+      {
+        "sol": 1137,
+        "neg": 87,
+        "mantido": 4,
+        "semAtb": 0,
+        "troca": 1,
+        "alta": 4,
+        "obito": 1,
+        "p": "jul/26",
         "c": 1
       }
     ]
