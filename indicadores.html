@@ -52,12 +52,20 @@ if(!window.React||!window.ReactDOM||!window.Recharts){
 }
 var h=React.createElement,useState=React.useState,useEffect=React.useEffect;
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-var BG='#f0f2f5', WHITE='#ffffff', BRDR='#d0d7de', MUTED='#8898aa';
-var NAVY='#1a2744', SLATE='#4a5568', LIGHT='#6b7280';
-var BLUE='#1565c0', RED='#c62828', GREEN='#2e7d32', AMBER='#e65100', PURPLE='#4527a0', TEAL='#00695c';
-var HIST='#9eaab8', CURR=BLUE;
-var GRID='#e2e6ea';
+// ── Design tokens (editáveis via dashboard_config.json; fallback = padrão) ─────
+var THEME_DEFAULTS={bg:'#f0f2f5',white:'#ffffff',brdr:'#d0d7de',muted:'#8898aa',navy:'#1a2744',slate:'#4a5568',light:'#6b7280',blue:'#1565c0',red:'#c62828',green:'#2e7d32',amber:'#e65100',purple:'#4527a0',teal:'#00695c',hist:'#9eaab8',grid:'#e2e6ea'};
+var BG,WHITE,BRDR,MUTED,NAVY,SLATE,LIGHT,BLUE,RED,GREEN,AMBER,PURPLE,TEAL,HIST,CURR,GRID;
+var THEME_CUR={};
+var __themeSetter=null;
+function applyTheme(t){
+  THEME_CUR=Object.assign({},THEME_DEFAULTS,t||{});
+  BG=THEME_CUR.bg;WHITE=THEME_CUR.white;BRDR=THEME_CUR.brdr;MUTED=THEME_CUR.muted;
+  NAVY=THEME_CUR.navy;SLATE=THEME_CUR.slate;LIGHT=THEME_CUR.light;
+  BLUE=THEME_CUR.blue;RED=THEME_CUR.red;GREEN=THEME_CUR.green;AMBER=THEME_CUR.amber;
+  PURPLE=THEME_CUR.purple;TEAL=THEME_CUR.teal;HIST=THEME_CUR.hist;GRID=THEME_CUR.grid;CURR=BLUE;
+  if(__themeSetter) __themeSetter(function(v){return v+1;});
+}
+applyTheme();
 
 // ── SAHE global ───────────────────────────────────────────────────────────────
 var SAHE=null;
@@ -700,39 +708,7 @@ function UtiSection(props){
   }
   return h('div',{className:'fi'},
     s?h(SaheLegenda):h(LimLegenda),
-    h(SH,{t:'IrAS — Densidade (/1000 dispositivo-dia)'}),
-    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
-      h(BarS,{title:'PAV (/1000 VM-dia)',data:ud.pav,maxY:35,sahe:sp('pav')}),
-      h(BarS,{title:'ITU Relacionada a SVD (/1000 SVD-dia)',data:ud.itu,maxY:14}),
-      h(BarS,{title:'IPCS Laboratorial — CVC (/1000 CVC-dia)',data:ud.ipcs,maxY:40,sahe:sp('ipcs')})
-    ),
-    h(SH,{t:'Utilização de Dispositivos (%)'}),
-    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}},
-      h(BarS,{title:'SVD',data:ud.svd,unit:'%',maxY:100,sahe:sp('svd')}),
-      h(BarS,{title:'CVC',data:ud.cvc,unit:'%',maxY:100,sahe:sp('cvc')}),
-      h(BarS,{title:'TOT / TQT',data:ud.tot,unit:'%',maxY:100})
-    ),
-    h(SH,{t:'Consumo de Antimicrobianos (DDD/1000 pac-dia)'}),
-    (function(){
-      var sfx=props.u==='utiAB'?'utiab':'utic';
-      var dp=STATS&&STATS.dot_mensal_por_par||{};
-      function mk(key){
-        var d=dp[key]; if(!d||!d.mann_kendall)return null;
-        var m=d.mann_kendall;
-        var up=m.tendencia==='crescente';
-        var col=m.sig?(up?RED:GREEN):'#9eaab8';
-        var p=m.p<0.001?'<0,001':String(m.p).replace('.',',');
-        return h('div',{style:{fontSize:7,color:col,fontWeight:m.sig?700:400,
-          fontFamily:"'IBM Plex Mono',monospace",padding:'3px 6px',textAlign:'center'}},
-          (up?'↑ ':'↓ ')+'τ='+m.tau+' · p='+p+(m.sig?' ✱':''));
-      }
-      return h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
-        h('div',null,h(BarS,{title:'Pip/Tazo',data:ud.dddPip,maxY:300}),mk('pip_'+sfx)),
-        h('div',null,h(BarS,{title:'Carbapenêmicos',data:ud.dddCarba,maxY:400}),mk('cbp_'+sfx)),
-        h('div',null,h(BarS,{title:'Glicopeptídeos',data:ud.dddGlico,maxY:320}),mk('gpp_'+sfx)),
-        h('div',null,h(BarS,{title:'Polimixina B',data:ud.dddPoli,maxY:200}),mk('pb_'+sfx))
-      );
-    })(),
+    renderGrids(props.u, ud, sp),
     h(SH,{t:'MDR · Clopper-Pearson'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10,marginBottom:10}},
       h(LineMDR,{title:'MDR — Densidade (/1000 pac-dia)',data:ud.mdr,maxE:ud.mdrMax.e,maxK:ud.mdrMax.k,maxA:ud.mdrMax.a,h:175}),
@@ -784,8 +760,7 @@ function UtiNeoSection(props){
     :null;
   return h('div',{className:'fi'},
     neoIpcsSahe?h(SaheLegenda):h(LimLegenda),
-    h(SH,{t:'IrAS — IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)'}),
-    h(BarS,{title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',data:neo.ipcs,maxY:55,h:220,sahe:neoIpcsSahe}),
+    renderGrids('utiNeo', neo, function(k){ return (neoS&&neoS[k])?Object.assign({},neoS[k],{ref_inicio:neoS.ref_inicio,ref_fim:neoS.ref_fim}):null; }),
     h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
       auditData.length>0?h(BarS,{title:'% Não-conformes por Mês',data:auditData,unit:'%',maxY:100,h:180}):null,
@@ -830,34 +805,7 @@ function HdSection(props){
     return Object.assign({},sHD[k],{ref_inicio:sHD.ref_inicio,ref_fim:sHD.ref_fim});
   }
   return h('div',{className:'fi'},
-    h(SH,{t:'Infecções Relacionadas ao Cateter de Hemodiálise · Clopper-Pearson'}),
-    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
-      ilavData.length>0?h(BarS,{title:'ILAV — Infecção Local/Externa · Total (/1000 cat-dia)',data:ilavData,badge:'ENDÊMICA',maxY:35}):null,
-      bactData.length>0?h(BarS,{title:'Bacteremia / ICS · Total (/1000 cat-dia)',data:bactData,badge:'ENDÊMICA',maxY:35}):null
-    ),
-    hasAccess?h('div',null,
-      h(SH,{t:'Por Tipo de Acesso · /1000 cat-dia · Cateter Temporário vs Permanente'}),
-      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
-        h(BarS,{title:'ILAV · Cateter Temporário (/1000 cat-dia)',
-          data:D.hd.ilavTemp||[],sahe:sp('ilavTemp'),
-          note:'Cateter não-tunelizado',maxY:20}),
-        h(BarS,{title:'ILAV · Cateter Permanente (/1000 cat-dia)',
-          data:D.hd.ilavPerm||[],sahe:sp('ilavPerm'),
-          note:'Cateter tunelizado',maxY:20})
-      ),
-      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
-        h(BarS,{title:'Bacteremia · Cateter Temporário (/1000 cat-dia)',
-          data:D.hd.bactTemp||[],sahe:sp('bactTemp'),
-          note:'Cateter não-tunelizado',maxY:35}),
-        h(BarS,{title:'Bacteremia · Cateter Permanente (/1000 cat-dia)',
-          data:D.hd.bactPerm||[],sahe:sp('bactPerm'),
-          note:'Cateter tunelizado',maxY:35})
-      )
-    ):null,
-    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}},
-      h(BarS,{title:'Pacientes em uso de Vancomicina (%)',data:D.hd.vanco,unit:'%',maxY:20}),
-      D.hd.cvc3m?h(BarS,{title:'Cateter Rígido > 3 meses (/1000 cat-dia)',data:D.hd.cvc3m,maxY:8}):null
-    ),
+    renderGrids('hd', D.hd, sp),
     D.hd.audit?h(AuditCard,{data:D.hd.audit}):null,
     h(ChecklistCVCBlock,{D:D,sectorKey:'hd',
       title:'Checklist de Inserção de CVC — Planilha de Controles (cobertura/conformidade)'})
@@ -1478,7 +1426,7 @@ function SuraSection(props){
   );
 }
 
-var NAV=[
+var NAV_DEFAULT=[
   {id:'overview',l:'Visão Geral',g:'Institucional',ic:'◈'},
   {id:'mdrInst',l:'Multirresistentes',g:'Institucional',ic:'⬡'},
   {id:'abio',l:'Antibiograma',g:'Institucional',ic:'⬟'},
@@ -1493,19 +1441,263 @@ var NAV=[
   {id:'sura',l:'Uso Racional de ATB',g:'Stewardship',ic:'◑'},
   {id:'isolamentos',l:'Precauções de Contato',g:'Stewardship',ic:'⊘'}
 ];
+var NAV, groups;
+function applyNav(ov){
+  var byId={}; NAV_DEFAULT.forEach(function(n){byId[n.id]=n;});
+  var out=[];
+  if(ov&&ov.length){
+    ov.forEach(function(o){
+      var base=byId[o.id]; if(!base) return;
+      if(o.hidden){ delete byId[o.id]; return; }
+      out.push({id:base.id, l:o.l||base.l, g:o.g||base.g, ic:o.ic||base.ic});
+      delete byId[o.id];
+    });
+    NAV_DEFAULT.forEach(function(n){ if(byId[n.id]) out.push(n); });
+  } else { out=NAV_DEFAULT.slice(); }
+  NAV=out;
+  groups=NAV.reduce(function(acc,n){if(n.g&&acc.indexOf(n.g)===-1)acc.push(n.g);return acc;},[]);
+  if(__themeSetter)__themeSetter(function(v){return v+1;});
+}
+applyNav();
 var TITLES={overview:'Visão Geral — IrAS & MDR',mdrInst:'Multirresistentes — Institucional',
   abio:'Antibiograma Institucional',utiAB:'UTI A/B',utic:'UTI C',
   utiNeo:'UTI Neonatal',hd:'Hemodiálise / Nefrologia',clinicaMedica:'Clínica Médica',
   clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos',
   diarreia:'Diarreia Hospitalar',sura:'Sistema de Uso Racional de ATB',
   isolamentos:'Precauções de Contato e Isolamentos'};
-var groups=NAV.reduce(function(acc,n){if(n.g&&acc.indexOf(n.g)===-1)acc.push(n.g);return acc;},[]);
+
+// ── Config de gráficos por seção (default reproduz o layout atual) ────────────
+function _utiGrids(){ return [
+  {header:'IrAS — Densidade (/1000 dispositivo-dia)',cols:3,charts:[
+    {id:'pav',title:'PAV (/1000 VM-dia)',src:'pav',maxY:35,sahe:'pav'},
+    {id:'itu',title:'ITU Relacionada a SVD (/1000 SVD-dia)',src:'itu',maxY:14},
+    {id:'ipcs',title:'IPCS Laboratorial — CVC (/1000 CVC-dia)',src:'ipcs',maxY:40,sahe:'ipcs'}
+  ]},
+  {header:'Utilização de Dispositivos (%)',cols:3,charts:[
+    {id:'svd',title:'SVD',src:'svd',unit:'%',maxY:100,sahe:'svd'},
+    {id:'cvc',title:'CVC',src:'cvc',unit:'%',maxY:100,sahe:'cvc'},
+    {id:'tot',title:'TOT / TQT',src:'tot',unit:'%',maxY:100}
+  ]},
+  {header:'Consumo de Antimicrobianos (DDD/1000 pac-dia)',cols:4,charts:[
+    {id:'dddPip',title:'Pip/Tazo',src:'dddPip',maxY:300,mk:'pip'},
+    {id:'dddCarba',title:'Carbapenêmicos',src:'dddCarba',maxY:400,mk:'cbp'},
+    {id:'dddGlico',title:'Glicopeptídeos',src:'dddGlico',maxY:320,mk:'gpp'},
+    {id:'dddPoli',title:'Polimixina B',src:'dddPoli',maxY:200,mk:'pb'}
+  ]}
+]; }
+var SEC_DEFAULT={
+  utiAB:{grids:_utiGrids()},
+  utic:{grids:_utiGrids()},
+  utiNeo:{grids:[
+    {header:'IrAS — IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',cols:1,charts:[
+      {id:'ipcs',title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',src:'ipcs',maxY:55,h:220,sahe:'ipcs'}
+    ]}
+  ]},
+  hd:{grids:[
+    {header:'Infecções Relacionadas ao Cateter de Hemodiálise · Clopper-Pearson',cols:2,charts:[
+      {id:'ilav',title:'ILAV — Infecção Local/Externa · Total (/1000 cat-dia)',src:'ilav',maxY:35,badge:'ENDÊMICA'},
+      {id:'bact',title:'Bacteremia / ICS · Total (/1000 cat-dia)',src:'bact',maxY:35,badge:'ENDÊMICA'}
+    ]},
+    {header:'Por Tipo de Acesso · Cateter Temporário vs Permanente (/1000 cat-dia)',cols:2,charts:[
+      {id:'ilavTemp',title:'ILAV · Cateter Temporário (/1000 cat-dia)',src:'ilavTemp',maxY:20,sahe:'ilavTemp',note:'Cateter não-tunelizado'},
+      {id:'ilavPerm',title:'ILAV · Cateter Permanente (/1000 cat-dia)',src:'ilavPerm',maxY:20,sahe:'ilavPerm',note:'Cateter tunelizado'}
+    ]},
+    {header:'',cols:2,charts:[
+      {id:'bactTemp',title:'Bacteremia · Cateter Temporário (/1000 cat-dia)',src:'bactTemp',maxY:35,sahe:'bactTemp',note:'Cateter não-tunelizado'},
+      {id:'bactPerm',title:'Bacteremia · Cateter Permanente (/1000 cat-dia)',src:'bactPerm',maxY:35,sahe:'bactPerm',note:'Cateter tunelizado'}
+    ]},
+    {header:'',cols:2,charts:[
+      {id:'vanco',title:'Pacientes em uso de Vancomicina (%)',src:'vanco',unit:'%',maxY:20},
+      {id:'cvc3m',title:'Cateter Rígido > 3 meses (/1000 cat-dia)',src:'cvc3m',maxY:8}
+    ]}
+  ]}
+};
+var SEC_CFG;
+function applySections(ov){
+  SEC_CFG=JSON.parse(JSON.stringify(SEC_DEFAULT));
+  if(ov){ Object.keys(ov).forEach(function(sid){ if(ov[sid]&&ov[sid].grids) SEC_CFG[sid]=ov[sid]; }); }
+  if(__themeSetter)__themeSetter(function(v){return v+1;});
+}
+applySections();
+
+// ── Seleção de gráfico (manipulação direta em modo edição) ────────────────────
+var EDIT_MODE=false;
+var SEL=null;              // {sec,gi,ci}
+var __selSetter=null;
+function _bumpSel(){ if(__selSetter)__selSetter(function(v){return v+1;}); }
+function selectChart(ref){ SEL=ref; _bumpSel(); }
+function deselectChart(){ SEL=null; _bumpSel(); }
+function selChartObj(){ try{ return SEC_CFG[SEL.sec].grids[SEL.gi].charts[SEL.ci]; }catch(e){ return null; } }
+function secEdit(ref,patch){ var a=SEC_CFG[ref.sec].grids[ref.gi].charts; a[ref.ci]=Object.assign({},a[ref.ci],patch); _bumpSel(); }
+function secMove(ref,d){ var a=SEC_CFG[ref.sec].grids[ref.gi].charts; var j=ref.ci+d; if(j<0||j>=a.length)return; var x=a[ref.ci];a[ref.ci]=a[j];a[j]=x; SEL={sec:ref.sec,gi:ref.gi,ci:j}; _bumpSel(); }
+function secDel(ref){ SEC_CFG[ref.sec].grids[ref.gi].charts.splice(ref.ci,1); SEL=null; _bumpSel(); }
+function secAdd(sec,gi){ var a=SEC_CFG[sec].grids[gi].charts; a.push({id:'c'+Math.random().toString(36).slice(2,6),title:'Novo gráfico',src:'',maxY:100}); SEL={sec:sec,gi:gi,ci:a.length-1}; _bumpSel(); }
+
+// ── Render genérico de grades config-driven, com clique-pra-editar ────────────
+function renderGrids(secId, ud, sp){
+  var scfg=SEC_CFG[secId]; if(!scfg||!scfg.grids) return null;
+  var dotSfx={utiAB:'utiab',utic:'utic'}[secId];
+  function mkAnnot(statKey){
+    var dp=STATS&&STATS.dot_mensal_por_par||{};
+    var d=dp[statKey]; if(!d||!d.mann_kendall) return null;
+    var m=d.mann_kendall;
+    var up=m.tendencia==='crescente';
+    var col=m.sig?(up?RED:GREEN):'#9eaab8';
+    var p=m.p<0.001?'<0,001':String(m.p).replace('.',',');
+    return h('div',{style:{fontSize:7,color:col,fontWeight:m.sig?700:400,
+      fontFamily:"'IBM Plex Mono',monospace",padding:'3px 6px',textAlign:'center'}},
+      (up?'↑ ':'↓ ')+'τ='+m.tau+' · p='+p+(m.sig?' ✱':''));
+  }
+  return scfg.grids.map(function(g,gi){
+    var charts=g.charts||[];
+    var anyVis=charts.some(function(c){ return !c.hidden && c.src && ud[c.src] && ud[c.src].length>0; });
+    if(!EDIT_MODE && !anyVis) return null;
+    return h('div',{key:secId+'g'+gi},
+      g.header?h(SH,{t:g.header}):null,
+      h('div',{style:{display:'grid',gridTemplateColumns:'repeat('+(g.cols||3)+',1fr)',gap:10,marginBottom:10}},
+        charts.map(function(c,ci){
+          var hasData=c.src&&ud[c.src]&&ud[c.src].length>0;
+          if(c.hidden&&!EDIT_MODE) return null;
+          if(!hasData&&!EDIT_MODE) return null;
+          var barEl=hasData
+            ? h(BarS,{title:c.title,data:ud[c.src],unit:c.unit,maxY:c.maxY,sahe:c.sahe?sp(c.sahe):null,badge:c.badge,note:c.note,h:c.h,refY:c.refY,refLbl:c.refLbl})
+            : h('div',{style:{background:WHITE,border:'1px dashed '+BRDR,borderRadius:8,padding:'30px 12px',textAlign:'center',color:MUTED,fontSize:11}},'Escolha uma série no inspetor →');
+          var ann=(hasData&&c.mk&&dotSfx)?mkAnnot(c.mk+'_'+dotSfx):null;
+          var inner=ann?h('div',null,barEl,ann):barEl;
+          if(!EDIT_MODE) return h('div',{key:c.id},inner);
+          var isSel=SEL&&SEL.sec===secId&&SEL.gi===gi&&SEL.ci===ci;
+          return h('div',{key:c.id,onClick:function(e){e.stopPropagation();selectChart({sec:secId,gi:gi,ci:ci});},
+            style:{cursor:'pointer',position:'relative',borderRadius:10,opacity:c.hidden?.5:1,
+              outline:isSel?('2px solid '+BLUE):'2px dashed '+BRDR,outlineOffset:3,
+              boxShadow:isSel?'0 0 0 4px rgba(21,101,192,.10)':'none'}},
+            inner,
+            isSel?h('div',{style:{position:'absolute',top:-9,left:10,background:BLUE,color:'#fff',fontSize:8,fontWeight:700,padding:'1px 7px',borderRadius:4,letterSpacing:.4}},'SELECIONADO'):null);
+        }),
+        EDIT_MODE?h('div',{onClick:function(e){e.stopPropagation();secAdd(secId,gi);},
+          style:{cursor:'pointer',border:'2px dashed '+BRDR,borderRadius:10,minHeight:120,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:MUTED,fontSize:12,gap:4}},
+          h('span',{style:{fontSize:24}},'＋'),'Adicionar gráfico'):null
+      ));
+  });
+}
 
 // ── App ───────────────────────────────────────────────────────────────────────
+// ── Editor de paleta (modo super-admin ?edit=1) ───────────────────────────────
+function ThemeEditor(props){
+  var tS=useState(Object.assign({},THEME_CUR)); var t=tS[0],setT=tS[1];
+  var navS=useState(function(){ return NAV.map(function(n){return {id:n.id,l:n.l,g:n.g,ic:n.ic,hidden:false};}); });
+  var nav=navS[0],setNav=navS[1];
+  var tabS=useState('pal'); var tab=tabS[0],setTab=tabS[1];
+  var msgS=useState(null); var msg=msgS[0],setMsg=msgS[1];
+  var openS=useState(true); var open=openS[0],setOpen=openS[1];
+  function flash(m){ setMsg(m); setTimeout(function(){setMsg(null);},2600); }
+  function setColor(k,v){ var nt=Object.assign({},t); nt[k]=v; setT(nt); props.onApply(nt); }
+  function commitNav(nn){ setNav(nn); applyNav(nn); }
+  function moveNav(i,d){ var j=i+d; if(j<0||j>=nav.length) return; var nn=nav.slice(); var x=nn[i];nn[i]=nn[j];nn[j]=x; commitNav(nn); }
+  function renameNav(i,v){ var nn=nav.slice(); nn[i]=Object.assign({},nn[i],{l:v}); commitNav(nn); }
+  function hideNav(i){ var nn=nav.slice(); nn[i]=Object.assign({},nn[i],{hidden:!nn[i].hidden}); commitNav(nn); }
+  var FIELDS=[['navy','Navy (sidebar)'],['blue','Azul · Acineto'],['red','Vermelho · KPC'],['green','Verde · ESBL'],['amber','Âmbar · Pseudo'],['purple','Roxo'],['teal','Teal'],['bg','Fundo'],['white','Cartão'],['brdr','Borda'],['muted','Texto suave'],['hist','Histórico'],['grid','Grade']];
+  function payload(){ return {theme:t, nav:nav, sections:SEC_CFG}; }
+  function save(){
+    fetch('/api/config',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload())})
+      .then(function(r){return r.json();}).then(function(j){ flash(j&&j.ok?'Salvo em dashboard_config.json':'Falha ao salvar'); })
+      .catch(function(e){ flash('Sem servidor: '+e.message); });
+  }
+  function exportCfg(){ var b=new Blob([JSON.stringify(payload(),null,2)],{type:'application/json'}); var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='dashboard_config.json'; a.click(); }
+  var box={position:'fixed',bottom:16,right:16,width:262,background:'#fff',border:'1px solid '+BRDR,borderRadius:12,boxShadow:'0 12px 40px rgba(0,0,0,.22)',zIndex:9999,fontFamily:"'IBM Plex Sans',sans-serif"};
+  if(!open) return h('button',{onClick:function(){setOpen(true);},style:{position:'fixed',bottom:16,right:16,zIndex:9999,border:'none',background:NAVY,color:'#fff',borderRadius:'50%',width:44,height:44,fontSize:18,cursor:'pointer',boxShadow:'0 8px 24px rgba(0,0,0,.25)'}},'🎨');
+  function TabBtn(id,lbl){ var on=tab===id; return h('button',{onClick:function(){setTab(id);},style:{flex:1,border:'none',background:on?'#fff':'#f5f7fa',color:on?'#1565c0':MUTED,fontSize:11,fontWeight:on?700:500,padding:'8px',borderBottom:on?'2px solid #1565c0':'2px solid transparent',cursor:'pointer'}},lbl); }
+  return h('div',{style:box},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 14px',borderBottom:'1px solid '+BRDR}},
+      h('div',{style:{fontSize:12,fontWeight:700,color:NAVY}},'🎨 Editar dashboard'),
+      h('button',{onClick:function(){setOpen(false);},style:{border:'none',background:'transparent',fontSize:16,color:MUTED,cursor:'pointer'}},'—')),
+    h('div',{style:{display:'flex',borderBottom:'1px solid '+BRDR}}, TabBtn('pal','Paleta'), TabBtn('sec','Seções')),
+    tab==='pal'
+    ? h('div',{style:{maxHeight:300,overflowY:'auto',padding:'10px 14px'}},
+        FIELDS.map(function(f){
+          return h('div',{key:f[0],style:{display:'flex',alignItems:'center',gap:9,marginBottom:7}},
+            h('input',{type:'color',value:t[f[0]]||'#000000',onChange:function(e){setColor(f[0],e.target.value);},style:{width:26,height:26,border:'1px solid '+BRDR,borderRadius:6,padding:0,cursor:'pointer'}}),
+            h('div',{style:{flex:1}},h('div',{style:{fontSize:11,color:NAVY}},f[1]),h('div',{style:{fontSize:9,fontFamily:"'IBM Plex Mono',monospace",color:MUTED}},t[f[0]])));
+        }))
+    : h('div',{style:{maxHeight:300,overflowY:'auto',padding:'8px 10px'}},
+        h('div',{style:{fontSize:9,color:MUTED,margin:'2px 4px 8px',lineHeight:1.5}},'Reordene (▲▼), renomeie e oculte seções. Para editar gráficos, clique num gráfico no dashboard.'),
+        nav.map(function(n,i){
+          return h('div',{key:n.id,style:{display:'flex',alignItems:'center',gap:5,marginBottom:5,opacity:n.hidden?.45:1}},
+            h('div',{style:{display:'flex',flexDirection:'column'}},
+              h('button',{onClick:function(){moveNav(i,-1);},style:navArrowBtn},'▲'),
+              h('button',{onClick:function(){moveNav(i,1);},style:navArrowBtn},'▼')),
+            h('input',{value:n.l,onChange:function(e){renameNav(i,e.target.value);},style:{flex:1,border:'1px solid '+BRDR,borderRadius:5,padding:'4px 6px',fontSize:11,color:NAVY,minWidth:0}}),
+            h('button',{onClick:function(){hideNav(i);},title:n.hidden?'Mostrar':'Ocultar',style:{border:'1px solid '+BRDR,background:'#fff',borderRadius:5,width:24,height:24,fontSize:11,cursor:'pointer',color:n.hidden?'#c62828':GREEN}},n.hidden?'∅':'👁'));
+        })
+    ),
+    msg?h('div',{style:{fontSize:10,color:TEAL,padding:'0 14px 6px'}},'✓ '+msg):null,
+    h('div',{style:{display:'flex',gap:6,padding:'10px 14px',borderTop:'1px solid '+BRDR}},
+      h('button',{onClick:save,style:{flex:1,border:'none',background:TEAL,color:'#fff',borderRadius:7,padding:'7px',fontSize:11,fontWeight:600,cursor:'pointer'}},'Salvar'),
+      h('button',{onClick:exportCfg,style:{border:'1px solid '+BRDR,background:'#fff',color:SLATE,borderRadius:7,padding:'7px 10px',fontSize:11,fontWeight:600,cursor:'pointer'}},'⭳'),
+      h('button',{onClick:function(){setT(Object.assign({},THEME_DEFAULTS));props.onApply(THEME_DEFAULTS);var dn=NAV_DEFAULT.map(function(x){return {id:x.id,l:x.l,g:x.g,ic:x.ic,hidden:false};});commitNav(dn);applySections();deselectChart();},style:{border:'1px solid '+BRDR,background:'#fff',color:SLATE,borderRadius:7,padding:'7px 10px',fontSize:11,cursor:'pointer'}},'↺')
+    )
+  );
+}
+
+// ── Inspetor do gráfico selecionado (clique num gráfico → edita aqui) ──────────
+function ChartInspector(props){
+  var c=selChartObj(); if(!c||!SEL) return null;
+  var ref=SEL;
+  var avail=(props.unitKeys||[]).slice();
+  if(c.src && avail.indexOf(c.src)<0) avail.unshift(c.src);
+  function inp(v,on,extra){ return h('input',Object.assign({value:v==null?'':v,onChange:on,style:{width:'100%',border:'1px solid '+BRDR,borderRadius:6,padding:'7px 9px',fontSize:12,color:NAVY,outline:'none'}},extra||{})); }
+  function fld(label,child){ return h('label',{style:{display:'block',marginBottom:11}}, h('div',{style:{fontSize:10,fontWeight:600,color:'#5a6b82',textTransform:'uppercase',letterSpacing:.3,marginBottom:4}},label), child); }
+  var box={position:'fixed',top:70,right:16,width:250,background:'#fff',border:'1px solid '+BLUE,borderRadius:12,boxShadow:'0 12px 40px rgba(0,0,0,.25)',zIndex:9998,fontFamily:"'IBM Plex Sans',sans-serif"};
+  var btn={border:'1px solid '+BRDR,background:'#fff',color:SLATE,borderRadius:7,padding:'7px 9px',fontSize:11,fontWeight:600,cursor:'pointer'};
+  return h('div',{style:box},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 14px',borderBottom:'1px solid '+BRDR}},
+      h('div',{style:{fontSize:12,fontWeight:700,color:BLUE}},'▤ Editar gráfico'),
+      h('button',{onClick:deselectChart,style:{border:'none',background:'transparent',fontSize:16,color:MUTED,cursor:'pointer'}},'×')),
+    h('div',{style:{padding:'14px'}},
+      fld('Título', inp(c.title,function(e){secEdit(ref,{title:e.target.value});})),
+      fld('Série de dados', h('select',{value:c.src||'',onChange:function(e){secEdit(ref,{src:e.target.value});},style:{width:'100%',border:'1px solid '+BRDR,borderRadius:6,padding:'7px 9px',fontSize:12,color:NAVY,cursor:'pointer'}},
+        [h('option',{key:'_',value:''},'— escolher —')].concat(avail.map(function(k){return h('option',{key:k,value:k},k);})))),
+      h('div',{style:{display:'flex',gap:8}},
+        h('div',{style:{flex:1}},fld('Unidade', inp(c.unit,function(e){secEdit(ref,{unit:e.target.value});},{placeholder:'% /1000'}))),
+        h('div',{style:{flex:1}},fld('Eixo-Y (máx)', inp(c.maxY,function(e){secEdit(ref,{maxY:parseFloat(e.target.value)||0});},{type:'number'})))
+      ),
+      h('div',{style:{display:'flex',gap:6,alignItems:'center',marginTop:2}},
+        h('button',{onClick:function(){secEdit(ref,{hidden:!c.hidden});},style:Object.assign({},btn,{color:c.hidden?'#c62828':GREEN})},c.hidden?'∅ Oculto':'👁 Visível'),
+        h('button',{onClick:function(){secMove(ref,-1);},style:btn},'▲'),
+        h('button',{onClick:function(){secMove(ref,1);},style:btn},'▼')
+      ),
+      h('button',{onClick:function(){secDel(ref);},style:{width:'100%',marginTop:10,border:'1px solid #f0c4c4',background:'#fff',color:'#c62828',borderRadius:7,padding:'8px',fontSize:11,fontWeight:600,cursor:'pointer'}},'🗑 Excluir gráfico'),
+      h('div',{style:{fontSize:9,color:MUTED,marginTop:10,lineHeight:1.5}},'Alterações ao vivo. Clique em Salvar no 🎨 para publicar.')
+    )
+  );
+}
+var navArrowBtn={border:'none',background:'transparent',color:'#8898aa',fontSize:8,lineHeight:1,padding:'1px',cursor:'pointer'};
+
 function App(){
   var s1=useState('overview'); var active=s1[0],setActive=s1[1];
   var s2=useState(null);       var D=s2[0],setD=s2[1];
   var s3=useState(true);       var loading=s3[0],setLoading=s3[1];
+  var tvS=useState(0);         __themeSetter=tvS[1];
+  var svS=useState(0);         __selSetter=svS[1];
+  var EDIT=/[?&]edit=1/.test(location.search);
+  EDIT_MODE=EDIT;
+
+  useEffect(function(){
+    // tema editável + controle remoto pelo Studio (postMessage)
+    fetch('./dashboard_config.json?t='+Date.now())
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(c){ if(c&&c.theme) applyTheme(c.theme); if(c&&c.nav) applyNav(c.nav); if(c&&c.sections) applySections(c.sections); })
+      .catch(function(){});
+    function onMsg(e){
+      if(!e||!e.data) return;
+      if(e.data.type==='husf-theme') applyTheme(e.data.theme);
+      if(e.data.type==='husf-navcfg') applyNav(e.data.nav);
+      if(e.data.type==='husf-nav'&&e.data.section) setActive(e.data.section);
+    }
+    window.addEventListener('message', onMsg);
+    // avisa o Studio (se estiver embutido) que o dashboard está pronto
+    try{ if(window.parent!==window) window.parent.postMessage({type:'husf-ready',theme:THEME_CUR},'*'); }catch(_){}
+    return function(){ window.removeEventListener('message', onMsg); };
+  },[]);
 
   useEffect(function(){
     setD(FB); setLoading(false);
@@ -1838,7 +2030,13 @@ function App(){
         })()
       ),
       h('div',{key:active,style:{flex:1,overflowY:'auto',padding:16}},renderSection(),h(MetodFooter))
-    )
+    ),
+    EDIT?h(ThemeEditor,{onApply:applyTheme,active:active,
+      unitKeys:(D&&D[active])?Object.keys(D[active]).filter(function(k){return Array.isArray(D[active][k]);}):[]
+    }):null,
+    (EDIT&&SEL)?h(ChartInspector,{
+      unitKeys:(D&&D[SEL.sec])?Object.keys(D[SEL.sec]).filter(function(k){return Array.isArray(D[SEL.sec][k]);}):[]
+    }):null
   );
 }
 
