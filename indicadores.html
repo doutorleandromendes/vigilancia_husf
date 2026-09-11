@@ -86,8 +86,43 @@ var SAHE_TXT={
     up:{b:'A análise dos últimos meses detectou tendência real de aumento — não é oscilação aleatória.',t:'Tendência crescente confirmada: sem intervenção, o indicador continuará subindo. Rever processos estruturais.'},
     dn:{b:'A análise confirma tendência real de redução ao longo dos meses.',t:'Tendência decrescente confirmada: manter e documentar as intervenções que geraram essa melhora.'},
     ns:{b:'Não há tendência estatisticamente detectável. O indicador oscila sem direção definida.',t:'Sem tendência: comportamento estável. Monitorar mensalmente.'}
+  },
+  ic:{
+    b:'A faixa vertical é o intervalo de 95% de confiança do indicador e funciona, em linhas gerais, como margem de erro. Com poucos casos e denominador pequeno (o que é comum na Neo), a faixa fica larga, mostrando que a taxa absoluta é imprecisa e oscila muito só por acaso.',
+    t:'Se as faixas de dois meses se sobrepõem, não há diferença estatística entre eles.'
+  },
+  gchart:{
+    b:'Em vez de taxa por mês, mostra quanto tempo (em cateter-dia) passa entre uma infecção e a próxima. Queremos que esse número seja grande (ou seja, que muito tempo se passe sem nenhuma infecção).',
+    t:'Quedas sucessivas abaixo da linha vermelha indicam infecções acontecendo mais próximas umas das outras do que o esperado.'
   }
 };
+
+function poisIC(n,cd){
+  if(cd==null||cd<=0)return null;
+  var z=1.96;
+  var lo=n<=0?0:n*Math.pow(1-1/(9*n)-z/(3*Math.sqrt(n)),3);
+  var hi=(n+1)*Math.pow(1-1/(9*(n+1))+z/(3*Math.sqrt(n+1)),3);
+  return [Math.max(lo,0)/cd*1000, hi/cd*1000];
+}
+function gchartSerie(serie){
+  var ev=[],cum=0;
+  serie.forEach(function(pt){var n=pt.n||0,cd=pt.cd||0;
+    for(var k=0;k<n;k++)ev.push({x:cum+cd*(k+0.5)/n,p:pt.p});cum+=cd;});
+  var out=[];
+  for(var i=0;i<ev.length;i++)out.push({i:i+1,gap:i===0?Math.round(ev[0].x):Math.round(ev[i].x-ev[i-1].x),p:ev[i].p});
+  return out;
+}
+function gchartLCL(p50){ if(!p50||p50<=0)return null; return Math.round(1000/(2*p50)); }
+function marcarClusters(gs,lcl){
+  if(lcl==null)return gs;
+  var below=gs.map(function(d){return d.gap<lcl;}),i=0;
+  while(i<below.length){
+    if(below[i]){var j=i;while(j<below.length&&below[j])j++;
+      if(j-i>=3)for(var k=i;k<j;k++)gs[k].cluster=true;i=j;}
+    else i++;
+  }
+  return gs;
+}
 
 // ── Recharts ──────────────────────────────────────────────────────────────────
 var RC=Recharts;
@@ -95,7 +130,7 @@ var BarChart=RC.BarChart,Bar=RC.Bar,ComposedChart=RC.ComposedChart;
 var LineChart=RC.LineChart,Line=RC.Line;
 var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
 var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer;
-var RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea,Cell=RC.Cell,Legend=RC.Legend;
+var RefLine=RC.ReferenceLine,RefArea=RC.ReferenceArea,Cell=RC.Cell,Legend=RC.Legend,ErrorBar=RC.ErrorBar;
 
 // ── Fallback data ─────────────────────────────────────────────────────────────
 var FB={
@@ -205,6 +240,12 @@ function BarS(props){
   var defPt=null;
   data.forEach(function(d){if(d.c)defPt=d.p;});
   if(!defPt&&data.length)defPt=data[data.length-1].p;
+
+  var dd=data;
+  if(props.ic){ dd=data.map(function(d){
+    if(d.n!=null&&d.cd!=null){ var _c=poisIC(d.n,d.cd);
+      if(_c) return Object.assign({},d,{_ic:[Math.max(d.v-_c[0],0),Math.max(_c[1]-d.v,0)]}); }
+    return d; }); }
 
   var stRef=useState({sel:defPt,pop:null});
   var st=stRef[0],setSt=stRef[1];
@@ -332,7 +373,7 @@ function BarS(props){
       badgeEl
     ),
     h(RCont,{width:'100%',height:ht},
-      h(ComposedChart,{data:data,margin:chartMargin,
+      h(ComposedChart,{data:dd,margin:chartMargin,
           onClick:function(e){if(e&&e.activePayload&&e.activePayload.length)
             selBar(e.activePayload[0].payload.p);}},
         h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
@@ -361,14 +402,14 @@ function BarS(props){
         refY!=null?h(RefLine,{y:refY,stroke:AMBER,strokeDasharray:'4 2',strokeWidth:1,
           label:{value:refLbl||'',fill:AMBER,fontSize:7,position:'insideTopRight'}}):null,
         h(Bar,{dataKey:'v',radius:[3,3,0,0],style:{cursor:sahe?'pointer':'default'}},
-          data.map(function(d,i){
+          dd.map(function(d,i){
             var isCurr=d.c,isSel=selPt&&d.p===selPt;
             var fill=isCurr?currColor:HIST;
             var op=isCurr?1:isSel?.85:.7;
             return h(Cell,{key:i,fill:fill,opacity:op,
               strokeWidth:isSel&&!isCurr?1.5:0,
               stroke:isSel&&!isCurr?'#1a2744':'none'});
-          })),
+          }), props.ic?h(ErrorBar,{dataKey:'_ic',width:5,strokeWidth:1.3,stroke:'#455a64',opacity:.85}):null),
         hasLim?h(Line,{type:'linear',dataKey:'lMax',stroke:RED,strokeDasharray:'5 3',
           strokeWidth:1.5,dot:false,connectNulls:false,legendType:'none'}):null,
         hasLim?h(Line,{type:'linear',dataKey:'lMin',stroke:GREEN,strokeDasharray:'5 3',
@@ -382,6 +423,45 @@ function BarS(props){
       fontFamily:"'IBM Plex Mono',monospace"}},
       'Ref: '+sahe.ref_inicio+' – '+sahe.ref_fim+' · bootstrap n=3000'):null
   );
+}
+
+function GChart(props){
+  var serie=props.serie||[];
+  var gs=gchartSerie(serie);
+  var lcl=gchartLCL(props.p50);
+  gs=marcarClusters(gs,lcl);
+  var maxY=Math.max.apply(null,gs.map(function(d){return d.gap;}).concat([lcl?lcl*3:60]));
+  var oRef=useState(false),open=oRef[0],setOpen=oRef[1];
+  if(!gs.length)return null;
+  return h('div',{style:{background:WHITE,border:'1px solid '+BRDR,borderRadius:8,
+      padding:'14px 14px 8px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)',position:'relative'}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}},
+      h('span',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,
+        color:NAVY,maxWidth:'80%',lineHeight:1.35}},
+        'g-chart — cateter-dia entre IPCS consecutivas',
+        h('button',{className:'help-btn',onClick:function(e){e.stopPropagation();setOpen(!open);},'aria-label':'Saiba mais'},'ⓘ')),
+      h('span',{style:{fontSize:7,color:'#9eaab8',fontFamily:"'IBM Plex Mono',monospace"}},'evento = cada IPCS')),
+    open?h('div',{className:'sahe-pop open',style:{maxWidth:300}},
+      h('div',{className:'sp-body'},SAHE_TXT.gchart.b),
+      h('div',{className:'sp-tip'},SAHE_TXT.gchart.t)):null,
+    h(RCont,{width:'100%',height:props.h||200},
+      h(LineChart,{data:gs,margin:{top:12,right:14,left:-8,bottom:4}},
+        h(CartGrid,{strokeDasharray:'3 3',stroke:GRID,vertical:false}),
+        h(XAxis,{dataKey:'i',tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(YAxis,{domain:[0,Math.ceil(maxY*1.1)],tick:{fill:LIGHT,fontSize:8,fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+        h(RCTip,{content:function(o){
+          if(!o||!o.active||!o.payload||!o.payload.length)return null;
+          var d=o.payload[0].payload;
+          return h('div',{style:{background:'#fff',border:'1px solid '+BRDR,borderRadius:6,padding:'6px 9px',fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:NAVY}},
+            'IPCS #'+d.i+' ('+d.p+')',h('br'),'intervalo: '+d.gap+' cat-dia');
+        }}),
+        lcl!=null?h(RefLine,{y:lcl,stroke:'#c62828',strokeDasharray:'5 3',strokeWidth:1.1,
+          label:{value:'limite inferior',position:'insideBottomRight',fill:'#c62828',fontSize:7}}):null,
+        h(Line,{type:'linear',dataKey:'gap',stroke:HIST,strokeWidth:1.5,
+          dot:function(o){var cl=o.payload.cluster;
+            return h('circle',{cx:o.cx,cy:o.cy,r:cl?5:4,fill:cl?'#c62828':BLUE,key:o.payload.i});},
+          activeDot:{r:5}})
+      )));
 }
 
 // ── LineMDR ───────────────────────────────────────────────────────────────────
@@ -761,6 +841,7 @@ function UtiNeoSection(props){
   return h('div',{className:'fi'},
     neoIpcsSahe?h(SaheLegenda):h(LimLegenda),
     renderGrids('utiNeo', neo, function(k){ return (neoS&&neoS[k])?Object.assign({},neoS[k],{ref_inicio:neoS.ref_inicio,ref_fim:neoS.ref_fim}):null; }),
+    h(GChart,{serie:neo.ipcs||[], p50:(SAHE&&SAHE.utiNeo&&SAHE.utiNeo.ipcs)?SAHE.utiNeo.ipcs.p50:null}),
     h(SH,{t:'Auditoria de Inserção de CVC — % Não-conformidade Mensal'}),
     h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr',gap:10}},
       auditData.length>0?h(BarS,{title:'% Não-conformes por Mês',data:auditData,unit:'%',maxY:100,h:180}):null,
@@ -1490,7 +1571,7 @@ var SEC_DEFAULT={
   utic:{grids:_utiGrids()},
   utiNeo:{grids:[
     {header:'IrAS — IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',cols:1,charts:[
-      {id:'ipcs',title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',src:'ipcs',maxY:55,h:220,sahe:'ipcs'}
+      {id:'ipcs',title:'IPCS Definida Clínica ou Laboratorialmente (/1000 CVC-dia)',src:'ipcs',maxY:120,h:220,sahe:'ipcs',ic:true}
     ]}
   ]},
   hd:{grids:[
@@ -1560,7 +1641,7 @@ function renderGrids(secId, ud, sp){
           if(c.hidden&&!EDIT_MODE) return null;
           if(!hasData&&!EDIT_MODE) return null;
           var barEl=hasData
-            ? h(BarS,{title:c.title,data:ud[c.src],unit:c.unit,maxY:c.maxY,sahe:c.sahe?sp(c.sahe):null,badge:c.badge,note:c.note,h:c.h,refY:c.refY,refLbl:c.refLbl})
+            ? h(BarS,{title:c.title,data:ud[c.src],unit:c.unit,maxY:c.maxY,sahe:c.sahe?sp(c.sahe):null,badge:c.badge,note:c.note,h:c.h,refY:c.refY,refLbl:c.refLbl,ic:c.ic})
             : h('div',{style:{background:WHITE,border:'1px dashed '+BRDR,borderRadius:8,padding:'30px 12px',textAlign:'center',color:MUTED,fontSize:11}},'Escolha uma série no inspetor →');
           var ann=(hasData&&c.mk&&dotSfx)?mkAnnot(c.mk+'_'+dotSfx):null;
           var inner=ann?h('div',null,barEl,ann):barEl;
