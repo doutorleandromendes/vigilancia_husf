@@ -8336,13 +8336,13 @@
         "p": "jul/26"
       },
       {
-        "sol": 305,
+        "sol": 254,
         "neg": 117,
-        "mantido": 0,
-        "semAtb": 0,
-        "troca": 0,
-        "alta": 0,
-        "obito": 0,
+        "mantido": 72,
+        "semAtb": 24,
+        "troca": 14,
+        "alta": 23,
+        "obito": 15,
         "p": "ago/26",
         "c": 1
       }
