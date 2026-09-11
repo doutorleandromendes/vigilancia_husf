@@ -11,3 +11,7 @@ relatorios/
 
 # Sistema
 .DS_Store
+cve_env.sh
+husf_pipeline/credentials/
+*.bak
+*_bk.py
