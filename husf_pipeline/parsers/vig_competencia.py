@@ -76,8 +76,11 @@ ISC_SETORES = (
 )
 
 # item (vig) -> chave de organismo do pipeline (usamos o INCIDENTE, '_novo')
+# NDM (metalo em Enterobacterales) separado do KPC desde set/26: a conduta
+# diverge. Metalo em Pseudomonas/Acinetobacter fica em pseu/acin (organismo primeiro).
 MDR_ORG = {'mdr_esbl_novo': 'esbl', 'mdr_acin_novo': 'acin',
-           'mdr_kpc_novo': 'kpc', 'mdr_pseu_novo': 'pseu'}
+           'mdr_kpc_novo': 'kpc', 'mdr_pseu_novo': 'pseu',
+           'mdr_ndm_novo': 'ndm'}
 
 # ATB (prevalente: soma = paciente-dia em uso) -> chave DOT do pipeline.
 # Cefepime (atb_cpm) não é exportado — paridade com o parser antigo.

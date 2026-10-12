@@ -40,6 +40,7 @@ var C={bg:'#f0f2f5',surf:'#ffffff',card:'#ffffff',hover:'#f0f2f5',brdr:'#d0d7de'
 // Organism metadata — KPC and Acinetobacter are PRIORITY
 var ORGS=[
   {key:'kpc',  label:'KPC',            color:'#c62828', priority:true,  stroke:2.5, dot:4},
+  {key:'ndm',  label:'NDM',            color:'#ef6c00', priority:true,  stroke:2.5, dot:4},
   {key:'acin', label:'Acinetobacter',  color:'#1565c0', priority:true,  stroke:2.5, dot:4},
   {key:'esbl', label:'ESBL',           color:'#2e7d32', priority:false, stroke:1.5, dot:3},
   {key:'pseu', label:'Pseudomonas',    color:'#6a1b9a', priority:false, stroke:1.5, dot:2},
@@ -239,6 +240,12 @@ function KpiStrip(props){
             :h('span',{style:{fontSize:18,color:'#9ca3af'}},'—'),
           h('span',{style:{fontSize:9,color:C.tm,marginLeft:2}},'‰')
         ),
+        alert?h('div',{style:{display:'flex',alignItems:'center',gap:5,
+          background:org.color+'14',border:'1px solid '+org.color+'44',borderRadius:4,
+          padding:'3px 7px',marginBottom:7}},
+          h('span',{style:{fontSize:9,color:org.color,fontWeight:700}},'↑'),
+          h('span',{style:{fontSize:8.5,color:C.ts,fontWeight:600}},
+            'acima da média histórica')):null,
         h('div',{style:{display:'flex',gap:10,borderTop:'1px solid '+C.brdr,paddingTop:5}},
           h('span',{style:{fontSize:9,color:C.tm}},'Pico ',
             h('span',{style:{color:C.ts,fontWeight:600,fontFamily:"'IBM Plex Mono',monospace"}},max.toFixed(1))),
@@ -247,9 +254,6 @@ function KpiStrip(props){
           h('span',{style:{fontSize:9,color:C.tm}},'n ',
             h('span',{style:{color:C.ts,fontWeight:600}},totalCounts))
         ),
-        alert?h('div',{style:{position:'absolute',top:10,right:10,background:org.color,
-          color:'#fff',fontSize:7,fontWeight:700,padding:'1px 5px',borderRadius:3}},
-          '↑ ACIMA DA MÉDIA'):null
       );
     })
   );
@@ -373,18 +377,19 @@ function App(){
             (src.pd||[]).forEach(function(x){if(x.p)pdByLabel[x.p]=x.v;});
 
             // Para cada organismo: mescla série do JSON sobre o FALLBACK
-            ['esbl','kpc','acin','pseu'].forEach(function(org){
+            ['esbl','kpc','acin','pseu','ndm'].forEach(function(org){
               var jsonSeries=src[org]||[];
               if(!jsonSeries.length) return;
               var jsonCounts=src.counts&&src.counts[org]||[];
-              var series=merged[unit][org];
-              if(!series) return;
+              // NDM nao existe no FALLBACK de fev/26: sem o '||[]' a serie era
+              // descartada em silencio.
+              var series=merged[unit][org]||[];
 
               // Remove o marcador c:1 da série base (será recolocado)
               series=series.filter(function(x){return !x.c;});
 
               jsonSeries.forEach(function(jpt,ji){
-                var pd=pdByLabel[jpt.p]||null;
+                var pd=pdByLabel[jpt.p]||jpt.pd||null;
                 var countForPt=jsonCounts[ji]!=null?jsonCounts[ji]:null;
                 var rate=jpt.v!==null&&jpt.v!==undefined
                   ? jpt.v

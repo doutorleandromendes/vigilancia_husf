@@ -53,8 +53,8 @@ if(!window.React||!window.ReactDOM||!window.Recharts){
 var h=React.createElement,useState=React.useState,useEffect=React.useEffect;
 
 // ── Design tokens (editáveis via dashboard_config.json; fallback = padrão) ─────
-var THEME_DEFAULTS={bg:'#f0f2f5',white:'#ffffff',brdr:'#d0d7de',muted:'#8898aa',navy:'#1a2744',slate:'#4a5568',light:'#6b7280',blue:'#1565c0',red:'#c62828',green:'#2e7d32',amber:'#e65100',purple:'#4527a0',teal:'#00695c',hist:'#9eaab8',grid:'#e2e6ea'};
-var BG,WHITE,BRDR,MUTED,NAVY,SLATE,LIGHT,BLUE,RED,GREEN,AMBER,PURPLE,TEAL,HIST,CURR,GRID;
+var THEME_DEFAULTS={bg:'#f0f2f5',white:'#ffffff',brdr:'#d0d7de',muted:'#8898aa',navy:'#1a2744',slate:'#4a5568',light:'#6b7280',blue:'#1565c0',red:'#c62828',green:'#2e7d32',amber:'#e65100',purple:'#4527a0',teal:'#00695c',hist:'#9eaab8',grid:'#e2e6ea',ndm:'#ef6c00'};
+var BG,WHITE,BRDR,MUTED,NAVY,SLATE,LIGHT,BLUE,RED,GREEN,AMBER,PURPLE,TEAL,HIST,CURR,GRID,NDM_COR;
 var THEME_CUR={};
 var __themeSetter=null;
 function applyTheme(t){
@@ -62,7 +62,7 @@ function applyTheme(t){
   BG=THEME_CUR.bg;WHITE=THEME_CUR.white;BRDR=THEME_CUR.brdr;MUTED=THEME_CUR.muted;
   NAVY=THEME_CUR.navy;SLATE=THEME_CUR.slate;LIGHT=THEME_CUR.light;
   BLUE=THEME_CUR.blue;RED=THEME_CUR.red;GREEN=THEME_CUR.green;AMBER=THEME_CUR.amber;
-  PURPLE=THEME_CUR.purple;TEAL=THEME_CUR.teal;HIST=THEME_CUR.hist;GRID=THEME_CUR.grid;CURR=BLUE;
+  PURPLE=THEME_CUR.purple;TEAL=THEME_CUR.teal;HIST=THEME_CUR.hist;GRID=THEME_CUR.grid;CURR=BLUE;NDM_COR=THEME_CUR.ndm;
   if(__themeSetter) __themeSetter(function(v){return v+1;});
 }
 applyTheme();
@@ -486,11 +486,14 @@ function LineMDR(props){
         h(Line,{type:'monotone',dataKey:'k',name:'KPC',stroke:RED,strokeWidth:2,
           dot:{r:2.5,fill:RED},activeDot:{r:4},connectNulls:false}),
         h(Line,{type:'monotone',dataKey:'a',name:'Acinetobacter',stroke:BLUE,strokeWidth:2,
-          dot:{r:2.5,fill:BLUE},activeDot:{r:4},connectNulls:false})
+          dot:{r:2.5,fill:BLUE},activeDot:{r:4},connectNulls:false}),
+        // NDM: sem RefLine - nao ha periodo de referencia (serie desde set/26)
+        h(Line,{type:'monotone',dataKey:'nd',name:'NDM',stroke:NDM_COR,strokeWidth:2,
+          dot:{r:3,fill:NDM_COR},activeDot:{r:4},connectNulls:false})
       )
     ),
     h('div',{style:{fontSize:8,color:MUTED,marginTop:3}},
-      'Tracejado = limiar de endemicidade · Clopper-Pearson')
+      'Tracejado = limiar de endemicidade · Clopper-Pearson · NDM sem limiar (vigilância diária desde set/26)')
   );
 }
 
@@ -1100,14 +1103,16 @@ cd.hm&&cd.hm.length>0?h(BarS,{title:'Higiene das Mãos — Álcool Gel (ml/pac-d
 function MdrInstSection(props){
   var D=props.D,s=D.mdrInst.s;
   var last=s[s.length-1],prev=s[s.length-2];
-  var items=[{l:'ESBL',k:'e',col:GREEN},{l:'KPC',k:'k',col:RED},{l:'Acinetobacter MDR',k:'a',col:BLUE}];
+  var items=[{l:'ESBL',k:'e',col:GREEN},{l:'KPC',k:'k',col:RED},{l:'Acinetobacter MDR',k:'a',col:BLUE},{l:'NDM',k:'nd',col:NDM_COR}];
   return h('div',{className:'fi'},
     h(LineMDR,{title:'Densidade de Incidência de Bactérias MDR — HUSF (/1000 pac-dia)',
       data:D.mdrInst.s,maxE:D.mdrInst.max.e,maxK:D.mdrInst.max.k,maxA:D.mdrInst.max.a,h:280}),
-    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginTop:12}},
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginTop:12}},
       items.map(function(item,i){
         var val=last[item.k],tr=val>prev[item.k]?'↑':val<prev[item.k]?'↓':'→';
-        var ok=val<=D.mdrInst.max[item.k];
+        // Sem limiar (NDM) nao e 'acima do limiar': val<=undefined daria falso.
+        var lim=D.mdrInst.max[item.k];
+        var ok=lim==null||val<=lim;
         return h('div',{key:i,style:{background:WHITE,border:'1px solid '+(ok?BRDR:item.col+'55'),
           borderRadius:8,padding:'16px 18px',boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
           h('div',{style:{fontSize:9,color:SLATE,marginBottom:6}},item.l),
@@ -1115,8 +1120,9 @@ function MdrInstSection(props){
             h('span',{style:{fontSize:30,fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,color:item.col}},val),
             h('span',{style:{fontSize:16,color:item.col,fontWeight:700}},tr)
           ),
-          h('div',{style:{fontSize:8,color:MUTED,marginTop:4}},'Limiar: '+D.mdrInst.max[item.k]+'/mil pd'),
-          h('div',{style:{fontSize:9,marginTop:3,color:ok?TEAL:AMBER,fontWeight:600}},ok?'✓ Endêmico':'⚠ Acima do limiar')
+          h('div',{style:{fontSize:8,color:MUTED,marginTop:4}},lim==null?'Sem limiar — série desde set/26':'Limiar: '+lim+'/mil pd'),
+          h('div',{style:{fontSize:9,marginTop:3,color:lim==null?MUTED:(ok?TEAL:AMBER),fontWeight:600}},
+            lim==null?'Referência em construção':(ok?'✓ Endêmico':'⚠ Acima do limiar'))
         );
       })
     )

@@ -45,6 +45,7 @@ var C={bg:'#f0f2f5',surf:'#ffffff',card:'#ffffff',hover:'#f0f2f5',brdr:'#d0d7de'
 // luminância sobre card branco. Mesma rampa, um passo acima.
 var ORGS=[
   {key:'kpc',  label:'KPC',           color:'#c62828', priority:true,  stroke:2.5, dot:4},
+  {key:'ndm',  label:'NDM',           color:'#ef6c00', priority:true,  stroke:2.5, dot:4},
   {key:'acin', label:'Acinetobacter', color:'#1565c0', priority:true,  stroke:2.5, dot:4},
   {key:'esbl', label:'ESBL',          color:'#2e7d32', priority:false, stroke:1.5, dot:3},
   {key:'pseu', label:'Pseudomonas',   color:'#7b1fa2', priority:false, stroke:1.5, dot:2}
@@ -83,7 +84,10 @@ function rotulos(u){
 }
 
 function nPontos(u){
-  // Meses com pelo menos um organismo medido. É o n que decide a página.
+  // Meses SOB VIGILANCIA da unidade (tem pac-dia do bloco MDR). Ponto de NDM
+  // derivado do laboratorio (pdFonte) nao conta: nao houve visita naquele mes.
+  var pdv=serie(u,'pd').filter(function(p){return p.v!=null;});
+  if(pdv.length) return pdv.length;
   var labels=rotulos(u);
   return labels.filter(function(l){
     return ORGS.some(function(o){
@@ -384,11 +388,14 @@ function Tabela(props){
               var p=pontoDe(u,o.key,l), n=contagem(u,o.key,l);
               return h('td',{key:o.key,style:td},
                 p&&p.v!=null?p.v.toFixed(2):'—',
+                p&&p.pdFonte?h('sup',{style:{color:C.amber,fontSize:8}},'†'):null,
                 h('span',{style:{color:C.tm,fontSize:9}},n!=null?' ('+n+')':''));
             }));
         }))),
     h('div',{style:{fontSize:9,color:C.tm,paddingTop:8}},
-      'Densidade /1000 pac-dia; entre parênteses, casos novos no mês.')
+      'Densidade /1000 pac-dia; entre parênteses, casos novos no mês. ',
+      h('span',{style:{color:C.amber}},'†'),
+      ' derivado da planilha geral de culturas, antes de a visita diária cobrir o NDM; pac-dia do Censo.')
   );
 }
 
@@ -486,7 +493,15 @@ function Rodape(){
         h('div',{style:{fontSize:9,color:C.tm,lineHeight:1.6}},
           'A densidade institucional de MDR continua somando apenas UTI A/B, '+
           'UTI C e UTI Neo. As enfermarias NÃO entram nela — incluí-las '+
-          'mudaria o denominador de uma série já publicada.'))),
+          'mudaria o denominador de uma série já publicada.')),
+      h('div',{style:{background:'#fafbfc',border:'1px solid '+C.brdr,borderRadius:6,
+        padding:'10px 12px'}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:C.ts,marginBottom:4}},'NDM'),
+        h('div',{style:{fontSize:9,color:C.tm,lineHeight:1.6}},
+          'Metalo-β-lactamase em Enterobacterales, separada do KPC: ceftazidima-avibactam '+
+          'cobre KPC e não cobre metalo. Metalo em Pseudomonas e Acinetobacter permanece '+
+          'nas séries desses organismos. Caso novo = primeira detecção na internação; '+
+          'transferência entra só no cumulativo; swab de admissão não entra.'))),
     h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
       display:'flex',justifyContent:'space-between',alignItems:'center',
       flexWrap:'wrap',gap:8}},

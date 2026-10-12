@@ -33,7 +33,7 @@ def appISC(series, point):
     return base
 
 
-def appMDR(series, label, e=None, k=None, a=None, ps=None):
+def appMDR(series, label, e=None, k=None, a=None, ps=None, nd=None):
     """
     Acumula ponto MDR {p, e, k, a, ps?} — formato do JSON real.
     """
@@ -42,6 +42,8 @@ def appMDR(series, label, e=None, k=None, a=None, ps=None):
     pt = {'p': label, 'e': e or 0, 'k': k or 0, 'a': a or 0}
     if ps is not None:
         pt['ps'] = ps
+    if nd is not None:
+        pt['nd'] = nd   # NDM (set/26+)
     pt['c'] = 1
     base.append(pt)
     return base
@@ -131,7 +133,8 @@ def build_month(prev_json, label, parsers_out, manual):
     ab_mdr = mdr.get('ab', {})
     d['utiAB']['mdr'] = appMDR(d['utiAB'].get('mdr', []), label,
         e=ab_mdr.get('esbl_r'), k=ab_mdr.get('kpc_r'),
-        a=ab_mdr.get('acin_r'), ps=ab_mdr.get('pseu_r'))
+        a=ab_mdr.get('acin_r'), ps=ab_mdr.get('pseu_r'),
+        nd=ab_mdr.get('ndm_r'))
 
     # ── UTI C ─────────────────────────────────────────────────────────────
     uc = cve.get('uc', {})
@@ -148,7 +151,7 @@ def build_month(prev_json, label, parsers_out, manual):
     uc_mdr = mdr.get('uc', {})
     d['utic']['mdr'] = appMDR(d['utic'].get('mdr', []), label,
         e=uc_mdr.get('esbl_r'), k=uc_mdr.get('kpc_r'),
-        a=uc_mdr.get('acin_r'))
+        a=uc_mdr.get('acin_r'), nd=uc_mdr.get('ndm_r'))
 
     # ── UTI Neo ───────────────────────────────────────────────────────────
     _neo = cve.get('neo', {})
@@ -205,7 +208,8 @@ def build_month(prev_json, label, parsers_out, manual):
         n = sum(mdr.get(u, {}).get(f'{org_key}_n', 0) or 0 for u in ('ab','uc','neo'))
         return round(n / pd_inst * 1000, 2) if pd_inst else 0
     d['mdrInst']['s'] = appMDR(d['mdrInst'].get('s', []), label,
-        e=inst_rate('esbl'), k=inst_rate('kpc'), a=inst_rate('acin'))
+        e=inst_rate('esbl'), k=inst_rate('kpc'), a=inst_rate('acin'),
+        nd=inst_rate('ndm'))
 
     # ── MDR Mensal (para mdr_mensal.html) ─────────────────────────────────
     # Estrutura: mdrMensal[unit][org] = série {p,v,c}; mdrMensal[unit].pd = série;
@@ -224,14 +228,14 @@ def build_month(prev_json, label, parsers_out, manual):
         def _clean(seq):
             if not isinstance(seq, list): return []
             return [pt for pt in seq if isinstance(pt, dict)]
-        for _org in ('esbl','kpc','acin','pseu'):
+        for _org in ('esbl','kpc','acin','pseu','ndm'):
             _mm[_org] = appS(_clean(_mm.get(_org, [])), label, _u.get(f'{_org}_r'))
         _mm['pd'] = appS(_clean(_mm.get('pd', [])), label, _u.get('pd'))
         # counts: arrays paralelos de contagens absolutas, 1:1 com a série do organismo.
         # Reconstrói a partir da série (fonte da verdade) para garantir alinhamento
         # mesmo após limpeza de dados legados.
         _mm.setdefault('counts', {})
-        for _org in ('esbl','kpc','acin','pseu'):
+        for _org in ('esbl','kpc','acin','pseu','ndm'):
             _series = _mm.get(_org, [])
             _prev_counts = _mm['counts'].get(_org, [])
             _n_atual = int(_u.get(f'{_org}_n', 0) or 0)
