@@ -151,11 +151,17 @@ def build_month(prev_json, label, parsers_out, manual):
         a=uc_mdr.get('acin_r'))
 
     # ── UTI Neo ───────────────────────────────────────────────────────────
-    app('utiNeo.ipcs', cve.get('neo', {}).get('ipcs'))
+    _neo = cve.get('neo', {})
+    app('utiNeo.ipcs', _neo.get('ipcs'))
+    # enriquece o ponto do mês com casos + cat-dia (p/ barra de erro IC95% e g-chart)
+    if _neo.get('ipcs') is not None and d['utiNeo'].get('ipcs'):
+        _pt = d['utiNeo']['ipcs'][-1]
+        if _neo.get('ipcs_n')  is not None: _pt['n']  = _neo['ipcs_n']
+        if _neo.get('ipcs_cd') is not None: _pt['cd'] = _neo['ipcs_cd']
 
     # ── Hemodiálise ───────────────────────────────────────────────────────
     hd = dial.get('hd', {})
-    for f in ('ilavTemp','ilavPerm','ilavFist','bactTemp','bactPerm','bactFist','vanco'):
+    for f in ('ilav','bact','ilavTemp','ilavPerm','ilavFist','bactTemp','bactPerm','bactFist','vanco'):
         app(f'hd.{f}', hd.get(f))
 
     # ── Diarreia ──────────────────────────────────────────────────────────
@@ -205,7 +211,11 @@ def build_month(prev_json, label, parsers_out, manual):
     # Estrutura: mdrMensal[unit][org] = série {p,v,c}; mdrMensal[unit].pd = série;
     # mdrMensal[unit].counts[org] = array paralelo de contagens absolutas.
     d.setdefault('mdrMensal', {})
-    for _ukey, _mkey in [('utiAB','ab'), ('utic','uc'), ('utiNeo','neo')]:
+    # CM e CC: vigilancia ativa de culturas; bloco mdr da visita diaria
+    # passou a cobri-las em set/26. O guard `if not _u` abaixo mantem a
+    # serie sem pontos nos meses em que o bloco nao foi coletado.
+    for _ukey, _mkey in [('utiAB','ab'), ('utic','uc'), ('utiNeo','neo'),
+                         ('clinicaMedica','cm'), ('clinicaCirurgica','cc')]:
         _u = mdr.get(_mkey, {})
         if not _u:
             continue
@@ -292,9 +302,14 @@ def build_month(prev_json, label, parsers_out, manual):
 
     # ── Status epidemiológico ─────────────────────────────────────────────
     for unit in ('global','utiAB','utic','utiNeo','clinicaMedica','clinicaCirurgica','epm','hd'):
+        if not isinstance(d.get(unit), dict):
+            continue
         s = man(f'status_{unit}')
-        if s and isinstance(d.get(unit), dict):
+        if s:
             d[unit]['status'] = s
+        t = man(f'statusTrend_{unit}')
+        if t:
+            d[unit]['statusTrend'] = t
 
     return d
 

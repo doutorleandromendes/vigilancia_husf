@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCIH/HUSF — MDR Enfermarias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0f2f5;font-family:'IBM Plex Sans',sans-serif;color:#1a2744;min-height:100vh;
+    background-image:radial-gradient(circle,rgba(75,156,245,0.035) 1px,transparent 1px);
+    background-size:26px 26px}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:4px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .fi{animation:fadeIn .18s ease-out}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .pulse{animation:pulse 2.2s ease-in-out infinite}
+  button{cursor:pointer;transition:all .12s}
+  table{border-collapse:collapse}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.min.js"></script>
+<script>
+'use strict';
+if (!window.React||!window.ReactDOM||!window.Recharts){
+  document.getElementById('root').innerHTML='<div style="color:#c62828;padding:40px;font-family:monospace">Erro: biblioteca não carregada.</div>';
+  throw new Error('lib fail');
+}
+var h=React.createElement,useState=React.useState,useEffect=React.useEffect;
+
+// ── Tokens — idênticos ao mdr_mensal.html ────────────────────────────────────
+var C={bg:'#f0f2f5',surf:'#ffffff',card:'#ffffff',hover:'#f0f2f5',brdr:'#d0d7de',
+  glow:'#b0bec5',teal:'#00695c',blue:'#1565c0',indigo:'#4527a0',amber:'#e65100',
+  red:'#c62828',green:'#2e7d32',ti:'#1a2744',ts:'#4a5568',tm:'#8898aa'};
+
+// KPC e Acinetobacter são prioritários (alerta clínico e epidemiológico).
+// pseu: #7b1fa2 em vez de #6a1b9a — o anterior fica fora da banda de
+// luminância sobre card branco. Mesma rampa, um passo acima.
+var ORGS=[
+  {key:'kpc',  label:'KPC',           color:'#c62828', priority:true,  stroke:2.5, dot:4},
+  {key:'acin', label:'Acinetobacter', color:'#1565c0', priority:true,  stroke:2.5, dot:4},
+  {key:'esbl', label:'ESBL',          color:'#2e7d32', priority:false, stroke:1.5, dot:3},
+  {key:'pseu', label:'Pseudomonas',   color:'#7b1fa2', priority:false, stroke:1.5, dot:2}
+];
+
+// A página é dirigida por esta lista. Acrescentar uma enfermaria aqui é a
+// única edição necessária — pills, views, tabela e comparativo saem dela.
+var UNITS=[
+  {key:'clinicaMedica',    label:'Clínica Médica',    curto:'CM', color:C.blue},
+  {key:'clinicaCirurgica', label:'Clínica Cirúrgica', curto:'CC', color:C.teal}
+];
+
+// Vigilância ativa de culturas iniciada em jul/2026 nas duas enfermarias; o
+// bloco `mdr` da visita diária passou a cobri-las em set/2026. Abaixo deste
+// número de pontos a página não desenha tendência nem média.
+var MIN_PTS=3;
+var INICIO_SERIE='set/26';
+
+var RC=Recharts;
+var ComposedChart=RC.ComposedChart,BarChart=RC.BarChart,Bar=RC.Bar,Line=RC.Line;
+var XAxis=RC.XAxis,YAxis=RC.YAxis,CartGrid=RC.CartesianGrid;
+var RCTip=RC.Tooltip,RCont=RC.ResponsiveContainer,Legend=RC.Legend,Cell=RC.Cell;
+
+// ── Leitura das séries ────────────────────────────────────────────────────────
+function serie(u,k){ return (u&&u[k])||[]; }
+
+function rotulos(u){
+  // União ordenada dos rótulos de mês presentes em qualquer organismo.
+  var vistos={},out=[];
+  ORGS.forEach(function(o){
+    serie(u,o.key).forEach(function(p){
+      if(p&&p.p&&!vistos[p.p]){vistos[p.p]=1;out.push(p.p);}
+    });
+  });
+  return out;
+}
+
+function nPontos(u){
+  // Meses com pelo menos um organismo medido. É o n que decide a página.
+  var labels=rotulos(u);
+  return labels.filter(function(l){
+    return ORGS.some(function(o){
+      return serie(u,o.key).some(function(p){return p.p===l&&p.v!=null;});
+    });
+  }).length;
+}
+
+function pontoDe(u,k,label){
+  var s=serie(u,k);
+  for(var i=0;i<s.length;i++){ if(s[i].p===label) return s[i]; }
+  return null;
+}
+
+function idxDe(u,k,label){
+  var s=serie(u,k);
+  for(var i=0;i<s.length;i++){ if(s[i].p===label) return i; }
+  return -1;
+}
+
+function contagem(u,k,label){
+  var i=idxDe(u,k,label);
+  var arr=(u&&u.counts&&u.counts[k])||[];
+  return (i>=0&&arr[i]!=null)?arr[i]:null;
+}
+
+function pacDia(u,label){
+  var p=pontoDe(u,'pd',label);
+  if(p&&p.v!=null) return p.v;
+  // fallback: pd carregado no próprio ponto do organismo
+  for(var i=0;i<ORGS.length;i++){
+    var q=pontoDe(u,ORGS[i].key,label);
+    if(q&&q.pd!=null) return q.pd;
+  }
+  return null;
+}
+
+function ultimoRotulo(u){
+  var ls=rotulos(u);
+  return ls.length?ls[ls.length-1]:null;
+}
+
+function historico(u,k){
+  // Pontos medidos que NÃO são o mês corrente — base de pico e média.
+  return serie(u,k).filter(function(p){return p.v!=null&&!p.c;})
+                   .map(function(p){return p.v;});
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+function Tip(p){
+  if(!p.active||!p.payload||!p.payload.length) return null;
+  var items=p.payload.filter(function(x){return x.value!=null;})
+                     .sort(function(a,b){return b.value-a.value;});
+  if(!items.length) return null;
+  var pd=p.payload[0]&&p.payload[0].payload&&p.payload[0].payload.pd;
+  return h('div',{style:{background:C.surf,border:'1px solid '+C.glow,borderRadius:8,
+    padding:'10px 14px',fontSize:12,minWidth:168,boxShadow:'0 2px 10px rgba(0,0,0,.08)'}},
+    h('div',{style:{color:C.ts,fontSize:10,marginBottom:6,fontWeight:600}},p.label),
+    items.map(function(it,i){
+      return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',
+        gap:14,marginBottom:2,alignItems:'center'}},
+        h('span',{style:{display:'flex',alignItems:'center',gap:6}},
+          h('span',{style:{width:8,height:8,borderRadius:2,background:it.color,
+            display:'inline-block',flexShrink:0}}),
+          h('span',{style:{color:C.ts,fontSize:11}},it.name)),
+        h('span',{style:{color:C.ti,fontFamily:"'IBM Plex Mono',monospace",
+          fontSize:11,fontWeight:700}},
+          typeof it.value==='number'?it.value.toFixed(2):it.value)
+      );
+    }),
+    pd?h('div',{style:{color:C.tm,fontSize:9,marginTop:5,
+      borderTop:'1px solid '+C.brdr,paddingTop:4}},pd+' pac-dia'):null
+  );
+}
+
+// ── Rótulo direto no último ponto ─────────────────────────────────────────────
+// Identidade nunca só por cor: marca colorida + texto em token de texto.
+// `ocupados` é compartilhado pelos quatro organismos do mesmo gráfico: quando
+// dois terminam em valores próximos, o segundo desce e ganha uma linha-guia
+// até o seu ponto. Sem isso os rótulos se sobrepõem — acontece sempre que
+// duas densidades convergem, que é justamente quando olhar o fim da série
+// importa.
+var GAP_ROTULO=11;
+function fazRotulo(org,total,ocupados){
+  return function(props){
+    if(props.index!==total-1||props.value==null) return null;
+    if(ocupados.length>=ORGS.length) ocupados.length=0;  // novo passe de render
+    var y=props.y;
+    for(var i=0;i<12;i++){
+      var colide=false;
+      for(var j=0;j<ocupados.length;j++){
+        if(Math.abs(ocupados[j]-y)<GAP_ROTULO){ colide=true; break; }
+      }
+      if(!colide) break;
+      y+=GAP_ROTULO;
+    }
+    ocupados.push(y);
+    var dy=props.y-y;
+    return h('g',{transform:'translate('+props.x+','+y+')'},
+      dy?h('line',{x1:1,y1:dy,x2:6,y2:0,stroke:org.color,strokeWidth:1,
+        strokeOpacity:.45}):null,
+      h('circle',{cx:7,cy:0,r:3,fill:org.color}),
+      h('text',{x:14,y:3,fill:C.ts,fontSize:9,
+        fontFamily:"'IBM Plex Sans',sans-serif"},org.label)
+    );
+  };
+}
+
+// ── Linhas de densidade ───────────────────────────────────────────────────────
+function LinhaDensidade(props){
+  var u=props.u, labels=rotulos(u), ocupados=[];
+  var dados=labels.map(function(l){
+    var row={m:l,pd:pacDia(u,l)};
+    ORGS.forEach(function(o){
+      var p=pontoDe(u,o.key,l);
+      row[o.key]=p&&p.v!=null?p.v:null;
+    });
+    return row;
+  });
+  return h(RCont,{width:'100%',height:props.h||280},
+    h(ComposedChart,{data:dados,margin:{top:10,right:92,left:-18,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,
+        fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,
+        fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(RCTip,{content:Tip,cursor:{stroke:C.glow,strokeDasharray:'3 3'}}),
+      h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:C.ts,paddingTop:6}}),
+      ORGS.map(function(o){
+        return h(Line,{key:o.key,type:'monotone',dataKey:o.key,name:o.label,
+          stroke:o.color,strokeWidth:o.stroke,connectNulls:false,
+          dot:{r:o.dot,fill:o.color,stroke:'#fff',strokeWidth:1.5},
+          activeDot:{r:5,fill:o.color,stroke:'#fff',strokeWidth:2},
+          label:fazRotulo(o,dados.length,ocupados)});
+      })
+    )
+  );
+}
+
+// ── Barras de contagem ────────────────────────────────────────────────────────
+function BarrasContagem(props){
+  var u=props.u, labels=rotulos(u);
+  var dados=labels.map(function(l){
+    var row={m:l,pd:pacDia(u,l)};
+    ORGS.forEach(function(o){ row[o.key]=contagem(u,o.key,l)||0; });
+    return row;
+  });
+  return h(RCont,{width:'100%',height:props.h||190},
+    h(BarChart,{data:dados,margin:{top:6,right:12,left:-22,bottom:0},barCategoryGap:'28%'},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,
+        fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,
+        fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false,
+        allowDecimals:false}),
+      h(RCTip,{content:Tip,cursor:{fill:'rgba(0,0,0,.03)'}}),
+      h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:C.ts,paddingTop:6}}),
+      ORGS.map(function(o){
+        return h(Bar,{key:o.key,dataKey:o.key,name:o.label,fill:o.color,
+          stackId:'s',maxBarSize:30,stroke:'#ffffff',strokeWidth:2},
+          dados.map(function(d,i){
+            return h(Cell,{key:i,fill:o.color,opacity:o.priority?1:0.62});
+          }));
+      })
+    )
+  );
+}
+
+// ── Modo série curta: o número, não a tendência ───────────────────────────────
+function Azulejos(props){
+  var u=props.u, label=props.label;
+  var pd=pacDia(u,label);
+  return h('div',{},
+    h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
+      ORGS.map(function(o){
+        var p=pontoDe(u,o.key,label);
+        var v=p&&p.v!=null?p.v:null;
+        var n=contagem(u,o.key,label);
+        return h('div',{key:o.key,style:{background:C.card,
+          border:'2px solid '+(o.priority?o.color+'66':C.brdr),borderRadius:8,
+          padding:'14px 16px',flex:'1',minWidth:168,position:'relative',
+          overflow:'hidden',boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}},
+          h('div',{style:{position:'absolute',top:0,left:0,
+            width:o.priority?'100%':'40%',height:3,
+            background:o.priority?o.color:C.brdr}}),
+          h('div',{style:{display:'flex',alignItems:'center',gap:6,
+            marginTop:3,marginBottom:8}},
+            h('span',{style:{width:8,height:8,borderRadius:2,background:o.color,
+              display:'inline-block'}}),
+            h('span',{style:{fontSize:10,color:o.priority?C.ti:C.ts,
+              fontWeight:o.priority?700:500}},o.label)),
+          h('div',{style:{display:'flex',alignItems:'baseline',gap:5,marginBottom:9}},
+            v!=null
+              ?h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:30,
+                  fontWeight:700,lineHeight:1,color:v>0?C.ti:'#9ca3af'}},v.toFixed(2))
+              :h('span',{style:{fontSize:20,color:'#9ca3af'}},'—'),
+            h('span',{style:{fontSize:9,color:C.tm}},'/1000 pac-dia')),
+          h('div',{style:{display:'flex',gap:14,borderTop:'1px solid '+C.brdr,
+            paddingTop:6}},
+            h('span',{style:{fontSize:9,color:C.tm}},'casos ',
+              h('span',{style:{color:C.ti,fontWeight:700,
+                fontFamily:"'IBM Plex Mono',monospace"}},n!=null?n:'—')),
+            h('span',{style:{fontSize:9,color:C.tm}},'pac-dia ',
+              h('span',{style:{color:C.ts,fontWeight:600,
+                fontFamily:"'IBM Plex Mono',monospace"}},pd!=null?pd:'—'))
+          )
+        );
+      })
+    )
+  );
+}
+
+// ── Modo série estabelecida ───────────────────────────────────────────────────
+function Kpis(props){
+  var u=props.u;
+  return h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}},
+    ORGS.map(function(o){
+      var s=serie(u,o.key);
+      var atual=s.filter(function(d){return d.c&&d.v!=null;})[0]
+             || s.filter(function(d){return d.v!=null;}).slice(-1)[0];
+      var curr=atual?atual.v:null, currLbl=atual?atual.p:'—';
+      var hist=historico(u,o.key);
+      var max=hist.length?Math.max.apply(null,hist):null;
+      var mean=hist.length?hist.reduce(function(a,b){return a+b;},0)/hist.length:null;
+      var alerta=curr!=null&&mean!=null&&curr>mean&&o.priority;
+      return h('div',{key:o.key,style:{background:C.card,
+        border:'2px solid '+(o.priority?(alerta?o.color:o.color+'66'):C.brdr),
+        borderRadius:8,padding:'12px 14px',flex:'1',minWidth:152,
+        position:'relative',overflow:'hidden',
+        boxShadow:alerta?'0 2px 8px '+o.color+'33':'0 1px 3px rgba(0,0,0,0.06)'}},
+        h('div',{style:{position:'absolute',top:0,left:0,
+          width:o.priority?'100%':'40%',height:3,
+          background:o.priority?o.color:C.brdr}}),
+        h('div',{style:{display:'flex',justifyContent:'space-between',
+          alignItems:'center',marginBottom:6,marginTop:2}},
+          h('span',{style:{display:'flex',alignItems:'center',gap:5}},
+            h('span',{style:{width:7,height:7,borderRadius:2,background:o.color,
+              display:'inline-block'}}),
+            h('span',{style:{fontSize:9,color:o.priority?C.ti:C.ts,
+              fontWeight:o.priority?700:500}},o.label)),
+          h('span',{style:{fontSize:8,color:C.tm,
+            fontFamily:"'IBM Plex Mono',monospace"}},currLbl)),
+        h('div',{style:{display:'flex',alignItems:'baseline',gap:5,marginBottom:8}},
+          curr!=null
+            ?h('span',{style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:28,
+                fontWeight:700,lineHeight:1,color:alerta?o.color:(curr>0?C.ti:'#9ca3af')}},
+                curr.toFixed(2))
+            :h('span',{style:{fontSize:18,color:'#9ca3af'}},'—'),
+          h('span',{style:{fontSize:9,color:C.tm,marginLeft:2}},'‰')),
+        // Aviso em linha, não sobreposto: o selo absoluto cobria o rótulo do mês.
+        alerta?h('div',{style:{display:'flex',alignItems:'center',gap:5,
+          background:o.color+'14',border:'1px solid '+o.color+'44',borderRadius:4,
+          padding:'3px 7px',marginBottom:7}},
+          h('span',{style:{fontSize:9,color:o.color,fontWeight:700}},'↑'),
+          h('span',{style:{fontSize:8.5,color:C.ts,fontWeight:600}},
+            'acima da média histórica')):null,
+        h('div',{style:{display:'flex',gap:10,borderTop:'1px solid '+C.brdr,
+          paddingTop:5}},
+          h('span',{style:{fontSize:9,color:C.tm}},'Pico ',
+            h('span',{style:{color:C.ts,fontWeight:600,
+              fontFamily:"'IBM Plex Mono',monospace"}},max!=null?max.toFixed(1):'—')),
+          h('span',{style:{fontSize:9,color:C.tm}},'Média ',
+            h('span',{style:{color:C.ts,fontWeight:600,
+              fontFamily:"'IBM Plex Mono',monospace"}},mean!=null?mean.toFixed(1):'—')))
+      );
+    })
+  );
+}
+
+// ── Tabela — identidade e valores sem depender de cor ─────────────────────────
+function Tabela(props){
+  var u=props.u, labels=rotulos(u);
+  var th={fontSize:9,color:C.ts,fontWeight:700,textAlign:'right',
+    padding:'7px 10px',borderBottom:'1px solid '+C.brdr,whiteSpace:'nowrap'};
+  var td={fontSize:10,color:C.ti,textAlign:'right',padding:'6px 10px',
+    fontFamily:"'IBM Plex Mono',monospace",borderBottom:'1px solid #eef1f4'};
+  return h('div',{style:{background:C.card,border:'1px solid '+C.brdr,
+    borderRadius:8,padding:'4px 10px 10px',overflowX:'auto'}},
+    h('table',{style:{width:'100%',minWidth:520}},
+      h('thead',{},
+        h('tr',{},
+          h('th',{style:Object.assign({},th,{textAlign:'left'})},'Mês'),
+          h('th',{style:th},'pac-dia'),
+          ORGS.map(function(o){
+            return h('th',{key:o.key,style:th},
+              h('span',{style:{display:'inline-flex',alignItems:'center',gap:5}},
+                h('span',{style:{width:7,height:7,borderRadius:2,
+                  background:o.color,display:'inline-block'}}),
+                o.label));
+          }))),
+      h('tbody',{},
+        labels.map(function(l){
+          return h('tr',{key:l},
+            h('td',{style:Object.assign({},td,{textAlign:'left',
+              fontFamily:"'IBM Plex Sans',sans-serif",fontWeight:600})},l),
+            h('td',{style:Object.assign({},td,{color:C.ts})},pacDia(u,l)!=null?pacDia(u,l):'—'),
+            ORGS.map(function(o){
+              var p=pontoDe(u,o.key,l), n=contagem(u,o.key,l);
+              return h('td',{key:o.key,style:td},
+                p&&p.v!=null?p.v.toFixed(2):'—',
+                h('span',{style:{color:C.tm,fontSize:9}},n!=null?' ('+n+')':''));
+            }));
+        }))),
+    h('div',{style:{fontSize:9,color:C.tm,paddingTop:8}},
+      'Densidade /1000 pac-dia; entre parênteses, casos novos no mês.')
+  );
+}
+
+// ── Comparativo entre enfermarias ─────────────────────────────────────────────
+function Comparativo(props){
+  var data=props.data, org=props.org;
+  var labels=[],vistos={};
+  UNITS.forEach(function(un){
+    rotulos(data[un.key]||{}).forEach(function(l){
+      if(!vistos[l]){vistos[l]=1;labels.push(l);}
+    });
+  });
+  var dados=labels.map(function(l){
+    var row={m:l};
+    UNITS.forEach(function(un){
+      var p=pontoDe(data[un.key]||{},org.key,l);
+      row[un.key]=p&&p.v!=null?p.v:null;
+    });
+    return row;
+  });
+  return h(RCont,{width:'100%',height:props.h||240},
+    h(ComposedChart,{data:dados,margin:{top:10,right:16,left:-18,bottom:0}},
+      h(CartGrid,{strokeDasharray:'2 4',stroke:'#e2e6ea',vertical:false}),
+      h(XAxis,{dataKey:'m',tick:{fill:'#6b7280',fontSize:9,
+        fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(YAxis,{tick:{fill:'#6b7280',fontSize:8,
+        fontFamily:"'IBM Plex Mono',monospace"},axisLine:false,tickLine:false}),
+      h(RCTip,{content:Tip,cursor:{stroke:C.glow,strokeDasharray:'3 3'}}),
+      h(Legend,{iconSize:8,wrapperStyle:{fontSize:9,color:C.ts,paddingTop:6}}),
+      UNITS.map(function(un,i){
+        return h(Line,{key:un.key,type:'monotone',dataKey:un.key,name:un.label,
+          stroke:un.color,strokeWidth:2,connectNulls:false,
+          strokeDasharray:i?'5 3':undefined,
+          dot:{r:3.5,fill:un.color,stroke:'#fff',strokeWidth:1.5},
+          activeDot:{r:5,fill:un.color,stroke:'#fff',strokeWidth:2}});
+      })
+    )
+  );
+}
+
+// ── Peças de layout ───────────────────────────────────────────────────────────
+function Pill(props){
+  var a=props.active,col=props.color||C.teal;
+  return h('button',{onClick:props.onClick,style:{padding:'5px 13px',borderRadius:20,
+    border:'none',background:a?col:'#e9ecef',color:a?'#ffffff':C.ts,
+    fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:a?700:400,
+    boxShadow:a?'0 0 0 2px '+col+'33':'none'}},props.label);
+}
+
+function SH(props){
+  return h('div',{style:{fontSize:8,color:C.ts,letterSpacing:2.5,fontWeight:700,
+    textTransform:'uppercase',margin:'16px 0 8px',paddingBottom:5,
+    borderBottom:'1px solid '+C.brdr,display:'flex',alignItems:'center',gap:8}},
+    h('span',{style:{width:14,height:1,background:C.teal,display:'inline-block'}}),
+    props.t);
+}
+
+function Aviso(props){
+  return h('div',{style:{background:'#fff8e1',border:'1px solid #ffe082',
+    borderLeft:'3px solid '+C.amber,borderRadius:6,padding:'10px 14px',
+    marginBottom:14,display:'flex',gap:10,alignItems:'flex-start'}},
+    h('span',{style:{fontSize:11,color:C.amber,fontWeight:700,flexShrink:0}},'n='+props.n),
+    h('div',{style:{fontSize:10,color:C.ts,lineHeight:1.6}},props.children)
+  );
+}
+
+function Rodape(){
+  return h('div',{style:{marginTop:24,borderTop:'1px solid '+C.brdr,paddingTop:14}},
+    h('div',{style:{fontSize:9,color:C.tm,fontWeight:600,letterSpacing:1,
+      textTransform:'uppercase',marginBottom:10}},'Notas metodológicas'),
+    h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:10}},
+      h('div',{style:{background:'#fafbfc',border:'1px solid '+C.brdr,borderRadius:6,
+        padding:'10px 12px'}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:C.ts,marginBottom:4}},
+          'Origem e denominador'),
+        h('div',{style:{fontSize:9,color:C.tm,lineHeight:1.6}},
+          'Casos novos registrados na visita diária do SCIH (bloco MDR). '+
+          'Denominador: paciente-dia dos dias em que o bloco foi efetivamente '+
+          'coletado no setor — não o mês inteiro. Densidade expressa por 1000 '+
+          'paciente-dia.')),
+      h('div',{style:{background:'#fafbfc',border:'1px solid '+C.brdr,borderRadius:6,
+        padding:'10px 12px'}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:C.ts,marginBottom:4}},
+          'Início da série'),
+        h('div',{style:{fontSize:9,color:C.tm,lineHeight:1.6}},
+          'Vigilância ativa de culturas iniciada em julho de 2026 em Clínica '+
+          'Médica e Clínica Cirúrgica. O bloco MDR da visita diária passou a '+
+          'cobrir as duas enfermarias em '+INICIO_SERIE+'. Comparações com as '+
+          'UTIs devem considerar que a busca ativa muda a probabilidade de '+
+          'detecção.')),
+      h('div',{style:{background:'#fafbfc',border:'1px solid '+C.brdr,borderRadius:6,
+        padding:'10px 12px'}},
+        h('div',{style:{fontSize:9,fontWeight:600,color:C.ts,marginBottom:4}},
+          'Relação com o indicador institucional'),
+        h('div',{style:{fontSize:9,color:C.tm,lineHeight:1.6}},
+          'A densidade institucional de MDR continua somando apenas UTI A/B, '+
+          'UTI C e UTI Neo. As enfermarias NÃO entram nela — incluí-las '+
+          'mudaria o denominador de uma série já publicada.'))),
+    h('div',{style:{marginTop:12,paddingTop:10,borderTop:'1px solid #e9ecef',
+      display:'flex',justifyContent:'space-between',alignItems:'center',
+      flexWrap:'wrap',gap:8}},
+      h('div',{style:{fontSize:9,color:C.tm,lineHeight:1.6}},
+        h('span',{style:{fontWeight:600,color:C.ts}},'Autoria · '),
+        'Sistema de interface desenvolvido por Dr. Leandro Mendes · ',
+        'Análises epidemiológicas e estatísticas realizadas por Dr. Leandro Mendes'),
+      h('div',{style:{fontSize:8,color:C.glow,
+        fontFamily:"'IBM Plex Mono',monospace"}},
+        'SCIH/CCIH · HUSF · Bragança Paulista'))
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App(){
+  var vs=useState(UNITS[0].key); var view=vs[0],setView=vs[1];
+  var os=useState('kpc');        var orgSel=os[0],setOrgSel=os[1];
+  var ds=useState(null);         var data=ds[0],setData=ds[1];
+  var es=useState(null);         var erro=es[0],setErro=es[1];
+  var ls=useState(true);         var loading=ls[0],setLoading=ls[1];
+  var ps=useState('');           var periodo=ps[0],setPeriodo=ps[1];
+  var ts=useState(false);        var tabela=ts[0],setTabela=ts[1];
+
+  // Sem fallback embutido, de propósito: dado congelado no HTML renderiza
+  // número plausível e errado quando o fetch falha. Falha tem que aparecer.
+  useEffect(function(){
+    fetch('./data_iras.json?t='+Date.now())
+      .then(function(r){
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.json();
+      })
+      .then(function(d){
+        var mm=d.mdrMensal||{};
+        var faltam=UNITS.filter(function(u){return !mm[u.key];})
+                        .map(function(u){return u.label;});
+        if(faltam.length===UNITS.length){
+          setErro('O data_iras.json não traz as séries das enfermarias ('+
+            faltam.join(', ')+'). Confirme que o merge.py inclui os pares '+
+            'clinicaMedica/cm e clinicaCirurgica/cc no loop do mdrMensal.');
+        }
+        setData(mm);
+        if(d.periodo) setPeriodo(d.periodo);
+        setLoading(false);
+      })
+      .catch(function(e){
+        setErro('Falha ao carregar data_iras.json ('+e.message+').');
+        setLoading(false);
+      });
+  },[]);
+
+  if(loading) return h('div',{style:{display:'flex',alignItems:'center',
+    justifyContent:'center',height:'100vh',flexDirection:'column',gap:14}},
+    h('div',{className:'pulse',style:{width:40,height:40,borderRadius:'50%',
+      background:C.teal,opacity:.5}}),
+    h('div',{style:{color:C.ts,fontSize:13}},'Carregando...'));
+
+  var topBar=h('div',{style:{background:C.surf,borderBottom:'1px solid '+C.brdr,
+    padding:'12px 28px',position:'sticky',top:0,zIndex:20,
+    display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}},
+    h('div',{},
+      h('div',{style:{fontSize:13,fontWeight:600,color:C.ti}},
+        'Bactérias Multirresistentes — Enfermarias'),
+      h('div',{style:{fontSize:9,color:'#6b7280',marginTop:1}},
+        'HUSF · SCIH/CCIH'+(periodo?' · '+periodo:''))),
+    h('div',{style:{marginLeft:'auto',display:'flex',gap:8,alignItems:'center'}},
+      h('div',{style:{display:'flex',gap:5,alignItems:'center',background:C.hover,
+        padding:'4px 10px',borderRadius:6,fontSize:9,color:C.ts}},
+        h('span',{style:{width:8,height:8,borderRadius:2,background:'#c62828',
+          display:'inline-block'}}),'KPC',
+        h('span',{style:{width:8,height:8,borderRadius:2,background:'#1565c0',
+          display:'inline-block',marginLeft:8}}),'Acinetobacter',
+        h('span',{style:{color:C.tm,marginLeft:6}},'— alerta prioritário')),
+      h('a',{href:'./mdr_mensal.html',style:{fontSize:9,color:C.ts,
+        textDecoration:'none',padding:'4px 10px',border:'1px solid '+C.brdr,
+        borderRadius:6}},'UTIs →')));
+
+  if(erro&&!data) return h('div',{},topBar,
+    h('div',{style:{maxWidth:720,margin:'40px auto',background:C.card,
+      border:'1px solid '+C.brdr,borderLeft:'3px solid '+C.red,borderRadius:8,
+      padding:'18px 22px'}},
+      h('div',{style:{fontSize:12,fontWeight:700,color:C.red,marginBottom:6}},
+        'Sem dados'),
+      h('div',{style:{fontSize:11,color:C.ts,lineHeight:1.7}},erro)));
+
+  var u=(data&&data[view])||{};
+  var n=nPontos(u);
+  var ultimo=ultimoRotulo(u);
+  var unidade=UNITS.filter(function(x){return x.key===view;})[0]||UNITS[0];
+  var comparativoAtivo=view==='comp';
+
+  var pills=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}},
+    UNITS.map(function(un){
+      return h(Pill,{key:un.key,label:un.label,color:un.color,
+        active:view===un.key,onClick:function(){setView(un.key);}});
+    }),
+    h(Pill,{label:'Comparativo',active:comparativoAtivo,
+      onClick:function(){setView('comp');}}));
+
+  var corpo;
+  if(comparativoAtivo){
+    corpo=h('div',{className:'fi'},
+      h(SH,{t:'Comparativo entre enfermarias'}),
+      h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}},
+        ORGS.map(function(o){
+          return h(Pill,{key:o.key,label:o.label,color:o.color,
+            active:orgSel===o.key,onClick:function(){setOrgSel(o.key);}});
+        })),
+      h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:8,
+        padding:'14px 12px 8px'}},
+        h(Comparativo,{data:data||{},
+          org:ORGS.filter(function(o){return o.key===orgSel;})[0]})));
+  } else if(!ultimo){
+    corpo=h('div',{style:{background:C.card,border:'1px solid '+C.brdr,
+      borderLeft:'3px solid '+C.amber,borderRadius:8,padding:'18px 22px'}},
+      h('div',{style:{fontSize:11,color:C.ts,lineHeight:1.7}},
+        'Ainda não há mês com bloco MDR coletado em '+unidade.label+'. '+
+        'A série começa em '+INICIO_SERIE+'.'));
+  } else if(n<MIN_PTS){
+    corpo=h('div',{className:'fi'},
+      h(Aviso,{n:n},
+        'Série iniciada em ',h('b',{},INICIO_SERIE),'. Com ',
+        h('b',{},n+(n===1?' mês':' meses')),
+        ' de observação não há base para tendência, média histórica ou limiar '+
+        'de endemicidade — por isso esta página mostra o valor do mês e a '+
+        'contagem absoluta, e nada mais. Os gráficos de série aparecem a '+
+        'partir de '+MIN_PTS+' meses.'),
+      h(SH,{t:unidade.label+' · '+ultimo}),
+      h(Azulejos,{u:u,label:ultimo}),
+      h('div',{style:{marginTop:14}},h(Tabela,{u:u})));
+  } else {
+    corpo=h('div',{className:'fi'},
+      h(SH,{t:unidade.label+' · densidade mensal'}),
+      h(Kpis,{u:u}),
+      h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:8,
+        padding:'14px 12px 8px'}},h(LinhaDensidade,{u:u})),
+      h(SH,{t:'Casos novos por mês'}),
+      h('div',{style:{background:C.card,border:'1px solid '+C.brdr,borderRadius:8,
+        padding:'14px 12px 8px'}},h(BarrasContagem,{u:u})),
+      h('div',{style:{marginTop:14}},
+        h('button',{onClick:function(){setTabela(!tabela);},
+          style:{background:'none',border:'1px solid '+C.brdr,borderRadius:6,
+            padding:'5px 12px',fontSize:10,color:C.ts,
+            fontFamily:"'IBM Plex Sans',sans-serif"}},
+          tabela?'Ocultar tabela':'Ver tabela de valores'),
+        tabela?h('div',{style:{marginTop:10}},h(Tabela,{u:u})):null));
+  }
+
+  return h('div',{},topBar,
+    h('div',{style:{maxWidth:1180,margin:'0 auto',padding:'18px 28px 40px'}},
+      erro?h('div',{style:{background:'#fff5f5',border:'1px solid #fed7d7',
+        borderLeft:'3px solid '+C.red,borderRadius:6,padding:'10px 14px',
+        marginBottom:14,fontSize:10,color:C.ts,lineHeight:1.6}},erro):null,
+      pills,corpo,h(Rodape)));
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>

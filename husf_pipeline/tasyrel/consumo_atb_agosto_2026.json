@@ -1,0 +1,1256 @@
+{
+  "periodo": "Período de 01/08/2026 até 31/08/2026",
+  "mes": "AGOSTO",
+  "ano": "2026",
+  "matriz": [
+    {
+      "antimicrobiano": "Aciclovir",
+      "apresentacao": "FR AMP 250MG",
+      "unidade": "APTO",
+      "qtde": 90.0
+    },
+    {
+      "antimicrobiano": "Aciclovir",
+      "apresentacao": "FR AMP 250MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 55.0
+    },
+    {
+      "antimicrobiano": "Aciclovir",
+      "apresentacao": "FR AMP 250MG",
+      "unidade": "PS",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 100 mg",
+      "unidade": "BERÇÁRIO BAIXO RISCO",
+      "qtde": 7.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 3.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 63.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 23.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "PEDIATRIA",
+      "qtde": 16.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "PS",
+      "qtde": 4.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 22.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "UTI ADULTO C",
+      "qtde": 10.0
+    },
+    {
+      "antimicrobiano": "Amicacina",
+      "apresentacao": "FR AMP 500 mg",
+      "unidade": "UTI NEOPED",
+      "qtde": 3.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "APTO",
+      "qtde": 10.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 14.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 130.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 104.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 41.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 56.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "PEDIATRIA",
+      "qtde": 139.2
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "PS",
+      "qtde": 127.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 84.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "UTI ADULTO C",
+      "qtde": 57.0
+    },
+    {
+      "antimicrobiano": "Amoxacilina + Clavulanato",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "UTI NEOPED",
+      "qtde": 0.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "APTO",
+      "qtde": 23.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "BERÇÁRIO BAIXO RISCO",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 70.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "CUIDADOS INTERMEDIÁRIOS NEO",
+      "qtde": 13.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 26.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 237.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "PEDIATRIA",
+      "qtde": 44.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "PS",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 60.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "UTI ADULTO C",
+      "qtde": 28.0
+    },
+    {
+      "antimicrobiano": "Ampicilina  (pura)",
+      "apresentacao": "TODAS",
+      "unidade": "UTI NEOPED",
+      "qtde": 79.0
+    },
+    {
+      "antimicrobiano": "Ampicilina-sulbactam (base ampicilina)",
+      "apresentacao": "FR AMP 3G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 55.0
+    },
+    {
+      "antimicrobiano": "Ampicilina-sulbactam (base ampicilina)",
+      "apresentacao": "FR AMP 3G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 18.0
+    },
+    {
+      "antimicrobiano": "Ampicilina-sulbactam (base ampicilina)",
+      "apresentacao": "FR AMP 3G",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 10.0
+    },
+    {
+      "antimicrobiano": "Ampicilina-sulbactam (base ampicilina)",
+      "apresentacao": "FR AMP 3G",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Ampicilina-sulbactam (base ampicilina)",
+      "apresentacao": "FR AMP 3G",
+      "unidade": "PS",
+      "qtde": 57.0
+    },
+    {
+      "antimicrobiano": "Ampicilina-sulbactam (base ampicilina)",
+      "apresentacao": "FR AMP 3G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 67.0
+    },
+    {
+      "antimicrobiano": "Azitromicina",
+      "apresentacao": "CP 500MG",
+      "unidade": "APTO",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Azitromicina",
+      "apresentacao": "CP 500MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 10.0
+    },
+    {
+      "antimicrobiano": "Azitromicina",
+      "apresentacao": "CP 500MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Azitromicina",
+      "apresentacao": "CP 500MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 75.5
+    },
+    {
+      "antimicrobiano": "Azitromicina",
+      "apresentacao": "CP 500MG",
+      "unidade": "PS",
+      "qtde": 5.7
+    },
+    {
+      "antimicrobiano": "Benzilpenicilina Benzatina",
+      "apresentacao": "FR AMP 1.200.000",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Benzilpenicilina Benzatina",
+      "apresentacao": "FR AMP 1.200.000",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 4.0
+    },
+    {
+      "antimicrobiano": "Benzilpenicilina Benzatina",
+      "apresentacao": "FR AMP 1.200.000",
+      "unidade": "CUIDADOS INTERMEDIÁRIOS NEO",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Benzilpenicilina Benzatina",
+      "apresentacao": "FR AMP 1.200.000",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 5.0
+    },
+    {
+      "antimicrobiano": "Benzilpenicilina Benzatina",
+      "apresentacao": "FR AMP 1.200.000",
+      "unidade": "PEDIATRIA",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Benzilpenicilina Benzatina",
+      "apresentacao": "FR AMP 1.200.000",
+      "unidade": "PS",
+      "qtde": 30.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "APTO",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 13.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 17.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 35.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 139.0
+    },
+    {
+      "antimicrobiano": "Cefalexina",
+      "apresentacao": "CP 500MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 13.0
+    },
+    {
+      "antimicrobiano": "Cefalotina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "APTO",
+      "qtde": 12.0
+    },
+    {
+      "antimicrobiano": "Cefalotina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Cefalotina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Cefalotina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Cefalotina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 32.0
+    },
+    {
+      "antimicrobiano": "Cefalotina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "PEDIATRIA",
+      "qtde": 18.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "APTO",
+      "qtde": 114.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 913.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 124.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 38.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 66.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "HMD",
+      "qtde": 165.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 3.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "PEDIATRIA",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "PS",
+      "qtde": 32.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 75.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "UTI ADULTO C",
+      "qtde": 46.0
+    },
+    {
+      "antimicrobiano": "Cefazolina",
+      "apresentacao": "FR AMP 1,0G",
+      "unidade": "UTI NEOPED",
+      "qtde": 3.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 63.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 6.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "PEDIATRIA",
+      "qtde": 7.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "PS",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 13.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI ADULTO C",
+      "qtde": 50.0
+    },
+    {
+      "antimicrobiano": "Cefepima",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI NEOPED",
+      "qtde": 26.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "APTO",
+      "qtde": 44.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 15.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 86.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 34.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 121.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "PEDIATRIA",
+      "qtde": 116.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "PS",
+      "qtde": 74.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 28.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI ADULTO C",
+      "qtde": 26.0
+    },
+    {
+      "antimicrobiano": "Ceftriaxone",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI NEOPED",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "APTO",
+      "qtde": 21.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 127.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 21.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 10.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "PS",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 57.0
+    },
+    {
+      "antimicrobiano": "Cefuroxima",
+      "apresentacao": "FR AMP 750MG",
+      "unidade": "UTI ADULTO C",
+      "qtde": 22.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "CP 500 MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "CP 500 MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 22.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "CP 500 MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 6.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "CP 500 MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "CP 500 MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "APTO",
+      "qtde": 31.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 36.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 178.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 18.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 41.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 6.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "PS",
+      "qtde": 64.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 69.0
+    },
+    {
+      "antimicrobiano": "Ciprofloxacina",
+      "apresentacao": "FR AMP 200 MG",
+      "unidade": "UTI ADULTO C",
+      "qtde": 48.0
+    },
+    {
+      "antimicrobiano": "Claritromicina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 14.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "APTO",
+      "qtde": 23.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 6.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 99.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 42.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 9.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 37.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "PS",
+      "qtde": 48.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Clindamicina",
+      "apresentacao": "AMP 600MG",
+      "unidade": "UTI NEOPED",
+      "qtde": 16.0
+    },
+    {
+      "antimicrobiano": "Doxiciclina monoidratada",
+      "apresentacao": "CP 100MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Fluconazol",
+      "apresentacao": "FR 200MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 19.0
+    },
+    {
+      "antimicrobiano": "Fluconazol",
+      "apresentacao": "FR 200MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 4.0
+    },
+    {
+      "antimicrobiano": "Fluconazol",
+      "apresentacao": "FR 200MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 12.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "BERÇÁRIO BAIXO RISCO",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 16.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 47.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 20.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "CUIDADOS INTERMEDIÁRIOS NEO",
+      "qtde": 5.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 9.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 17.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 15.0
+    },
+    {
+      "antimicrobiano": "Gentamicina",
+      "apresentacao": "AMP 80 MG",
+      "unidade": "UTI NEOPED",
+      "qtde": 38.05
+    },
+    {
+      "antimicrobiano": "Levofloxacina",
+      "apresentacao": "CP 500 MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Levofloxacina",
+      "apresentacao": "FR AMP 750 MG",
+      "unidade": "APTO",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Levofloxacina",
+      "apresentacao": "FR AMP 750 MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 3.0
+    },
+    {
+      "antimicrobiano": "Levofloxacina",
+      "apresentacao": "FR AMP 750 MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Levofloxacina",
+      "apresentacao": "FR AMP 750 MG",
+      "unidade": "PS",
+      "qtde": 8.0
+    },
+    {
+      "antimicrobiano": "Levofloxacina",
+      "apresentacao": "FR AMP 750 MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 9.0
+    },
+    {
+      "antimicrobiano": "Meropenem",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 10.0
+    },
+    {
+      "antimicrobiano": "Meropenem",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 22.0
+    },
+    {
+      "antimicrobiano": "Meropenem",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "PS",
+      "qtde": 20.0
+    },
+    {
+      "antimicrobiano": "Meropenem",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 75.0
+    },
+    {
+      "antimicrobiano": "Meropenem",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI ADULTO C",
+      "qtde": 9.0
+    },
+    {
+      "antimicrobiano": "Meropenem",
+      "apresentacao": "FR AMP 1G",
+      "unidade": "UTI NEOPED",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "APTO",
+      "qtde": 21.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 17.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 105.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 18.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 64.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 5.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 33.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "PS",
+      "qtde": 64.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 73.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "UTI ADULTO C",
+      "qtde": 50.0
+    },
+    {
+      "antimicrobiano": "Metronidazol",
+      "apresentacao": "FR 500MG",
+      "unidade": "UTI NEOPED",
+      "qtde": 7.0
+    },
+    {
+      "antimicrobiano": "Oxacilina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "BERÇÁRIO BAIXO RISCO",
+      "qtde": 13.0
+    },
+    {
+      "antimicrobiano": "Oxacilina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 236.0
+    },
+    {
+      "antimicrobiano": "Oxacilina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 48.0
+    },
+    {
+      "antimicrobiano": "Oxacilina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 25.0
+    },
+    {
+      "antimicrobiano": "Oxacilina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 130.0
+    },
+    {
+      "antimicrobiano": "Oxacilina",
+      "apresentacao": "FR AMP 500MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 88.0
+    },
+    {
+      "antimicrobiano": "Penicilina G potássica",
+      "apresentacao": "5.000.000UI FR",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Penicilina G potássica",
+      "apresentacao": "5.000.000UI FR",
+      "unidade": "OBSTETRÍCIA",
+      "qtde": 1.0
+    },
+    {
+      "antimicrobiano": "Penicilina G potássica",
+      "apresentacao": "5.000.000UI FR",
+      "unidade": "PEDIATRIA",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Penicilina G potássica",
+      "apresentacao": "5.000.000UI FR",
+      "unidade": "UTI NEOPED",
+      "qtde": 15.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 77.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 46.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 23.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "PS",
+      "qtde": 39.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 42.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "UTI ADULTO C",
+      "qtde": 40.0
+    },
+    {
+      "antimicrobiano": "Piperacilina-tazobactam (base piperacilina)",
+      "apresentacao": "FR AMP 4,5G",
+      "unidade": "UTI NEOPED",
+      "qtde": 24.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "APTO",
+      "qtde": 7.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 6.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 53.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "PEDIATRIA",
+      "qtde": 25.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 64.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "AMP 5ml",
+      "unidade": "UTI ADULTO C",
+      "qtde": 11.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "CP 160MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 7.0
+    },
+    {
+      "antimicrobiano": "Sulfametoxazol 800 mg/Trimetoprima 160mg",
+      "apresentacao": "CP 160MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 2.0
+    },
+    {
+      "antimicrobiano": "Sulfato de Polimixina B",
+      "apresentacao": "FR AMP 500.000 UI (50 MG)",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 28.0
+    },
+    {
+      "antimicrobiano": "Teicoplanina",
+      "apresentacao": "FR AMP 400 MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 26.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "APTO",
+      "qtde": 3.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "CENTRO CIRÚRGICO",
+      "qtde": 98.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "CLÍNICA CIRÚRGICA",
+      "qtde": 46.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "CLÍNICA MÉDICA",
+      "qtde": 40.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "EPM ( Convênios)",
+      "qtde": 24.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "HMD",
+      "qtde": 120.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "PEDIATRIA",
+      "qtde": 47.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "PS",
+      "qtde": 35.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "UTI ADULTO A e B",
+      "qtde": 158.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "UTI ADULTO C",
+      "qtde": 119.0
+    },
+    {
+      "antimicrobiano": "Vancomicina",
+      "apresentacao": "FR AMP 500 MG",
+      "unidade": "UTI NEOPED",
+      "qtde": 48.0
+    }
+  ],
+  "auditoria": {
+    "setores_nao_mapeados": {
+      "ALOJAMENTO CONJUNTO": 1.0,
+      "ULTRASSONOGRAFIA": 1.0
+    },
+    "materiais_nao_mapeados": {
+      "736 - Ceftriaxona 1g": 1.0,
+      "2186 - Aciclovir 10 g creme": 40.0,
+      "2367 - Fluconazol 150 mg": 11.0,
+      "3369 - Itraconazol 100mg": 22.0,
+      "18751 - Ivermectina 6mg cp.": 20.0,
+      "66206 - Sulfametoxazol": 1.0,
+      "669 - Cefalexina": 60.0,
+      "1691 - Nistatina 100.": 219.0,
+      "72057 - Complexo Lipídico": 12.0
+    },
+    "destinos_inexistentes": [],
+    "materiais_ignorados": {
+      "53169 - Miconazol Nitrato": 2.0
+    },
+    "qtde_total_relatorio": 8782.449999999999,
+    "qtde_total_alocada": 8392.449999999999,
+    "qtde_ignorada": 2.0,
+    "qtde_perdida": 388.0
+  }
+}

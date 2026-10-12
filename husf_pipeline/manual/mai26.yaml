@@ -1,0 +1,55 @@
+# manual/mai26.yaml — Campos de julgamento para mai/26
+# Edite os valores antes de rodar: python gerar_competencia.py --mes mai/26
+# Deixe null os campos que não se aplicam ao mês.
+
+# ── Taxa IH Global ────────────────────────────────────────────────────────────
+global_taxaIH: 0.98         # ex: 1.05
+
+# ── Status epidemiológico por unidade ─────────────────────────────────────────
+# Valores válidos: endemico | alerta | epidemico
+status_global:         endemico
+status_utiAB:          endemico
+status_utic:           endemico
+status_utiNeo:         endemico
+status_clinicaMedica:  endemico
+status_clinicaCirurgica: endemico
+status_epm:            endemico
+status_hd:             endemico
+
+# ── Enfermarias — contagens absolutas do mês ─────────────────────────────────
+# ac=Inf. Acesso Central · itu=Inf. Urinária · pneu=Pneumonia
+# isc=Inf. Sítio Cirúrgico · pd=Pacientes-dia
+clinicaMedica:
+  ac:   1
+  itu:  0
+  pneu: 4
+  isc:  0      # CM geralmente não tem ISC
+  pd:   727
+
+clinicaCirurgica:
+  ac:   4
+  itu:  2
+  pneu: 7
+  isc:  6
+  pd:   844
+
+epm:
+  ac:   0
+  itu:  1
+  pneu: 1
+  isc:  2
+  pd:   493
+
+# ── SURA ─────────────────────────────────────────────────────────────────────
+sura:
+  sol:     153   # total de solicitações
+  neg:     95   # pareceres negativos
+  mantido: 32   # uso mantido apesar do parecer
+  semAtb:  9   # alta sem ATB
+  troca:   22   # troca de ATB
+  alta:    19   # alta < 72h (%)
+
+# ── Antibiograma ──────────────────────────────────────────────────────────────
+# Atualizar apenas quando houver nova versão do antibiograma institucional.
+# Deixe null para manter o valor do mês anterior.
+abio: null

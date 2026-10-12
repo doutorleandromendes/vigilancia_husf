@@ -1,0 +1,19 @@
+{
+  "theme": {
+    "bg": "#f0f2f5",
+    "white": "#ffffff",
+    "brdr": "#d0d7de",
+    "muted": "#8898aa",
+    "navy": "#2351b3",
+    "slate": "#4a5568",
+    "light": "#6b7280",
+    "blue": "#1565c0",
+    "red": "#c52626",
+    "green": "#2e7d32",
+    "amber": "#e65100",
+    "purple": "#4527a0",
+    "teal": "#00695c",
+    "hist": "#9eaab8",
+    "grid": "#e2e6ea"
+  }
+}

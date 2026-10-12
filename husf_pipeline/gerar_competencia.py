@@ -16,7 +16,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import husf_pipeline.config as cfg
 from husf_pipeline.parsers._util import XlsxProvider, parse_mes_arg, mes_label
-from husf_pipeline.parsers import censo_mdr, censo_isc, diarreia, dots
+from husf_pipeline.parsers import censo_mdr, censo_isc, diarreia, dots, censo
+from husf_pipeline.parsers import vig_competencia
 from husf_pipeline.parsers import cve_mestre, cve_utic, dialise, controles
 from husf_pipeline.parsers.controles import parse_alcool_enfermarias
 from husf_pipeline.parsers import isolamentos
@@ -118,7 +119,7 @@ def run_r_scripts(label):
 
 # ── Run mensal ────────────────────────────────────────────────────────────────
 
-def run(mes_str, dry_run=False, skip_r=False):
+def run(mes_str, dry_run=False, skip_r=False, fonte='vig'):
     mes_idx, ano = parse_mes_arg(mes_str)
     label = mes_label(mes_idx, ano)
     print(f"\n==> Gerando competencia {label}\n")
@@ -143,15 +144,41 @@ def run(mes_str, dry_run=False, skip_r=False):
             print(f"  ERR {name}: {e}")
             errs.append(f"{name}: {e}")
 
-    rp('censo_mdr',   censo_mdr.parse,   sp['censo_mdr'])
-    rp('censo_isc',   censo_isc.parse,   sp['censo_isc'])
-    rp('diarreia',    diarreia.parse,    sp['diarreia'])
-    rp('dots',        dots.parse,        sp['dots'])
+    # ── Vigilância diária: MDR, ISC, diarreia, isolamentos e DOTs ────────────
+    # Desde set/26 vêm do módulo vig_* (Postgres), não mais das 5 planilhas.
+    # --fonte sheets regenera meses antigos (até jul/26) pela fonte original.
+    if fonte == 'vig':
+        import os
+        _base = (os.environ.get('VIG_URL') or os.environ.get('CVE_SURA_URL')
+                 or getattr(cfg, 'VIG_URL', 'https://app.lcmendes.med.br'))
+        _key  = os.environ.get('VIG_API_KEY') or getattr(cfg, 'VIG_API_KEY', None)
+        _inst = (os.environ.get('VIG_INST') or os.environ.get('CVE_INST')
+                 or getattr(cfg, 'VIG_INST', 'HUSF'))
+        _mes_api = f'{ano}-{mes_idx + 1:02d}'
+        try:
+            _api = vig_competencia.fetch(_base, _inst, _mes_api, _key)
+            for _nome, _res in vig_competencia.build_all(_api).items():
+                out[_nome] = _res
+            _cob = vig_competencia.cobertura_resumo(_api)
+            print(f"  OK  vig ({_mes_api}) — " +
+                  ' · '.join(f'{b}:{c["dias_min"]}-{c["dias_max"]}d'
+                             for b, c in _cob.items()))
+        except Exception as e:
+            # Falha aqui NAO pode virar zero silencioso: aborta.
+            sys.exit(f"ERRO: vigilancia diaria ({_mes_api}) indisponivel: {e}\n"
+                     f"      Confira VIG_API_KEY e o endpoint; ou use --fonte sheets.")
+    else:
+        rp('censo_mdr',   censo_mdr.parse,   sp['censo_mdr'])
+        rp('censo_isc',   censo_isc.parse,   sp['censo_isc'])
+        rp('diarreia',    diarreia.parse,    sp['diarreia'])
+        rp('dots',        dots.parse,        sp['dots'])
+        rp('isolamentos', isolamentos.parse, sp['isolamentos'])
+
+    rp('censo',       censo.parse,       sp['censo'])
     rp('cve_mestre',  cve_mestre.parse,  xl['cve_mestre'])
     rp('cve_utic',    cve_utic.parse,    xl['cve_utic'])
     rp('cve_dialise', dialise.parse,     xl['cve_dialise'])
     rp('controles',   controles.parse,   xl['controles'])
-    rp('isolamentos', isolamentos.parse, sp['isolamentos'])
     # Álcool das UTIs (bags do SHL na Planilha de Controles 'Dados UTI')
     try:
         out['controles_alcool_uti'] = parse_alcool_uti(
@@ -172,7 +199,14 @@ def run(mes_str, dry_run=False, skip_r=False):
         errs.append(f'controles_alcool: {e}')
 
     yaml_path = cfg.MANUAL_DIR / f"{label.replace('/','')}.yaml"
-    manual = _load_yaml(yaml_path)
+    from husf_pipeline.core import manual_auto
+    try:
+        auto = manual_auto.build(out, ano, mes_idx, prev_json)
+        print(f'  OK  auto-manual ({len(auto)} campos)')
+    except Exception as e:
+        auto = {}
+        print(f'  ERR auto-manual: {e}')
+    manual = {**auto, **_load_yaml(yaml_path)}     # YAML sobrepoe (correcao a mao)
 
     new_json = build_month(prev_json, label, out, manual)
     print_report(label, out, manual, warnings=errs)
@@ -427,6 +461,9 @@ def main():
                    help='Processa mas nao grava JSON nem roda R')
     p.add_argument('--skip-r',   action='store_true',
                    help='Pula os scripts R (util em testes)')
+    p.add_argument('--fonte', choices=['vig', 'sheets'], default='vig',
+                   help='Fonte da vigilancia diaria: vig (padrao, desde set/26) '
+                        'ou sheets (meses ate jul/26)')
     args = p.parse_args()
 
     if args.seed_historico:
@@ -440,7 +477,7 @@ def main():
     elif args.seed_alcool_uti:
         seed_alcool_uti()
     else:
-        run(args.mes, dry_run=args.dry_run, skip_r=args.skip_r)
+        run(args.mes, dry_run=args.dry_run, skip_r=args.skip_r, fonte=args.fonte)
 
 
 if __name__ == '__main__':

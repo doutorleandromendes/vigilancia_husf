@@ -1,0 +1,51 @@
+# manual/jun26.yaml — Campos de julgamento para jun/26
+# Gerado pelo Studio · python gerar_competencia.py --mes jun/26
+
+# ── Taxa IH Global ────────────────────────────────────────────────────────────
+global_taxaIH: 0.71
+
+# ── Status epidemiológico por unidade ─────────────────────────────────────────
+# Valores válidos: endemico | alerta | epidemico
+status_global:           endemico
+status_utiAB:            endemico
+status_utic:             endemico
+status_utiNeo:           endemico
+status_clinicaMedica:    endemico
+status_clinicaCirurgica: endemico
+status_epm:              endemico
+status_hd:               endemico
+
+# ── Enfermarias — contagens absolutas do mês ─────────────────────────────────
+# ac=Acesso Central · itu=Urinária · pneu=Pneumonia · isc=Sítio Cirúrgico · pd=Pac-dia
+clinicaMedica:
+  ac:   1
+  itu:  0
+  pneu: 3
+  isc:  0
+  pd:   695
+
+clinicaCirurgica:
+  ac:   1
+  itu:  2
+  pneu: 4
+  isc:  3
+  pd:   810
+
+epm:
+  ac:   0
+  itu:  0
+  pneu: 2
+  isc:  1
+  pd:   711
+
+# ── SURA ─────────────────────────────────────────────────────────────────────
+sura:
+  sol:     229 # total de solicitações
+  neg:     109 # pareceres negativos
+  mantido: 60  # uso mantido apesar do parecer
+  semAtb:  6   # alta sem ATB
+  troca:   10  # troca de ATB
+  alta:    11  # alta < 72h (%)
+
+# ── Antibiograma ──────────────────────────────────────────────────────────────
+abio: null
