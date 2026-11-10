@@ -1,69 +1,69 @@
 {
-  "gerado": "2026-10-12",
+  "gerado": "2026-11-10",
   "utiAB": {
     "ref_inicio": "jan/22",
-    "ref_fim": "ago/26",
-    "n_ref": 56,
+    "ref_fim": "set/26",
+    "n_ref": 57,
     "pav": {
-      "p10": 7.32,
-      "p25": 11,
-      "p50": 13.54,
-      "p75": 17.98,
-      "p90": 24.62,
-      "mk_tau": -0.073,
-      "mk_p": 0.3051,
+      "p10": 7.42,
+      "p25": 11.11,
+      "p50": 13.61,
+      "p75": 18.73,
+      "p90": 24.56,
+      "mk_tau": -0.058,
+      "mk_p": 0.4104,
       "mk_dir": -1,
-      "sen": -0.029,
+      "sen": -0.024,
       "meses": {
         "jan/19": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.006
+          "p_poi": 0.0065
         },
         "fev/19": {
           "zona": "alerta",
           "pct": 88,
-          "p_poi": 0.032
+          "p_poi": 0.0341
         },
         "mar/19": {
           "zona": "alerta",
           "pct": 88,
-          "p_poi": 0.032
+          "p_poi": 0.0341
         },
         "abr/19": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0032
+          "p_poi": 0.0035
         },
         "mai/19": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0032
+          "p_poi": 0.0035
         },
         "jun/19": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.5307
+          "pct": 58,
+          "p_poi": 0.5409
         },
         "jul/19": {
-          "zona": "alerta",
-          "pct": 75,
-          "p_poi": 0.2481
+          "zona": "endemica",
+          "pct": 74,
+          "p_poi": 0.2566
         },
         "ago/19": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0109
+          "p_poi": 0.0117
         },
         "set/19": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.052
+          "p_poi": 0.055
         },
         "out/19": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.0032
+          "p_poi": 0.0035
         },
         "nov/19": {
           "zona": "epidemica",
@@ -73,52 +73,52 @@
         "dez/19": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.006
+          "p_poi": 0.0065
         },
         "jan/20": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.4282
+          "pct": 61,
+          "p_poi": 0.4385
         },
         "fev/20": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.5307
+          "pct": 56,
+          "p_poi": 0.5409
         },
         "mar/20": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.5307
+          "pct": 58,
+          "p_poi": 0.5409
         },
         "abr/20": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9971
+          "p_poi": 0.9973
         },
         "mai/20": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9971
+          "p_poi": 0.9973
         },
         "jun/20": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.9816
+          "p_poi": 0.9827
         },
         "jul/20": {
           "zona": "endemica",
-          "pct": 61,
-          "p_poi": 0.5307
+          "pct": 60,
+          "p_poi": 0.5409
         },
         "ago/20": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.7294
+          "pct": 47,
+          "p_poi": 0.7377
         },
         "set/20": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9922
+          "p_poi": 0.9927
         },
         "out/20": {
           "zona": "abaixo",
@@ -128,182 +128,182 @@
         "nov/20": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9971
+          "p_poi": 0.9973
         },
         "dez/20": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.9618
+          "p_poi": 0.9638
         },
         "jan/21": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.9618
+          "p_poi": 0.9638
         },
         "fev/21": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.6333
+          "pct": 49,
+          "p_poi": 0.6429
         },
         "mar/21": {
           "zona": "endemica",
-          "pct": 61,
-          "p_poi": 0.5307
+          "pct": 60,
+          "p_poi": 0.5409
         },
         "abr/21": {
           "zona": "baixa",
           "pct": 25,
-          "p_poi": 0.8798
+          "p_poi": 0.8846
         },
         "mai/21": {
           "zona": "baixa",
           "pct": 11,
-          "p_poi": 0.9816
+          "p_poi": 0.9827
         },
         "jun/21": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.5307
+          "pct": 58,
+          "p_poi": 0.5409
         },
         "jul/21": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.929
+          "pct": 19,
+          "p_poi": 0.9322
         },
         "ago/21": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.178
+          "pct": 79,
+          "p_poi": 0.1851
         },
         "set/21": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.9816
+          "p_poi": 0.9827
         },
         "out/21": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.1228
+          "pct": 79,
+          "p_poi": 0.1284
         },
         "nov/21": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.929
+          "p_poi": 0.9322
         },
         "dez/21": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.7294
+          "pct": 47,
+          "p_poi": 0.7377
         },
         "jan/22": {
           "zona": "endemica",
           "pct": 32,
-          "p_poi": 0.8798
+          "p_poi": 0.8846
         },
         "fev/22": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.8798
+          "pct": 33,
+          "p_poi": 0.8846
         },
         "mar/22": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.3324
+          "pct": 68,
+          "p_poi": 0.342
         },
         "abr/22": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.178
+          "pct": 79,
+          "p_poi": 0.1851
         },
         "mai/22": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.0815
+          "p_poi": 0.0857
         },
         "jun/22": {
           "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.9922
+          "p_poi": 0.9927
         },
         "jul/22": {
           "zona": "endemica",
           "pct": 39,
-          "p_poi": 0.8129
+          "p_poi": 0.8195
         },
         "ago/22": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.4282
+          "pct": 63,
+          "p_poi": 0.4385
         },
         "set/22": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0109
+          "p_poi": 0.0117
         },
         "out/22": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.8798
+          "pct": 28,
+          "p_poi": 0.8846
         },
         "nov/22": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.8129
+          "pct": 37,
+          "p_poi": 0.8195
         },
         "dez/22": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.6333
+          "pct": 54,
+          "p_poi": 0.6429
         },
         "jan/23": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.8129
+          "pct": 35,
+          "p_poi": 0.8195
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.6333
+          "pct": 56,
+          "p_poi": 0.6429
         },
         "mar/23": {
           "zona": "endemica",
-          "pct": 71,
-          "p_poi": 0.3324
+          "pct": 70,
+          "p_poi": 0.342
         },
         "abr/23": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.7294
+          "pct": 49,
+          "p_poi": 0.7377
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 54,
-          "p_poi": 0.6333
+          "pct": 53,
+          "p_poi": 0.6429
         },
         "jun/23": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.5307
+          "pct": 61,
+          "p_poi": 0.5409
         },
         "jul/23": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.178
+          "pct": 75,
+          "p_poi": 0.1851
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 61,
-          "p_poi": 0.5307
+          "pct": 60,
+          "p_poi": 0.5409
         },
         "set/23": {
           "zona": "baixa",
           "pct": 25,
-          "p_poi": 0.8798
+          "p_poi": 0.8846
         },
         "out/23": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.0017
+          "p_poi": 0.0018
         },
         "nov/23": {
           "zona": "abaixo",
@@ -318,57 +318,57 @@
         "jan/24": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8798
+          "p_poi": 0.8846
         },
         "fev/24": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.8798
+          "pct": 28,
+          "p_poi": 0.8846
         },
         "mar/24": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9991
+          "p_poi": 0.9992
         },
         "abr/24": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.0032
+          "p_poi": 0.0035
         },
         "mai/24": {
           "zona": "endemica",
-          "pct": 43,
-          "p_poi": 0.7294
+          "pct": 42,
+          "p_poi": 0.7377
         },
         "jun/24": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.019
+          "p_poi": 0.0203
         },
         "jul/24": {
           "zona": "endemica",
-          "pct": 73,
-          "p_poi": 0.2481
+          "pct": 72,
+          "p_poi": 0.2566
         },
         "ago/24": {
           "zona": "endemica",
-          "pct": 52,
-          "p_poi": 0.6333
+          "pct": 51,
+          "p_poi": 0.6429
         },
         "set/24": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.7294
+          "pct": 47,
+          "p_poi": 0.7377
         },
         "out/24": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.5307
+          "pct": 58,
+          "p_poi": 0.5409
         },
         "nov/24": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.8798
+          "p_poi": 0.8846
         },
         "dez/24": {
           "zona": "abaixo",
@@ -378,27 +378,27 @@
         "jan/25": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.929
+          "p_poi": 0.9322
         },
         "fev/25": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.178
+          "pct": 77,
+          "p_poi": 0.1851
         },
         "mar/25": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.929
+          "pct": 19,
+          "p_poi": 0.9322
         },
         "abr/25": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.9618
+          "p_poi": 0.9638
         },
         "mai/25": {
           "zona": "endemica",
-          "pct": 68,
-          "p_poi": 0.3324
+          "pct": 67,
+          "p_poi": 0.342
         },
         "jun/25": {
           "zona": "abaixo",
@@ -407,18 +407,18 @@
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.4282
+          "pct": 65,
+          "p_poi": 0.4385
         },
         "ago/25": {
           "zona": "alerta",
           "pct": 88,
-          "p_poi": 0.052
+          "p_poi": 0.055
         },
         "set/25": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.0815
+          "p_poi": 0.0857
         },
         "out/25": {
           "zona": "epidemica",
@@ -428,37 +428,37 @@
         "nov/25": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.9816
+          "p_poi": 0.9827
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 75,
-          "p_poi": 0.2481
+          "pct": 74,
+          "p_poi": 0.2566
         },
         "jan/26": {
           "zona": "endemica",
           "pct": 46,
-          "p_poi": 0.7294
+          "p_poi": 0.7377
         },
         "fev/26": {
           "zona": "endemica",
           "pct": 46,
-          "p_poi": 0.7294
+          "p_poi": 0.7377
         },
         "mar/26": {
           "zona": "baixa",
           "pct": 18,
-          "p_poi": 0.929
+          "p_poi": 0.9322
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 41,
-          "p_poi": 0.7294
+          "pct": 40,
+          "p_poi": 0.7377
         },
         "mai/26": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.929
+          "p_poi": 0.9322
         },
         "jun/26": {
           "zona": "abaixo",
@@ -467,96 +467,101 @@
         },
         "jul/26": {
           "zona": "alerta",
-          "pct": 82,
-          "p_poi": 0.0815
+          "pct": 81,
+          "p_poi": 0.0857
         },
         "ago/26": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.0008
+          "p_poi": 0.0009
         },
         "set/26": {
           "zona": "alerta",
           "pct": 82,
-          "p_poi": 0.0815
+          "p_poi": 0.0857
+        },
+        "out/26": {
+          "zona": "alerta",
+          "pct": 86,
+          "p_poi": 0.0857
         }
       }
     },
     "ipcs": {
-      "p10": 4.53,
-      "p25": 7.37,
-      "p50": 10.07,
-      "p75": 12.91,
-      "p90": 14.99,
-      "mk_tau": 0.168,
-      "mk_p": 0.017,
+      "p10": 4.54,
+      "p25": 7.38,
+      "p50": 10.15,
+      "p75": 13.05,
+      "p90": 15.69,
+      "mk_tau": 0.167,
+      "mk_p": 0.0171,
       "mk_dir": 1,
-      "sen": 0.04,
+      "sen": 0.039,
       "meses": {
         "jan/19": {
           "zona": "alerta",
-          "pct": 88,
-          "p_poi": 0.1377
+          "pct": 86,
+          "p_poi": 0.1486
         },
         "fev/19": {
           "zona": "endemica",
-          "pct": 54,
-          "p_poi": 0.5458
+          "pct": 53,
+          "p_poi": 0.5637
         },
         "mar/19": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.8717
+          "pct": 19,
+          "p_poi": 0.8805
         },
         "abr/19": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "mai/19": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "jun/19": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "jul/19": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.6705
+          "pct": 44,
+          "p_poi": 0.6865
         },
         "ago/19": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.9713
+          "p_poi": 0.9739
         },
         "set/19": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.7825
+          "pct": 35,
+          "p_poi": 0.7951
         },
         "out/19": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "nov/19": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3066
+          "pct": 63,
+          "p_poi": 0.3233
         },
         "dez/19": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.4207
+          "pct": 58,
+          "p_poi": 0.4388
         },
         "jan/20": {
           "zona": "epidemica",
-          "pct": 93,
-          "p_poi": 0.0147
+          "pct": 91,
+          "p_poi": 0.0166
         },
         "fev/20": {
           "zona": "abaixo",
@@ -566,97 +571,97 @@
         "mar/20": {
           "zona": "abaixo",
           "pct": 4,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "abr/20": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.9713
+          "p_poi": 0.9739
         },
         "mai/20": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.7825
+          "p_poi": 0.7951
         },
         "jun/20": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.5458
+          "pct": 47,
+          "p_poi": 0.5637
         },
         "jul/20": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.8717
+          "p_poi": 0.8805
         },
         "ago/20": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9995
+          "p_poi": 0.9996
         },
         "set/20": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "out/20": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "nov/20": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.9713
+          "p_poi": 0.9739
         },
         "dez/20": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.7825
+          "p_poi": 0.7951
         },
         "jan/21": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.8717
+          "p_poi": 0.8805
         },
         "fev/21": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5458
+          "pct": 54,
+          "p_poi": 0.5637
         },
         "mar/21": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.7825
+          "pct": 33,
+          "p_poi": 0.7951
         },
         "abr/21": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "mai/21": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "jun/21": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.7825
+          "pct": 35,
+          "p_poi": 0.7951
         },
         "jul/21": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.7825
+          "pct": 28,
+          "p_poi": 0.7951
         },
         "ago/21": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9995
+          "p_poi": 0.9996
         },
         "set/21": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3066
+          "pct": 63,
+          "p_poi": 0.3233
         },
         "out/21": {
           "zona": "abaixo",
@@ -665,288 +670,288 @@
         },
         "nov/21": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5458
+          "pct": 54,
+          "p_poi": 0.5637
         },
         "dez/21": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.0074
+          "p_poi": 0.0085
         },
         "jan/22": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0036
+          "p_poi": 0.0042
         },
         "fev/22": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.3066
+          "pct": 68,
+          "p_poi": 0.3233
         },
         "mar/22": {
           "zona": "endemica",
-          "pct": 73,
-          "p_poi": 0.2113
+          "pct": 72,
+          "p_poi": 0.2253
         },
         "abr/22": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.7825
+          "pct": 33,
+          "p_poi": 0.7951
         },
         "mai/22": {
           "zona": "endemica",
-          "pct": 52,
-          "p_poi": 0.5458
+          "pct": 51,
+          "p_poi": 0.5637
         },
         "jun/22": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.0147
+          "p_poi": 0.0166
         },
         "jul/22": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0036
+          "p_poi": 0.0042
         },
         "ago/22": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.3066
+          "pct": 65,
+          "p_poi": 0.3233
         },
         "set/22": {
           "zona": "endemica",
           "pct": 32,
-          "p_poi": 0.7825
+          "p_poi": 0.7951
         },
         "out/22": {
           "zona": "alerta",
-          "pct": 89,
-          "p_poi": 0.1377
+          "pct": 88,
+          "p_poi": 0.1486
         },
         "nov/22": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.2113
+          "pct": 79,
+          "p_poi": 0.2253
         },
         "dez/22": {
           "zona": "abaixo",
           "pct": 7,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "jan/23": {
           "zona": "endemica",
-          "pct": 71,
-          "p_poi": 0.2113
+          "pct": 70,
+          "p_poi": 0.2253
         },
         "fev/23": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.7825
+          "p_poi": 0.7951
         },
         "mar/23": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.5458
+          "pct": 49,
+          "p_poi": 0.5637
         },
         "abr/23": {
           "zona": "alerta",
-          "pct": 86,
-          "p_poi": 0.1377
+          "pct": 84,
+          "p_poi": 0.1486
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 68,
-          "p_poi": 0.3066
+          "pct": 67,
+          "p_poi": 0.3233
         },
         "jun/23": {
           "zona": "endemica",
-          "pct": 54,
-          "p_poi": 0.5458
+          "pct": 53,
+          "p_poi": 0.5637
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5458
+          "pct": 54,
+          "p_poi": 0.5637
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.4207
+          "pct": 63,
+          "p_poi": 0.4388
         },
         "set/23": {
           "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.9899
+          "p_poi": 0.9909
         },
         "out/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8717
+          "p_poi": 0.8805
         },
         "nov/23": {
           "zona": "endemica",
           "pct": 46,
-          "p_poi": 0.6705
+          "p_poi": 0.6865
         },
         "dez/23": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.6705
+          "pct": 37,
+          "p_poi": 0.6865
         },
         "jan/24": {
           "zona": "abaixo",
           "pct": 4,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "fev/24": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9899
+          "p_poi": 0.9909
         },
         "mar/24": {
           "zona": "epidemica",
-          "pct": 93,
-          "p_poi": 0.0498
+          "pct": 91,
+          "p_poi": 0.0551
         },
         "abr/24": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.9713
+          "p_poi": 0.9739
         },
         "mai/24": {
           "zona": "endemica",
-          "pct": 41,
-          "p_poi": 0.6705
+          "pct": 40,
+          "p_poi": 0.6865
         },
         "jun/24": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.6705
+          "pct": 44,
+          "p_poi": 0.6865
         },
         "jul/24": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.8717
+          "p_poi": 0.8805
         },
         "ago/24": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.9713
+          "p_poi": 0.9739
         },
         "set/24": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.9713
+          "p_poi": 0.9739
         },
         "out/24": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.934
+          "pct": 19,
+          "p_poi": 0.9392
         },
         "nov/24": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.4207
+          "pct": 61,
+          "p_poi": 0.4388
         },
         "dez/24": {
           "zona": "baixa",
           "pct": 25,
-          "p_poi": 0.8717
+          "p_poi": 0.8805
         },
         "jan/25": {
           "zona": "endemica",
           "pct": 39,
-          "p_poi": 0.6705
+          "p_poi": 0.6865
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 75,
-          "p_poi": 0.2113
+          "pct": 74,
+          "p_poi": 0.2253
         },
         "mar/25": {
           "zona": "endemica",
-          "pct": 27,
-          "p_poi": 0.8717
+          "pct": 26,
+          "p_poi": 0.8805
         },
         "abr/25": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9973
+          "p_poi": 0.9976
         },
         "mai/25": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.0074
+          "p_poi": 0.0085
         },
         "jun/25": {
-          "zona": "epidemica",
-          "pct": 91,
-          "p_poi": 0.0498
+          "zona": "alerta",
+          "pct": 89,
+          "p_poi": 0.0551
         },
         "jul/25": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.2113
+          "pct": 77,
+          "p_poi": 0.2253
         },
         "ago/25": {
           "zona": "alerta",
-          "pct": 88,
-          "p_poi": 0.1377
+          "pct": 86,
+          "p_poi": 0.1486
         },
         "set/25": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.4207
+          "pct": 58,
+          "p_poi": 0.4388
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.7825
+          "pct": 35,
+          "p_poi": 0.7951
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4207
+          "pct": 56,
+          "p_poi": 0.4388
         },
         "dez/25": {
           "zona": "baixa",
           "pct": 18,
-          "p_poi": 0.934
+          "p_poi": 0.9392
         },
         "jan/26": {
           "zona": "alerta",
-          "pct": 84,
-          "p_poi": 0.2113
+          "pct": 82,
+          "p_poi": 0.2253
         },
         "fev/26": {
           "zona": "alerta",
-          "pct": 84,
-          "p_poi": 0.2113
+          "pct": 82,
+          "p_poi": 0.2253
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 61,
-          "p_poi": 0.4207
+          "pct": 60,
+          "p_poi": 0.4388
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.6705
+          "pct": 47,
+          "p_poi": 0.6865
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 43,
-          "p_poi": 0.6705
+          "pct": 42,
+          "p_poi": 0.6865
         },
         "jun/26": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.2113
+          "pct": 75,
+          "p_poi": 0.2253
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.7825
+          "pct": 28,
+          "p_poi": 0.7951
         },
         "ago/26": {
           "zona": "abaixo",
@@ -956,325 +961,330 @@
         "set/26": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.0147
+          "p_poi": 0.0166
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 46,
+          "p_poi": 0.6865
         }
       }
     },
     "cvc": {
-      "p10": 66.25,
-      "p25": 70.09,
-      "p50": 74.81,
-      "p75": 79,
-      "p90": 81.84,
-      "mk_tau": -0.085,
-      "mk_p": 0.227,
+      "p10": 66.37,
+      "p25": 70.12,
+      "p50": 74.7,
+      "p75": 78.92,
+      "p90": 81.82,
+      "mk_tau": -0.099,
+      "mk_p": 0.1573,
       "mk_dir": -1,
-      "sen": -0.033,
+      "sen": -0.038,
       "meses": {
         "jan/19": {
-          "zona": "baixa",
+          "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.8385
+          "p_poi": 0.8373
         },
         "fev/19": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4235
+          "pct": 58,
+          "p_poi": 0.4215
         },
         "mar/19": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.735
+          "p_poi": 0.7334
         },
         "abr/19": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5156
+          "pct": 46,
+          "p_poi": 0.5135
         },
         "mai/19": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5619
+          "pct": 46,
+          "p_poi": 0.5599
         },
         "jun/19": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5619
+          "pct": 46,
+          "p_poi": 0.5599
         },
         "jul/19": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.7727
+          "p_poi": 0.7711
         },
         "ago/19": {
           "zona": "endemica",
-          "pct": 46,
-          "p_poi": 0.5156
+          "pct": 47,
+          "p_poi": 0.5135
         },
         "set/19": {
           "zona": "alerta",
           "pct": 75,
-          "p_poi": 0.2957
+          "p_poi": 0.2939
         },
         "out/19": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.735
+          "p_poi": 0.7334
         },
         "nov/19": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.6947
+          "p_poi": 0.6929
         },
         "dez/19": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5619
+          "pct": 46,
+          "p_poi": 0.5599
         },
         "jan/20": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.735
+          "p_poi": 0.7334
         },
         "fev/20": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9578
+          "p_poi": 0.9574
         },
         "mar/20": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.379
+          "pct": 63,
+          "p_poi": 0.3771
         },
         "abr/20": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0759
+          "p_poi": 0.0751
         },
         "mai/20": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.4692
+          "pct": 49,
+          "p_poi": 0.4672
         },
         "jun/20": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.8072
+          "p_poi": 0.8059
         },
         "jul/20": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1355
+          "p_poi": 0.1344
         },
         "ago/20": {
           "zona": "alerta",
           "pct": 75,
-          "p_poi": 0.2957
+          "p_poi": 0.2939
         },
         "set/20": {
           "zona": "alerta",
           "pct": 75,
-          "p_poi": 0.2957
+          "p_poi": 0.2939
         },
         "out/20": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.6076
+          "pct": 39,
+          "p_poi": 0.6056
         },
         "nov/20": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1355
+          "p_poi": 0.1344
         },
         "dez/20": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.652
+          "pct": 28,
+          "p_poi": 0.6502
         },
         "jan/21": {
           "zona": "alerta",
           "pct": 79,
-          "p_poi": 0.2577
+          "p_poi": 0.256
         },
         "fev/21": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0929
+          "p_poi": 0.0921
         },
         "mar/21": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.379
+          "pct": 63,
+          "p_poi": 0.3771
         },
         "abr/21": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1614
+          "p_poi": 0.1601
         },
         "mai/21": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2225
+          "p_poi": 0.2209
         },
         "jun/21": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.5156
+          "pct": 49,
+          "p_poi": 0.5135
         },
         "jul/21": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2225
+          "p_poi": 0.2209
         },
         "ago/21": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1128
+          "p_poi": 0.1118
         },
         "set/21": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2225
+          "p_poi": 0.2209
         },
         "out/21": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.3362
+          "pct": 67,
+          "p_poi": 0.3344
         },
         "nov/21": {
           "zona": "alerta",
           "pct": 82,
-          "p_poi": 0.2577
+          "p_poi": 0.256
         },
         "dez/21": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.3362
+          "p_poi": 0.3344
         },
         "jan/22": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.5156
+          "pct": 49,
+          "p_poi": 0.5135
         },
         "fev/22": {
           "zona": "abaixo",
           "pct": 4,
-          "p_poi": 0.9908
+          "p_poi": 0.9907
         },
         "mar/22": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.379
+          "pct": 65,
+          "p_poi": 0.3771
         },
         "abr/22": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "mai/22": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.7727
+          "p_poi": 0.7711
         },
         "jun/22": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.4235
+          "pct": 56,
+          "p_poi": 0.4215
         },
         "jul/22": {
           "zona": "endemica",
           "pct": 61,
-          "p_poi": 0.379
+          "p_poi": 0.3771
         },
         "ago/22": {
           "zona": "alerta",
           "pct": 79,
-          "p_poi": 0.2957
+          "p_poi": 0.2939
         },
         "set/22": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.2957
+          "p_poi": 0.2939
         },
         "out/22": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.7727
+          "pct": 19,
+          "p_poi": 0.7711
         },
         "nov/22": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.2577
+          "pct": 81,
+          "p_poi": 0.256
         },
         "dez/22": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.4692
+          "pct": 51,
+          "p_poi": 0.4672
         },
         "jan/23": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.379
+          "pct": 63,
+          "p_poi": 0.3771
         },
         "mar/23": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.3362
+          "p_poi": 0.3344
         },
         "abr/23": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.6076
+          "pct": 35,
+          "p_poi": 0.6056
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4235
+          "pct": 58,
+          "p_poi": 0.4215
         },
         "jun/23": {
-          "zona": "endemica",
+          "zona": "alerta",
           "pct": 75,
-          "p_poi": 0.2957
+          "p_poi": 0.2939
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 71,
-          "p_poi": 0.3362
+          "pct": 72,
+          "p_poi": 0.3344
         },
         "ago/23": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "set/23": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.1128
+          "p_poi": 0.1118
         },
         "out/23": {
           "zona": "endemica",
           "pct": 68,
-          "p_poi": 0.3362
+          "p_poi": 0.3344
         },
         "nov/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.735
+          "p_poi": 0.7334
         },
         "dez/23": {
           "zona": "baixa",
           "pct": 18,
-          "p_poi": 0.7727
+          "p_poi": 0.7711
         },
         "jan/24": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.8072
+          "p_poi": 0.8059
         },
         "fev/24": {
           "zona": "abaixo",
@@ -1283,176 +1293,181 @@
         },
         "mar/24": {
           "zona": "endemica",
-          "pct": 39,
-          "p_poi": 0.6076
+          "pct": 40,
+          "p_poi": 0.6056
         },
         "abr/24": {
           "zona": "endemica",
-          "pct": 73,
-          "p_poi": 0.3362
+          "pct": 74,
+          "p_poi": 0.3344
         },
         "mai/24": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "jun/24": {
           "zona": "alerta",
           "pct": 82,
-          "p_poi": 0.2577
+          "p_poi": 0.256
         },
         "jul/24": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "ago/24": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0141
+          "p_poi": 0.0139
         },
         "set/24": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "out/24": {
           "zona": "endemica",
-          "pct": 43,
-          "p_poi": 0.5619
+          "pct": 44,
+          "p_poi": 0.5599
         },
         "nov/24": {
           "zona": "alerta",
           "pct": 88,
-          "p_poi": 0.1904
+          "p_poi": 0.189
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 52,
-          "p_poi": 0.4692
+          "pct": 53,
+          "p_poi": 0.4672
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.379
+          "pct": 67,
+          "p_poi": 0.3771
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.4235
+          "pct": 60,
+          "p_poi": 0.4215
         },
         "mar/25": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9679
+          "p_poi": 0.9676
         },
         "abr/25": {
           "zona": "abaixo",
           "pct": 7,
-          "p_poi": 0.8664
+          "p_poi": 0.8654
         },
         "mai/25": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.652
+          "p_poi": 0.6502
         },
         "jun/25": {
           "zona": "baixa",
           "pct": 25,
-          "p_poi": 0.6947
+          "p_poi": 0.6929
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 46,
-          "p_poi": 0.5156
+          "pct": 47,
+          "p_poi": 0.5135
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 27,
-          "p_poi": 0.6947
+          "pct": 26,
+          "p_poi": 0.6929
         },
         "set/25": {
           "zona": "endemica",
           "pct": 32,
-          "p_poi": 0.652
+          "p_poi": 0.6502
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.652
+          "pct": 28,
+          "p_poi": 0.6502
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.6076
+          "pct": 37,
+          "p_poi": 0.6056
         },
         "dez/25": {
           "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.8385
+          "p_poi": 0.8373
         },
         "jan/26": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.8072
+          "p_poi": 0.8059
         },
         "fev/26": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.8072
+          "p_poi": 0.8059
         },
         "mar/26": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.8664
+          "p_poi": 0.8654
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5619
+          "pct": 46,
+          "p_poi": 0.5599
         },
         "mai/26": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2577
+          "p_poi": 0.256
         },
         "jun/26": {
           "zona": "endemica",
-          "pct": 41,
-          "p_poi": 0.6076
+          "pct": 42,
+          "p_poi": 0.6056
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.6076
+          "pct": 39,
+          "p_poi": 0.6056
         },
         "ago/26": {
           "zona": "endemica",
           "pct": 54,
-          "p_poi": 0.4692
+          "p_poi": 0.4672
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 32,
-          "p_poi": 0.6076
+          "pct": 33,
+          "p_poi": 0.6056
+        },
+        "out/26": {
+          "zona": "baixa",
+          "pct": 16,
+          "p_poi": 0.8059
         }
       }
     },
     "svd": {
-      "p10": 68.82,
-      "p25": 73.33,
-      "p50": 76.76,
-      "p75": 81.16,
-      "p90": 83.15,
-      "mk_tau": -0.08,
-      "mk_p": 0.2564,
+      "p10": 68.87,
+      "p25": 73.37,
+      "p50": 76.74,
+      "p75": 81.1,
+      "p90": 83.13,
+      "mk_tau": -0.081,
+      "mk_p": 0.2462,
       "mk_dir": -1,
-      "sen": -0.035,
+      "sen": -0.033,
       "meses": {
         "jan/19": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.8706
+          "p_poi": 0.87
         },
         "fev/19": {
           "zona": "abaixo",
@@ -1462,292 +1477,292 @@
         "mar/19": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.7437
+          "p_poi": 0.7428
         },
         "abr/19": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.7437
+          "p_poi": 0.7428
         },
         "mai/19": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.7801
+          "p_poi": 0.7793
         },
         "jun/19": {
           "zona": "endemica",
-          "pct": 39,
-          "p_poi": 0.5751
+          "pct": 40,
+          "p_poi": 0.574
         },
         "jul/19": {
           "zona": "endemica",
           "pct": 32,
-          "p_poi": 0.6198
+          "p_poi": 0.6187
         },
         "ago/19": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2723
+          "p_poi": 0.2713
         },
         "set/19": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.7046
+          "p_poi": 0.7036
         },
         "out/19": {
           "zona": "endemica",
-          "pct": 52,
-          "p_poi": 0.4839
+          "pct": 53,
+          "p_poi": 0.4828
         },
         "nov/19": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3943
+          "pct": 63,
+          "p_poi": 0.3932
         },
         "dez/19": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "jan/20": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.8706
+          "p_poi": 0.87
         },
         "fev/20": {
           "zona": "abaixo",
           "pct": 7,
-          "p_poi": 0.8437
+          "p_poi": 0.8431
         },
         "mar/20": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.2036
+          "p_poi": 0.2027
         },
         "abr/20": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0685
+          "p_poi": 0.0681
         },
         "mai/20": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3943
+          "pct": 63,
+          "p_poi": 0.3932
         },
         "jun/20": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.8942
+          "p_poi": 0.8937
         },
         "jul/20": {
           "zona": "alerta",
           "pct": 79,
-          "p_poi": 0.2723
+          "p_poi": 0.2713
         },
         "ago/20": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.7801
+          "p_poi": 0.7793
         },
         "set/20": {
           "zona": "alerta",
           "pct": 79,
-          "p_poi": 0.2723
+          "p_poi": 0.2713
         },
         "out/20": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3515
+          "pct": 63,
+          "p_poi": 0.3505
         },
         "nov/20": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.084
+          "p_poi": 0.0835
         },
         "dez/20": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.2036
+          "p_poi": 0.2027
         },
         "jan/21": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3943
+          "pct": 63,
+          "p_poi": 0.3932
         },
         "fev/21": {
           "zona": "endemica",
           "pct": 54,
-          "p_poi": 0.4386
+          "p_poi": 0.4375
         },
         "mar/21": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.1468
+          "p_poi": 0.1462
         },
         "abr/21": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "mai/21": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2365
+          "p_poi": 0.2356
         },
         "jun/21": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3943
+          "pct": 63,
+          "p_poi": 0.3932
         },
         "jul/21": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.2036
+          "p_poi": 0.2027
         },
         "ago/21": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.1021
+          "p_poi": 0.1016
         },
         "set/21": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "out/21": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.2365
+          "p_poi": 0.2356
         },
         "nov/21": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "dez/21": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4386
+          "pct": 58,
+          "p_poi": 0.4375
         },
         "jan/22": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.2365
+          "p_poi": 0.2356
         },
         "fev/22": {
           "zona": "endemica",
           "pct": 54,
-          "p_poi": 0.4386
+          "p_poi": 0.4375
         },
         "mar/22": {
           "zona": "endemica",
-          "pct": 71,
-          "p_poi": 0.3515
+          "pct": 72,
+          "p_poi": 0.3505
         },
         "abr/22": {
           "zona": "alerta",
           "pct": 79,
-          "p_poi": 0.2723
+          "p_poi": 0.2713
         },
         "mai/22": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.8437
+          "p_poi": 0.8431
         },
         "jun/22": {
           "zona": "endemica",
           "pct": 32,
-          "p_poi": 0.6198
+          "p_poi": 0.6187
         },
         "jul/22": {
           "zona": "endemica",
-          "pct": 59,
-          "p_poi": 0.3943
+          "pct": 60,
+          "p_poi": 0.3932
         },
         "ago/22": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.4839
+          "pct": 51,
+          "p_poi": 0.4828
         },
         "set/22": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "out/22": {
           "zona": "endemica",
           "pct": 68,
-          "p_poi": 0.3515
+          "p_poi": 0.3505
         },
         "nov/22": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.2723
+          "pct": 81,
+          "p_poi": 0.2713
         },
         "dez/22": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3943
+          "pct": 63,
+          "p_poi": 0.3932
         },
         "jan/23": {
           "zona": "alerta",
           "pct": 88,
-          "p_poi": 0.2365
+          "p_poi": 0.2356
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 71,
-          "p_poi": 0.3515
+          "pct": 72,
+          "p_poi": 0.3505
         },
         "mar/23": {
           "zona": "baixa",
           "pct": 18,
-          "p_poi": 0.7046
+          "p_poi": 0.7036
         },
         "abr/23": {
           "zona": "endemica",
-          "pct": 46,
-          "p_poi": 0.5296
+          "pct": 47,
+          "p_poi": 0.5284
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 27,
-          "p_poi": 0.6631
+          "pct": 26,
+          "p_poi": 0.6621
         },
         "jun/23": {
           "zona": "baixa",
           "pct": 12,
-          "p_poi": 0.8135
+          "p_poi": 0.8128
         },
         "jul/23": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "ago/23": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.2365
+          "p_poi": 0.2356
         },
         "set/23": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.2723
+          "p_poi": 0.2713
         },
         "out/23": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3515
+          "pct": 65,
+          "p_poi": 0.3505
         },
         "nov/23": {
           "zona": "endemica",
-          "pct": 52,
-          "p_poi": 0.4839
+          "pct": 53,
+          "p_poi": 0.4828
         },
         "dez/23": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.7437
+          "p_poi": 0.7428
         },
         "jan/24": {
           "zona": "abaixo",
@@ -1756,8 +1771,8 @@
         },
         "fev/24": {
           "zona": "endemica",
-          "pct": 39,
-          "p_poi": 0.5751
+          "pct": 40,
+          "p_poi": 0.574
         },
         "mar/24": {
           "zona": "abaixo",
@@ -1767,170 +1782,175 @@
         "abr/24": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.3107
+          "p_poi": 0.3097
         },
         "mai/24": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.2365
+          "p_poi": 0.2356
         },
         "jun/24": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.2036
+          "p_poi": 0.2027
         },
         "jul/24": {
           "zona": "alerta",
           "pct": 82,
-          "p_poi": 0.2723
+          "p_poi": 0.2713
         },
         "ago/24": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1737
+          "p_poi": 0.1729
         },
         "set/24": {
           "zona": "endemica",
-          "pct": 41,
-          "p_poi": 0.5296
+          "pct": 42,
+          "p_poi": 0.5284
         },
         "out/24": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.7801
+          "p_poi": 0.7793
         },
         "nov/24": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.5751
+          "pct": 37,
+          "p_poi": 0.574
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4386
+          "pct": 58,
+          "p_poi": 0.4375
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.4386
+          "pct": 56,
+          "p_poi": 0.4375
         },
         "fev/25": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.6198
+          "p_poi": 0.6187
         },
         "mar/25": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.6631
+          "pct": 19,
+          "p_poi": 0.6621
         },
         "abr/25": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9147
+          "p_poi": 0.9142
         },
         "mai/25": {
           "zona": "endemica",
-          "pct": 48,
-          "p_poi": 0.5296
+          "pct": 49,
+          "p_poi": 0.5284
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.5751
+          "pct": 35,
+          "p_poi": 0.574
         },
         "jul/25": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.6631
+          "p_poi": 0.6621
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 73,
-          "p_poi": 0.3515
+          "pct": 74,
+          "p_poi": 0.3505
         },
         "set/25": {
           "zona": "abaixo",
           "pct": 7,
-          "p_poi": 0.8437
+          "p_poi": 0.8431
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 29,
-          "p_poi": 0.6631
+          "pct": 28,
+          "p_poi": 0.6621
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.6198
+          "pct": 33,
+          "p_poi": 0.6187
         },
         "dez/25": {
           "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.8135
+          "p_poi": 0.8128
         },
         "jan/26": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5296
+          "pct": 46,
+          "p_poi": 0.5284
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5296
+          "pct": 46,
+          "p_poi": 0.5284
         },
         "mar/26": {
           "zona": "baixa",
           "pct": 21,
-          "p_poi": 0.6631
+          "p_poi": 0.6621
         },
         "abr/26": {
           "zona": "baixa",
           "pct": 25,
-          "p_poi": 0.6631
+          "p_poi": 0.6621
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.3515
+          "pct": 67,
+          "p_poi": 0.3505
         },
         "jun/26": {
           "zona": "endemica",
           "pct": 61,
-          "p_poi": 0.3943
+          "p_poi": 0.3932
         },
         "jul/26": {
-          "zona": "endemica",
+          "zona": "alerta",
           "pct": 75,
-          "p_poi": 0.3107
+          "p_poi": 0.3097
         },
         "ago/26": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.1468
+          "p_poi": 0.1462
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.5751
+          "pct": 39,
+          "p_poi": 0.574
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 49,
+          "p_poi": 0.4828
         }
       }
     }
   },
   "utic": {
     "ref_inicio": "abr/22",
-    "ref_fim": "ago/26",
-    "n_ref": 53,
+    "ref_fim": "set/26",
+    "n_ref": 54,
     "pav": {
       "p10": 0,
-      "p25": 7.46,
-      "p50": 12.12,
-      "p75": 20.69,
-      "p90": 24.78,
-      "mk_tau": -0.085,
-      "mk_p": 0.3698,
+      "p25": 7.49,
+      "p50": 12.5,
+      "p75": 20.49,
+      "p90": 24.73,
+      "mk_tau": -0.08,
+      "mk_p": 0.3989,
       "mk_dir": -1,
-      "sen": -0.067,
+      "sen": -0.059,
       "meses": {
         "abr/22": {
           "zona": "baixa",
@@ -1940,11 +1960,11 @@
         "mai/22": {
           "zona": "endemica",
           "pct": 74,
-          "p_poi": 0.0566
+          "p_poi": 0.0595
         },
         "jun/22": {
           "zona": "epidemica",
-          "pct": 92,
+          "pct": 93,
           "p_poi": 0.0008
         },
         "jul/22": {
@@ -1954,18 +1974,18 @@
         },
         "ago/22": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.0342
+          "pct": 80,
+          "p_poi": 0.0362
         },
         "set/22": {
           "zona": "alerta",
           "pct": 87,
-          "p_poi": 0.006
+          "p_poi": 0.0064
         },
         "out/22": {
           "zona": "endemica",
-          "pct": 32,
-          "p_poi": 0.9195
+          "pct": 31,
+          "p_poi": 0.9228
         },
         "nov/22": {
           "zona": "baixa",
@@ -1974,13 +1994,13 @@
         },
         "dez/22": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.7858
+          "pct": 44,
+          "p_poi": 0.7924
         },
         "jan/23": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.4775
+          "pct": 61,
+          "p_poi": 0.487
         },
         "fev/23": {
           "zona": "epidemica",
@@ -1989,8 +2009,8 @@
         },
         "mar/23": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.0342
+          "pct": 78,
+          "p_poi": 0.0362
         },
         "abr/23": {
           "zona": "epidemica",
@@ -1999,8 +2019,8 @@
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.5865
+          "pct": 56,
+          "p_poi": 0.5957
         },
         "jun/23": {
           "zona": "baixa",
@@ -2009,18 +2029,18 @@
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5865
+          "pct": 54,
+          "p_poi": 0.5957
         },
         "ago/23": {
           "zona": "baixa",
-          "pct": 21,
-          "p_poi": 0.9921
+          "pct": 20,
+          "p_poi": 0.9925
         },
         "set/23": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.4775
+          "pct": 57,
+          "p_poi": 0.487
         },
         "out/23": {
           "zona": "epidemica",
@@ -2029,33 +2049,33 @@
         },
         "nov/23": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.6919
+          "pct": 48,
+          "p_poi": 0.7
         },
         "dez/23": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.9195
+          "p_poi": 0.9228
         },
         "jan/24": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.6919
+          "pct": 50,
+          "p_poi": 0.7
         },
         "fev/24": {
           "zona": "alerta",
           "pct": 85,
-          "p_poi": 0.0111
+          "p_poi": 0.0119
         },
         "mar/24": {
           "zona": "endemica",
-          "pct": 68,
-          "p_poi": 0.1993
+          "pct": 67,
+          "p_poi": 0.2063
         },
         "abr/24": {
           "zona": "alerta",
-          "pct": 75,
-          "p_poi": 0.0342
+          "pct": 76,
+          "p_poi": 0.0362
         },
         "mai/24": {
           "zona": "baixa",
@@ -2064,18 +2084,18 @@
         },
         "jun/24": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.1366
+          "pct": 69,
+          "p_poi": 0.1422
         },
         "jul/24": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3726
+          "pct": 63,
+          "p_poi": 0.3818
         },
         "ago/24": {
           "zona": "baixa",
           "pct": 19,
-          "p_poi": 0.9973
+          "p_poi": 0.9975
         },
         "set/24": {
           "zona": "baixa",
@@ -2085,12 +2105,12 @@
         "out/24": {
           "zona": "endemica",
           "pct": 28,
-          "p_poi": 0.9576
+          "p_poi": 0.9596
         },
         "nov/24": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.2785
+          "pct": 65,
+          "p_poi": 0.2868
         },
         "dez/24": {
           "zona": "baixa",
@@ -2099,8 +2119,8 @@
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.5865
+          "pct": 52,
+          "p_poi": 0.5957
         },
         "fev/25": {
           "zona": "baixa",
@@ -2109,18 +2129,18 @@
         },
         "mar/25": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.6919
+          "pct": 48,
+          "p_poi": 0.7
         },
         "abr/25": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.006
+          "p_poi": 0.0064
         },
         "mai/25": {
           "zona": "alerta",
           "pct": 83,
-          "p_poi": 0.0111
+          "p_poi": 0.0119
         },
         "jun/25": {
           "zona": "epidemica",
@@ -2130,27 +2150,27 @@
         "jul/25": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0031
+          "p_poi": 0.0034
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.8625
+          "pct": 37,
+          "p_poi": 0.8674
         },
         "set/25": {
           "zona": "alerta",
           "pct": 81,
-          "p_poi": 0.0199
+          "p_poi": 0.0212
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.8625
+          "pct": 37,
+          "p_poi": 0.8674
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.4775
+          "pct": 59,
+          "p_poi": 0.487
         },
         "dez/25": {
           "zona": "baixa",
@@ -2160,109 +2180,114 @@
         "jan/26": {
           "zona": "endemica",
           "pct": 72,
-          "p_poi": 0.0898
+          "p_poi": 0.0939
         },
         "fev/26": {
           "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.9803
+          "pct": 24,
+          "p_poi": 0.9813
         },
         "mar/26": {
           "zona": "endemica",
           "pct": 43,
-          "p_poi": 0.7858
+          "p_poi": 0.7924
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.9195
+          "pct": 33,
+          "p_poi": 0.9228
         },
         "mai/26": {
           "zona": "baixa",
-          "pct": 23,
-          "p_poi": 0.9921
+          "pct": 22,
+          "p_poi": 0.9925
         },
         "jun/26": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.8625
+          "pct": 41,
+          "p_poi": 0.8674
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.8625
+          "pct": 39,
+          "p_poi": 0.8674
         },
         "ago/26": {
-          "zona": "endemica",
+          "zona": "baixa",
           "pct": 26,
-          "p_poi": 0.9803
+          "p_poi": 0.9813
         },
         "set/26": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.1366
+          "p_poi": 0.1422
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 54,
+          "p_poi": 0.5957
         }
       }
     },
     "ipcs": {
       "p10": 0,
       "p25": 0,
-      "p50": 5.71,
-      "p75": 10,
-      "p90": 17.32,
-      "mk_tau": -0.001,
-      "mk_p": 0.9939,
-      "mk_dir": -1,
+      "p50": 6.67,
+      "p75": 10.44,
+      "p90": 17.01,
+      "mk_tau": 0.028,
+      "mk_p": 0.7736,
+      "mk_dir": 1,
       "sen": 0,
       "meses": {
         "abr/22": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "mai/22": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.0717
+          "pct": 80,
+          "p_poi": 0.0752
         },
         "jun/22": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "jul/22": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4559
+          "pct": 56,
+          "p_poi": 0.465
         },
         "ago/22": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "set/22": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "out/22": {
           "zona": "alerta",
           "pct": 87,
-          "p_poi": 0.0088
+          "p_poi": 0.0095
         },
         "nov/22": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.3199
+          "pct": 69,
+          "p_poi": 0.3283
         },
         "dez/22": {
           "zona": "epidemica",
-          "pct": 92,
-          "p_poi": 0.0002
+          "pct": 93,
+          "p_poi": 0.0003
         },
         "jan/23": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "fev/23": {
@@ -2272,102 +2297,102 @@
         },
         "mar/23": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.4559
+          "pct": 52,
+          "p_poi": 0.465
         },
         "abr/23": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3199
+          "pct": 63,
+          "p_poi": 0.3283
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.9355
+          "pct": 37,
+          "p_poi": 0.938
         },
         "jun/23": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.7438
+          "pct": 50,
+          "p_poi": 0.7507
         },
         "jul/23": {
-          "zona": "alerta",
-          "pct": 75,
-          "p_poi": 0.2086
+          "zona": "endemica",
+          "pct": 74,
+          "p_poi": 0.2156
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3199
+          "pct": 63,
+          "p_poi": 0.3283
         },
         "set/23": {
           "zona": "alerta",
           "pct": 81,
-          "p_poi": 0.038
+          "p_poi": 0.0401
         },
         "out/23": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.858
+          "pct": 44,
+          "p_poi": 0.8627
         },
         "nov/23": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.1266
+          "pct": 76,
+          "p_poi": 0.1318
         },
         "dez/23": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "jan/24": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.858
+          "pct": 48,
+          "p_poi": 0.8627
         },
         "fev/24": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "mar/24": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3199
+          "pct": 63,
+          "p_poi": 0.3283
         },
         "abr/24": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "mai/24": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "jun/24": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.4559
+          "pct": 57,
+          "p_poi": 0.465
         },
         "jul/24": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.3199
+          "pct": 65,
+          "p_poi": 0.3283
         },
         "ago/24": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "set/24": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "out/24": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "nov/24": {
@@ -2377,17 +2402,17 @@
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 72,
-          "p_poi": 0.3199
+          "pct": 70,
+          "p_poi": 0.3283
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.3199
+          "pct": 69,
+          "p_poi": 0.3283
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "mar/25": {
@@ -2398,736 +2423,751 @@
         "abr/25": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0006
+          "p_poi": 0.0007
         },
         "mai/25": {
           "zona": "endemica",
-          "pct": 74,
-          "p_poi": 0.2086
+          "pct": 72,
+          "p_poi": 0.2156
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "jul/25": {
           "zona": "alerta",
           "pct": 83,
-          "p_poi": 0.0189
+          "p_poi": 0.0201
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.858
+          "pct": 46,
+          "p_poi": 0.8627
         },
         "set/25": {
           "zona": "epidemica",
           "pct": 94,
-          "p_poi": 0.0002
+          "p_poi": 0.0003
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.9355
+          "pct": 41,
+          "p_poi": 0.938
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.9355
+          "pct": 33,
+          "p_poi": 0.938
         },
         "dez/25": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.0088
+          "p_poi": 0.0095
         },
         "jan/26": {
           "zona": "alerta",
           "pct": 85,
-          "p_poi": 0.0189
+          "p_poi": 0.0201
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.4559
+          "pct": 56,
+          "p_poi": 0.465
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.9355
+          "pct": 35,
+          "p_poi": 0.938
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.9355
+          "pct": 39,
+          "p_poi": 0.938
         },
         "jun/26": {
           "zona": "endemica",
           "pct": 43,
-          "p_poi": 0.9355
+          "p_poi": 0.938
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 32,
+          "pct": 31,
           "p_poi": 0.9994
         },
         "set/26": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.1266
+          "pct": 78,
+          "p_poi": 0.1318
+        },
+        "out/26": {
+          "zona": "epidemica",
+          "pct": 89,
+          "p_poi": 0.0018
         }
       }
     },
     "cvc": {
-      "p10": 69.05,
-      "p25": 72.61,
-      "p50": 78.04,
-      "p75": 83.27,
-      "p90": 88.06,
-      "mk_tau": -0.071,
-      "mk_p": 0.4556,
+      "p10": 69.13,
+      "p25": 72.67,
+      "p50": 78.18,
+      "p75": 83.2,
+      "p90": 87.98,
+      "mk_tau": -0.098,
+      "mk_p": 0.2959,
       "mk_dir": -1,
-      "sen": -0.051,
+      "sen": -0.066,
       "meses": {
         "abr/22": {
           "zona": "endemica",
           "pct": 57,
-          "p_poi": 0.4293
+          "p_poi": 0.43
         },
         "mai/22": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.1002
+          "p_poi": 0.1006
         },
         "jun/22": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0826
+          "p_poi": 0.0828
         },
         "jul/22": {
           "zona": "baixa",
           "pct": 15,
-          "p_poi": 0.8343
+          "p_poi": 0.8347
         },
         "ago/22": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.4739
+          "pct": 54,
+          "p_poi": 0.4746
         },
         "set/22": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.519
+          "pct": 52,
+          "p_poi": 0.5197
         },
         "out/22": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.2662
+          "pct": 80,
+          "p_poi": 0.2668
         },
         "nov/22": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.6933
+          "pct": 35,
+          "p_poi": 0.6939
         },
         "dez/22": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.6933
+          "pct": 33,
+          "p_poi": 0.6939
         },
         "jan/23": {
           "zona": "endemica",
           "pct": 74,
-          "p_poi": 0.3038
+          "p_poi": 0.3044
         },
         "fev/23": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0213
+          "p_poi": 0.0214
         },
         "mar/23": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.3438
+          "p_poi": 0.3444
         },
         "abr/23": {
           "zona": "abaixo",
           "pct": 6,
-          "p_poi": 0.9542
+          "p_poi": 0.9544
         },
         "mai/23": {
           "zona": "epidemica",
-          "pct": 92,
-          "p_poi": 0.1206
+          "pct": 93,
+          "p_poi": 0.121
         },
         "jun/23": {
           "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.862
+          "p_poi": 0.8623
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.6518
+          "pct": 37,
+          "p_poi": 0.6524
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 68,
-          "p_poi": 0.3438
+          "pct": 69,
+          "p_poi": 0.3444
         },
         "set/23": {
           "zona": "alerta",
           "pct": 81,
-          "p_poi": 0.2662
+          "p_poi": 0.2668
         },
         "out/23": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.5641
+          "pct": 48,
+          "p_poi": 0.5648
         },
         "nov/23": {
           "zona": "baixa",
           "pct": 17,
-          "p_poi": 0.8035
+          "p_poi": 0.8039
         },
         "dez/23": {
           "zona": "alerta",
           "pct": 85,
-          "p_poi": 0.17
+          "p_poi": 0.1705
         },
         "jan/24": {
           "zona": "baixa",
           "pct": 13,
-          "p_poi": 0.8343
+          "p_poi": 0.8347
         },
         "fev/24": {
           "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.7327
+          "pct": 24,
+          "p_poi": 0.7333
         },
         "mar/24": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.3038
+          "pct": 78,
+          "p_poi": 0.3044
         },
         "abr/24": {
           "zona": "alerta",
           "pct": 83,
-          "p_poi": 0.1992
+          "p_poi": 0.1997
         },
         "mai/24": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.6518
+          "pct": 39,
+          "p_poi": 0.6524
         },
         "jun/24": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.17
+          "p_poi": 0.1705
         },
         "jul/24": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.4293
+          "pct": 63,
+          "p_poi": 0.43
         },
         "ago/24": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.4293
+          "pct": 61,
+          "p_poi": 0.43
         },
         "set/24": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.98
+          "p_poi": 0.9801
         },
         "out/24": {
           "zona": "abaixo",
-          "pct": 8,
-          "p_poi": 0.9414
+          "pct": 7,
+          "p_poi": 0.9416
         },
         "nov/24": {
           "zona": "abaixo",
           "pct": 4,
-          "p_poi": 0.9542
+          "p_poi": 0.9544
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.5641
+          "pct": 46,
+          "p_poi": 0.5648
         },
         "jan/25": {
-          "zona": "endemica",
+          "zona": "baixa",
           "pct": 26,
-          "p_poi": 0.7327
+          "p_poi": 0.7333
         },
         "fev/25": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.8864
+          "p_poi": 0.8867
         },
         "mar/25": {
           "zona": "baixa",
-          "pct": 21,
-          "p_poi": 0.7695
+          "pct": 20,
+          "p_poi": 0.77
         },
         "abr/25": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.519
+          "pct": 50,
+          "p_poi": 0.5197
         },
         "mai/25": {
           "zona": "alerta",
-          "pct": 75,
-          "p_poi": 0.3038
+          "pct": 76,
+          "p_poi": 0.3044
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.6086
+          "pct": 44,
+          "p_poi": 0.6092
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.6518
+          "pct": 41,
+          "p_poi": 0.6524
         },
         "ago/25": {
           "zona": "endemica",
           "pct": 28,
-          "p_poi": 0.7327
+          "p_poi": 0.7333
         },
         "set/25": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.7327
+          "p_poi": 0.7333
         },
         "out/25": {
           "zona": "epidemica",
           "pct": 94,
-          "p_poi": 0.1002
+          "p_poi": 0.1006
         },
         "nov/25": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.1438
+          "p_poi": 0.1442
         },
         "dez/25": {
           "zona": "baixa",
           "pct": 19,
-          "p_poi": 0.8035
+          "p_poi": 0.8039
         },
         "jan/26": {
           "zona": "endemica",
           "pct": 43,
-          "p_poi": 0.6086
+          "p_poi": 0.6092
         },
         "fev/26": {
           "zona": "baixa",
-          "pct": 23,
-          "p_poi": 0.7695
+          "pct": 22,
+          "p_poi": 0.77
         },
         "mar/26": {
           "zona": "alerta",
           "pct": 87,
-          "p_poi": 0.17
+          "p_poi": 0.1705
         },
         "abr/26": {
           "zona": "endemica",
           "pct": 72,
-          "p_poi": 0.3038
+          "p_poi": 0.3044
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3858
+          "pct": 65,
+          "p_poi": 0.3864
         },
         "jun/26": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.4293
+          "pct": 59,
+          "p_poi": 0.43
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.3438
+          "pct": 67,
+          "p_poi": 0.3444
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 32,
-          "p_poi": 0.7327
+          "pct": 31,
+          "p_poi": 0.7333
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.4739
+          "pct": 56,
+          "p_poi": 0.4746
+        },
+        "out/26": {
+          "zona": "abaixo",
+          "pct": 9,
+          "p_poi": 0.8623
         }
       }
     },
     "svd": {
-      "p10": 68.35,
-      "p25": 73.57,
-      "p50": 78.49,
-      "p75": 85.71,
-      "p90": 90.34,
-      "mk_tau": 0.045,
-      "mk_p": 0.633,
+      "p10": 68.55,
+      "p25": 73.7,
+      "p50": 78.67,
+      "p75": 85.9,
+      "p90": 90.32,
+      "mk_tau": 0.046,
+      "mk_p": 0.6216,
       "mk_dir": 1,
-      "sen": 0.05,
+      "sen": 0.044,
       "meses": {
         "abr/22": {
           "zona": "endemica",
-          "pct": 66,
-          "p_poi": 0.3419
+          "pct": 65,
+          "p_poi": 0.3477
         },
         "mai/22": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.6049
+          "pct": 41,
+          "p_poi": 0.6109
         },
         "jun/22": {
           "zona": "alerta",
           "pct": 87,
-          "p_poi": 0.1695
+          "p_poi": 0.1736
         },
         "jul/22": {
           "zona": "abaixo",
-          "pct": 8,
-          "p_poi": 0.9524
+          "pct": 7,
+          "p_poi": 0.9539
         },
         "ago/22": {
           "zona": "epidemica",
           "pct": 94,
-          "p_poi": 0.1002
+          "p_poi": 0.1031
         },
         "set/22": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.1205
+          "p_poi": 0.1237
         },
         "out/22": {
           "zona": "alerta",
           "pct": 89,
-          "p_poi": 0.1205
+          "p_poi": 0.1237
         },
         "nov/22": {
           "zona": "endemica",
-          "pct": 57,
-          "p_poi": 0.471
+          "pct": 56,
+          "p_poi": 0.4772
         },
         "dez/22": {
           "zona": "baixa",
           "pct": 15,
-          "p_poi": 0.8308
+          "p_poi": 0.8346
         },
         "jan/23": {
           "zona": "baixa",
           "pct": 13,
-          "p_poi": 0.8587
+          "p_poi": 0.8621
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5607
+          "pct": 44,
+          "p_poi": 0.5668
         },
         "mar/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.5607
+          "pct": 46,
+          "p_poi": 0.5668
         },
         "abr/23": {
           "zona": "abaixo",
           "pct": 6,
-          "p_poi": 0.9632
+          "p_poi": 0.9644
         },
         "mai/23": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0439
+          "p_poi": 0.0454
         },
         "jun/23": {
           "zona": "endemica",
-          "pct": 32,
-          "p_poi": 0.6895
+          "pct": 31,
+          "p_poi": 0.695
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 36,
-          "p_poi": 0.6481
+          "pct": 35,
+          "p_poi": 0.6538
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 68,
-          "p_poi": 0.3419
+          "pct": 67,
+          "p_poi": 0.3477
         },
         "set/23": {
           "zona": "abaixo",
           "pct": 4,
-          "p_poi": 0.9918
+          "p_poi": 0.9922
         },
         "out/23": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.5159
+          "pct": 52,
+          "p_poi": 0.5221
         },
         "nov/23": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.7289
+          "p_poi": 0.734
         },
         "dez/23": {
           "zona": "endemica",
-          "pct": 62,
-          "p_poi": 0.3835
+          "pct": 61,
+          "p_poi": 0.3895
         },
         "jan/24": {
           "zona": "baixa",
           "pct": 19,
-          "p_poi": 0.7998
+          "p_poi": 0.8041
         },
         "fev/24": {
           "zona": "endemica",
-          "pct": 74,
-          "p_poi": 0.265
+          "pct": 72,
+          "p_poi": 0.2702
         },
         "mar/24": {
           "zona": "alerta",
-          "pct": 77,
-          "p_poi": 0.2303
+          "pct": 76,
+          "p_poi": 0.2351
         },
         "abr/24": {
           "zona": "alerta",
           "pct": 85,
-          "p_poi": 0.1695
+          "p_poi": 0.1736
         },
         "mai/24": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5159
+          "pct": 54,
+          "p_poi": 0.5221
         },
         "jun/24": {
           "zona": "alerta",
           "pct": 83,
-          "p_poi": 0.1985
+          "p_poi": 0.2029
         },
         "jul/24": {
           "zona": "alerta",
-          "pct": 81,
-          "p_poi": 0.2303
+          "pct": 80,
+          "p_poi": 0.2351
         },
         "ago/24": {
           "zona": "endemica",
           "pct": 43,
-          "p_poi": 0.5607
+          "p_poi": 0.5668
         },
         "set/24": {
           "zona": "abaixo",
           "pct": 9,
-          "p_poi": 0.9524
+          "p_poi": 0.9539
         },
         "out/24": {
           "zona": "abaixo",
           "pct": 2,
-          "p_poi": 0.9918
+          "p_poi": 0.9922
         },
         "nov/24": {
           "zona": "baixa",
-          "pct": 23,
-          "p_poi": 0.7998
+          "pct": 22,
+          "p_poi": 0.8041
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 34,
-          "p_poi": 0.6895
+          "pct": 33,
+          "p_poi": 0.695
         },
         "jan/25": {
           "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.7657
+          "pct": 24,
+          "p_poi": 0.7704
         },
         "fev/25": {
           "zona": "baixa",
           "pct": 17,
-          "p_poi": 0.8308
+          "p_poi": 0.8346
         },
         "mar/25": {
           "zona": "endemica",
-          "pct": 72,
-          "p_poi": 0.265
+          "pct": 70,
+          "p_poi": 0.2702
         },
         "abr/25": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.4268
+          "pct": 59,
+          "p_poi": 0.4329
         },
         "mai/25": {
           "zona": "endemica",
-          "pct": 64,
-          "p_poi": 0.3835
+          "pct": 63,
+          "p_poi": 0.3895
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.265
+          "pct": 69,
+          "p_poi": 0.2702
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.5607
+          "pct": 50,
+          "p_poi": 0.5668
         },
         "ago/25": {
-          "zona": "endemica",
+          "zona": "baixa",
           "pct": 26,
-          "p_poi": 0.7289
+          "p_poi": 0.734
         },
         "set/25": {
           "zona": "abaixo",
           "pct": 11,
-          "p_poi": 0.9049
+          "p_poi": 0.9075
         },
         "out/25": {
           "zona": "epidemica",
-          "pct": 92,
-          "p_poi": 0.1002
+          "pct": 93,
+          "p_poi": 0.1031
         },
         "nov/25": {
-          "zona": "alerta",
-          "pct": 75,
-          "p_poi": 0.2303
+          "zona": "endemica",
+          "pct": 74,
+          "p_poi": 0.2351
         },
         "dez/25": {
           "zona": "baixa",
-          "pct": 21,
-          "p_poi": 0.7998
+          "pct": 20,
+          "p_poi": 0.8041
         },
         "jan/26": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.5607
+          "pct": 48,
+          "p_poi": 0.5668
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.6049
+          "pct": 39,
+          "p_poi": 0.6109
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.4268
+          "pct": 57,
+          "p_poi": 0.4329
         },
         "abr/26": {
           "zona": "endemica",
           "pct": 28,
-          "p_poi": 0.7289
+          "p_poi": 0.734
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 38,
-          "p_poi": 0.6481
+          "pct": 37,
+          "p_poi": 0.6538
         },
         "jun/26": {
           "zona": "epidemica",
           "pct": 96,
-          "p_poi": 0.0675
+          "p_poi": 0.0697
         },
         "jul/26": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0547
+          "p_poi": 0.0565
         },
         "ago/26": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.2303
+          "pct": 78,
+          "p_poi": 0.2351
         },
         "set/26": {
           "zona": "alerta",
           "pct": 81,
-          "p_poi": 0.2303
+          "p_poi": 0.2351
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 54,
+          "p_poi": 0.5221
         }
       }
     }
   },
   "utiNeo": {
     "ref_inicio": "jan/25",
-    "ref_fim": "ago/26",
-    "n_ref": 20,
+    "ref_fim": "set/26",
+    "n_ref": 21,
     "ipcs": {
-      "p10": 8.82,
-      "p25": 10.56,
-      "p50": 18.02,
-      "p75": 26.23,
-      "p90": 38.16,
-      "mk_tau": -0.043,
-      "mk_p": 0.8088,
-      "mk_dir": -1,
-      "sen": -0.126,
+      "p10": 0,
+      "p25": 10.31,
+      "p50": 17.7,
+      "p75": 24.39,
+      "p90": 37.5,
+      "mk_tau": 0.009,
+      "mk_p": 0.9775,
+      "mk_dir": 1,
+      "sen": 0,
       "meses": {
         "jan/25": {
           "zona": "endemica",
-          "pct": 35,
-          "p_poi": 0.97
+          "pct": 38,
+          "p_poi": 0.9532
         },
         "fev/25": {
           "zona": "baixa",
-          "pct": 15,
-          "p_poi": 0.9964
+          "pct": 19,
+          "p_poi": 0.9937
         },
         "mar/25": {
           "zona": "endemica",
-          "pct": 30,
-          "p_poi": 0.9921
+          "pct": 33,
+          "p_poi": 0.9866
         },
         "abr/25": {
           "zona": "alerta",
-          "pct": 85,
-          "p_poi": 0.0023
+          "pct": 86,
+          "p_poi": 0.0011
         },
         "mai/25": {
           "zona": "endemica",
-          "pct": 65,
-          "p_poi": 0.5798
+          "pct": 67,
+          "p_poi": 0.4933
         },
         "jun/25": {
-          "zona": "endemica",
-          "pct": 75,
-          "p_poi": 0.2524
+          "zona": "alerta",
+          "pct": 76,
+          "p_poi": 0.1862
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.8138
+          "pct": 48,
+          "p_poi": 0.7516
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.7446
+          "pct": 52,
+          "p_poi": 0.6712
         },
         "set/25": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.0117
+          "pct": 81,
+          "p_poi": 0.0061
         },
         "out/25": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.9964
+          "pct": 24,
+          "p_poi": 0.9937
         },
         "nov/25": {
-          "zona": "alerta",
+          "zona": "epidemica",
           "pct": 90,
-          "p_poi": 0.0004
+          "p_poi": 0.0001
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.7446
+          "pct": 57,
+          "p_poi": 0.6712
         },
         "jan/26": {
           "zona": "epidemica",
@@ -3136,33 +3176,33 @@
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.6655
+          "pct": 62,
+          "p_poi": 0.5836
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.4917
+          "pct": 71,
+          "p_poi": 0.4048
         },
         "abr/26": {
-          "zona": "abaixo",
-          "pct": 10,
+          "zona": "baixa",
+          "pct": 14,
           "p_poi": 1
         },
         "mai/26": {
-          "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.9964
+          "zona": "endemica",
+          "pct": 29,
+          "p_poi": 0.9937
         },
         "jun/26": {
-          "zona": "abaixo",
-          "pct": 10,
+          "zona": "baixa",
+          "pct": 14,
           "p_poi": 1
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.871
+          "pct": 43,
+          "p_poi": 0.8214
         },
         "ago/26": {
           "zona": "epidemica",
@@ -3170,250 +3210,265 @@
           "p_poi": 0
         },
         "set/26": {
-          "zona": "abaixo",
-          "pct": 10,
+          "zona": "baixa",
+          "pct": 14,
           "p_poi": 1
+        },
+        "out/26": {
+          "zona": "alerta",
+          "pct": 76,
+          "p_poi": 0.0648
         }
       }
     }
   },
   "hd": {
     "ref_inicio": "jan/25",
-    "ref_fim": "ago/26",
-    "n_ref": 20,
+    "ref_fim": "set/26",
+    "n_ref": 21,
     "ilav": {
       "p10": 0,
       "p25": 0.43,
-      "p50": 1.05,
+      "p50": 1.25,
       "p75": 1.69,
       "p90": 2.58,
-      "mk_tau": -0.068,
-      "mk_p": 0.6938,
+      "mk_tau": -0.066,
+      "mk_p": 0.6922,
       "mk_dir": -1,
-      "sen": -0.004,
+      "sen": -0.005,
       "meses": {
         "jan/25": {
-          "zona": "endemica",
-          "pct": 75,
-          "p_poi": 0.3453
+          "zona": "alerta",
+          "pct": 76,
+          "p_poi": 0.3466
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.7054
+          "pct": 48,
+          "p_poi": 0.7065
         },
         "mar/25": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.7054
+          "pct": 67,
+          "p_poi": 0.7065
         },
         "abr/25": {
           "zona": "alerta",
-          "pct": 85,
-          "p_poi": 0.3453
+          "pct": 86,
+          "p_poi": 0.3466
         },
         "mai/25": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0357
+          "p_poi": 0.036
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.7054
+          "pct": 57,
+          "p_poi": 0.7065
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.7054
+          "pct": 38,
+          "p_poi": 0.7065
         },
         "ago/25": {
           "zona": "baixa",
-          "pct": 15,
-          "p_poi": 0.7054
+          "pct": 14,
+          "p_poi": 0.7065
         },
         "set/25": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.7054
+          "pct": 19,
+          "p_poi": 0.7065
         },
         "out/25": {
           "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.7054
+          "pct": 24,
+          "p_poi": 0.7065
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.7054
+          "pct": 57,
+          "p_poi": 0.7065
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.7054
+          "pct": 38,
+          "p_poi": 0.7065
         },
         "jan/26": {
           "zona": "endemica",
-          "pct": 65,
-          "p_poi": 0.7054
+          "pct": 62,
+          "p_poi": 0.7065
         },
         "fev/26": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.3453
+          "pct": 81,
+          "p_poi": 0.3466
         },
         "mar/26": {
           "zona": "baixa",
-          "pct": 15,
-          "p_poi": 0.7054
+          "pct": 14,
+          "p_poi": 0.7065
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 50,
-          "p_poi": 0.7054
+          "pct": 48,
+          "p_poi": 0.7065
         },
         "mai/26": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.1253
+          "p_poi": 0.1261
         },
         "jun/26": {
           "zona": "baixa",
-          "pct": 15,
-          "p_poi": 0.7054
+          "pct": 14,
+          "p_poi": 0.7065
         },
         "jul/26": {
-          "zona": "alerta",
+          "zona": "epidemica",
           "pct": 90,
-          "p_poi": 0.1253
+          "p_poi": 0.1261
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 30,
-          "p_poi": 0.7054
+          "pct": 29,
+          "p_poi": 0.7065
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.7054
+          "pct": 71,
+          "p_poi": 0.7065
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 48,
+          "p_poi": 0.7065
         }
       }
     },
     "bact": {
-      "p10": 1.2,
-      "p25": 2.45,
+      "p10": 1.24,
+      "p25": 2.17,
       "p50": 3.33,
-      "p75": 3.85,
-      "p90": 4.56,
-      "mk_tau": -0.1,
-      "mk_p": 0.5457,
+      "p75": 3.75,
+      "p90": 4.55,
+      "mk_tau": -0.043,
+      "mk_p": 0.7996,
       "mk_dir": -1,
-      "sen": -0.054,
+      "sen": -0.021,
       "meses": {
         "jan/25": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.1931
+          "p_poi": 0.186
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 35,
-          "p_poi": 0.5878
+          "pct": 38,
+          "p_poi": 0.5785
         },
         "mar/25": {
           "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.8081
+          "pct": 24,
+          "p_poi": 0.802
         },
         "abr/25": {
           "zona": "alerta",
-          "pct": 80,
-          "p_poi": 0.3639
+          "pct": 81,
+          "p_poi": 0.3545
         },
         "mai/25": {
           "zona": "baixa",
-          "pct": 15,
-          "p_poi": 0.9526
+          "pct": 14,
+          "p_poi": 0.9506
         },
         "jun/25": {
-          "zona": "endemica",
-          "pct": 75,
-          "p_poi": 0.3639
+          "zona": "alerta",
+          "pct": 76,
+          "p_poi": 0.3545
         },
         "jul/25": {
-          "zona": "alerta",
+          "zona": "epidemica",
           "pct": 90,
-          "p_poi": 0.1931
+          "p_poi": 0.186
         },
         "ago/25": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9526
+          "p_poi": 0.9506
         },
         "set/25": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.5878
+          "pct": 43,
+          "p_poi": 0.5785
         },
         "out/25": {
           "zona": "alerta",
-          "pct": 85,
-          "p_poi": 0.3639
+          "pct": 86,
+          "p_poi": 0.3545
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5878
+          "pct": 57,
+          "p_poi": 0.5785
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 55,
-          "p_poi": 0.5878
+          "pct": 57,
+          "p_poi": 0.5785
         },
         "jan/26": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.5878
+          "pct": 62,
+          "p_poi": 0.5785
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 30,
-          "p_poi": 0.5878
+          "pct": 33,
+          "p_poi": 0.5785
         },
         "mar/26": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.1931
+          "p_poi": 0.186
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 45,
-          "p_poi": 0.5878
+          "pct": 48,
+          "p_poi": 0.5785
         },
         "mai/26": {
           "zona": "baixa",
-          "pct": 20,
-          "p_poi": 0.8081
+          "pct": 19,
+          "p_poi": 0.802
         },
         "jun/26": {
           "zona": "abaixo",
           "pct": 10,
-          "p_poi": 0.9526
+          "p_poi": 0.9506
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 65,
-          "p_poi": 0.5878
+          "pct": 67,
+          "p_poi": 0.5785
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 70,
-          "p_poi": 0.5878
+          "pct": 71,
+          "p_poi": 0.5785
         },
         "set/26": {
-          "zona": "baixa",
-          "pct": 25,
-          "p_poi": 0.8081
+          "zona": "endemica",
+          "pct": 29,
+          "p_poi": 0.802
+        },
+        "out/26": {
+          "zona": "alerta",
+          "pct": 76,
+          "p_poi": 0.3545
         }
       }
     },
@@ -3421,563 +3476,573 @@
       "p10": 0,
       "p25": 0,
       "p50": 1.75,
-      "p75": 3.18,
-      "p90": 4.59,
-      "mk_tau": -0.069,
-      "mk_p": 0.5333,
+      "p75": 3.11,
+      "p90": 4.58,
+      "mk_tau": -0.097,
+      "mk_p": 0.3754,
       "mk_dir": -1,
       "sen": 0,
       "meses": {
         "jan/23": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.8452
+          "pct": 39,
+          "p_poi": 0.8464
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 67,
-          "p_poi": 0.2869
+          "pct": 68,
+          "p_poi": 0.2891
         },
         "mar/23": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.1194
+          "p_poi": 0.1208
         },
         "abr/23": {
           "zona": "alerta",
-          "pct": 88,
-          "p_poi": 0.0413
+          "pct": 89,
+          "p_poi": 0.042
         },
         "mai/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.8452
+          "pct": 45,
+          "p_poi": 0.8464
         },
         "jun/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.8452
+          "pct": 45,
+          "p_poi": 0.8464
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "set/23": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.2869
+          "pct": 80,
+          "p_poi": 0.2891
         },
         "out/23": {
           "zona": "endemica",
-          "pct": 74,
-          "p_poi": 0.2869
+          "pct": 75,
+          "p_poi": 0.2891
         },
         "nov/23": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0413
+          "p_poi": 0.042
         },
         "dez/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "jan/24": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.5563
+          "pct": 59,
+          "p_poi": 0.5586
         },
         "fev/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "mar/24": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.1194
+          "p_poi": 0.1208
         },
         "abr/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "mai/24": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0122
+          "p_poi": 0.0124
         },
         "jun/24": {
           "zona": "endemica",
-          "pct": 63,
-          "p_poi": 0.5563
+          "pct": 61,
+          "p_poi": 0.5586
         },
         "jul/24": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.5563
+          "pct": 52,
+          "p_poi": 0.5586
         },
         "ago/24": {
           "zona": "endemica",
-          "pct": 74,
-          "p_poi": 0.2869
+          "pct": 75,
+          "p_poi": 0.2891
         },
         "set/24": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.2869
+          "p_poi": 0.2891
         },
         "out/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "nov/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.5563
+          "pct": 57,
+          "p_poi": 0.5586
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.5563
+          "pct": 57,
+          "p_poi": 0.5586
         },
         "mar/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "abr/25": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.0413
+          "p_poi": 0.042
         },
         "mai/25": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0122
+          "p_poi": 0.0124
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.8452
+          "pct": 41,
+          "p_poi": 0.8464
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "set/25": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.5563
+          "pct": 48,
+          "p_poi": 0.5586
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.5563
+          "pct": 52,
+          "p_poi": 0.5586
         },
         "fev/26": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0122
+          "p_poi": 0.0124
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 65,
-          "p_poi": 0.5563
+          "pct": 66,
+          "p_poi": 0.5586
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "jun/26": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8452
+          "pct": 36,
+          "p_poi": 0.8464
         },
         "jul/26": {
           "zona": "alerta",
-          "pct": 81,
-          "p_poi": 0.1194
+          "pct": 82,
+          "p_poi": 0.1208
         },
         "ago/26": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.2869
+          "p_poi": 0.2891
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 63,
-          "p_poi": 0.5563
+          "pct": 64,
+          "p_poi": 0.5586
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 36,
+          "p_poi": 0.8464
         }
       }
     },
     "ilavPerm": {
       "p10": 0,
       "p25": 0,
-      "p50": 0.51,
+      "p50": 0.6,
       "p75": 1.04,
-      "p90": 2.05,
-      "mk_tau": -0.22,
-      "mk_p": 0.0451,
+      "p90": 2.04,
+      "mk_tau": -0.242,
+      "mk_p": 0.026,
       "mk_dir": -1,
-      "sen": -0.009,
+      "sen": -0.01,
       "meses": {
         "jan/23": {
           "zona": "epidemica",
           "pct": 100,
-          "p_poi": 0.0464
+          "p_poi": 0.046
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 67,
-          "p_poi": 0.5473
+          "pct": 68,
+          "p_poi": 0.5463
         },
         "mar/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "abr/23": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0464
+          "p_poi": 0.046
         },
         "mai/23": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.5473
+          "p_poi": 0.5463
         },
         "jun/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "ago/23": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.1885
+          "p_poi": 0.1877
         },
         "set/23": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.5473
+          "pct": 61,
+          "p_poi": 0.5463
         },
         "out/23": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.5473
+          "p_poi": 0.5463
         },
         "nov/23": {
           "zona": "endemica",
-          "pct": 67,
-          "p_poi": 0.5473
+          "pct": 68,
+          "p_poi": 0.5463
         },
         "dez/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "jan/24": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.5473
+          "pct": 50,
+          "p_poi": 0.5463
         },
         "fev/24": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.5473
+          "p_poi": 0.5463
         },
         "mar/24": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.1885
+          "p_poi": 0.1877
         },
         "abr/24": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.5473
+          "pct": 80,
+          "p_poi": 0.5463
         },
         "mai/24": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.1885
+          "p_poi": 0.1877
         },
         "jun/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "jul/24": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.5473
+          "p_poi": 0.5463
         },
         "ago/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "set/24": {
           "zona": "alerta",
-          "pct": 88,
-          "p_poi": 0.1885
+          "pct": 89,
+          "p_poi": 0.1877
         },
         "out/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "nov/24": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.5473
+          "pct": 48,
+          "p_poi": 0.5463
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 67,
-          "p_poi": 0.5473
+          "pct": 68,
+          "p_poi": 0.5463
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "mar/25": {
           "zona": "alerta",
-          "pct": 81,
-          "p_poi": 0.5473
+          "pct": 82,
+          "p_poi": 0.5463
         },
         "abr/25": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.5473
+          "pct": 41,
+          "p_poi": 0.5463
         },
         "mai/25": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.1885
+          "p_poi": 0.1877
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.5473
+          "pct": 45,
+          "p_poi": 0.5463
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 44,
-          "p_poi": 0.5473
+          "pct": 43,
+          "p_poi": 0.5463
         },
         "ago/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "set/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "nov/25": {
           "zona": "endemica",
-          "pct": 56,
-          "p_poi": 0.5473
+          "pct": 57,
+          "p_poi": 0.5463
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.5473
+          "pct": 55,
+          "p_poi": 0.5463
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.5473
+          "pct": 39,
+          "p_poi": 0.5463
         },
         "mai/26": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.1885
+          "p_poi": 0.1877
         },
         "jun/26": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.5473
+          "pct": 59,
+          "p_poi": 0.5463
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.5473
+          "pct": 36,
+          "p_poi": 0.5463
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.5473
+          "pct": 52,
+          "p_poi": 0.5463
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 36,
+          "p_poi": 0.5463
         }
       }
     },
     "bactTemp": {
-      "p10": 1.14,
-      "p25": 2.62,
+      "p10": 1.15,
+      "p25": 2.45,
       "p50": 6.67,
       "p75": 9.09,
-      "p90": 10.06,
-      "mk_tau": 0.13,
-      "mk_p": 0.2208,
+      "p90": 10.03,
+      "mk_tau": 0.114,
+      "mk_p": 0.2774,
       "mk_dir": 1,
-      "sen": 0.067,
+      "sen": 0.058,
       "meses": {
         "jan/23": {
           "zona": "baixa",
           "pct": 16,
-          "p_poi": 0.9863
+          "p_poi": 0.9851
         },
         "fev/23": {
           "zona": "abaixo",
           "pct": 7,
-          "p_poi": 0.9981
+          "p_poi": 0.9979
         },
         "mar/23": {
-          "zona": "baixa",
-          "pct": 26,
-          "p_poi": 0.9863
+          "zona": "endemica",
+          "pct": 27,
+          "p_poi": 0.9851
         },
         "abr/23": {
           "zona": "endemica",
-          "pct": 30,
-          "p_poi": 0.9492
+          "pct": 32,
+          "p_poi": 0.9456
         },
         "mai/23": {
           "zona": "baixa",
           "pct": 14,
-          "p_poi": 0.9981
+          "p_poi": 0.9979
         },
         "jun/23": {
           "zona": "baixa",
-          "pct": 21,
-          "p_poi": 0.9863
+          "pct": 23,
+          "p_poi": 0.9851
         },
         "jul/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.5971
+          "pct": 48,
+          "p_poi": 0.5829
         },
         "ago/23": {
           "zona": "alerta",
           "pct": 84,
-          "p_poi": 0.104
+          "p_poi": 0.0969
         },
         "set/23": {
           "zona": "abaixo",
-          "pct": 12,
-          "p_poi": 0.9981
+          "pct": 11,
+          "p_poi": 0.9979
         },
         "out/23": {
           "zona": "baixa",
-          "pct": 19,
-          "p_poi": 0.9863
+          "pct": 18,
+          "p_poi": 0.9851
         },
         "nov/23": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.9492
+          "pct": 39,
+          "p_poi": 0.9456
         },
         "dez/23": {
           "zona": "endemica",
-          "pct": 35,
-          "p_poi": 0.9492
+          "pct": 36,
+          "p_poi": 0.9456
         },
         "jan/24": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.7498
+          "pct": 41,
+          "p_poi": 0.7384
         },
         "fev/24": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.104
+          "p_poi": 0.0969
         },
         "mar/24": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.4374
+          "pct": 59,
+          "p_poi": 0.4227
         },
         "abr/24": {
           "zona": "endemica",
-          "pct": 56,
-          "p_poi": 0.4374
+          "pct": 57,
+          "p_poi": 0.4227
         },
         "mai/24": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.104
+          "p_poi": 0.0969
         },
         "jun/24": {
           "zona": "epidemica",
@@ -3986,133 +4051,138 @@
         },
         "jul/24": {
           "zona": "endemica",
-          "pct": 72,
-          "p_poi": 0.1822
+          "pct": 73,
+          "p_poi": 0.172
         },
         "ago/24": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.1822
+          "pct": 80,
+          "p_poi": 0.172
         },
         "set/24": {
           "zona": "endemica",
-          "pct": 44,
-          "p_poi": 0.5971
+          "pct": 45,
+          "p_poi": 0.5829
         },
         "out/24": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.1822
+          "pct": 80,
+          "p_poi": 0.172
         },
         "nov/24": {
           "zona": "endemica",
-          "pct": 65,
-          "p_poi": 0.2944
+          "pct": 66,
+          "p_poi": 0.2813
         },
         "dez/24": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.1822
+          "pct": 80,
+          "p_poi": 0.172
         },
         "jan/25": {
           "zona": "endemica",
-          "pct": 63,
-          "p_poi": 0.4374
+          "pct": 64,
+          "p_poi": 0.4227
         },
         "fev/25": {
           "zona": "endemica",
-          "pct": 63,
-          "p_poi": 0.4374
+          "pct": 64,
+          "p_poi": 0.4227
         },
         "mar/25": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9981
+          "p_poi": 0.9979
         },
         "abr/25": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.0549
+          "p_poi": 0.0505
         },
         "mai/25": {
           "zona": "endemica",
-          "pct": 28,
-          "p_poi": 0.9492
+          "pct": 30,
+          "p_poi": 0.9456
         },
         "jun/25": {
           "zona": "alerta",
-          "pct": 88,
-          "p_poi": 0.104
+          "pct": 89,
+          "p_poi": 0.0969
         },
         "jul/25": {
           "zona": "alerta",
-          "pct": 81,
-          "p_poi": 0.1822
+          "pct": 82,
+          "p_poi": 0.172
         },
         "ago/25": {
           "zona": "abaixo",
-          "pct": 12,
-          "p_poi": 0.9981
+          "pct": 11,
+          "p_poi": 0.9979
         },
         "set/25": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.4374
+          "pct": 50,
+          "p_poi": 0.4227
         },
         "out/25": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0053
+          "p_poi": 0.0047
         },
         "nov/25": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0053
+          "p_poi": 0.0047
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 72,
-          "p_poi": 0.1822
+          "pct": 73,
+          "p_poi": 0.172
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 67,
-          "p_poi": 0.2944
+          "pct": 68,
+          "p_poi": 0.2813
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 51,
-          "p_poi": 0.4374
+          "pct": 52,
+          "p_poi": 0.4227
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.4374
+          "pct": 55,
+          "p_poi": 0.4227
         },
         "mai/26": {
           "zona": "baixa",
-          "pct": 23,
-          "p_poi": 0.9863
+          "pct": 25,
+          "p_poi": 0.9851
         },
         "jun/26": {
           "zona": "abaixo",
           "pct": 5,
-          "p_poi": 0.9981
+          "p_poi": 0.9979
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 42,
-          "p_poi": 0.7498
+          "pct": 43,
+          "p_poi": 0.7384
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 33,
-          "p_poi": 0.9492
+          "pct": 34,
+          "p_poi": 0.9456
         },
         "set/26": {
           "zona": "baixa",
-          "pct": 19,
-          "p_poi": 0.9863
+          "pct": 20,
+          "p_poi": 0.9851
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 39,
+          "p_poi": 0.8642
         }
       }
     },
@@ -4121,116 +4191,116 @@
       "p25": 0.45,
       "p50": 1.04,
       "p75": 3.03,
-      "p90": 6.22,
-      "mk_tau": 0.113,
-      "mk_p": 0.2943,
+      "p90": 6.1,
+      "mk_tau": 0.126,
+      "mk_p": 0.2336,
       "mk_dir": 1,
-      "sen": 0.004,
+      "sen": 0.005,
       "meses": {
         "jan/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.8841
+          "pct": 45,
+          "p_poi": 0.8811
         },
         "fev/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.8841
+          "pct": 45,
+          "p_poi": 0.8811
         },
         "mar/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "abr/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "mai/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "jun/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "jul/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "ago/23": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.8841
+          "pct": 55,
+          "p_poi": 0.8811
         },
         "set/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "out/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "nov/23": {
           "zona": "endemica",
-          "pct": 47,
-          "p_poi": 0.8841
+          "pct": 45,
+          "p_poi": 0.8811
         },
         "dez/23": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "jan/24": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.8841
+          "pct": 48,
+          "p_poi": 0.8811
         },
         "fev/24": {
           "zona": "epidemica",
           "pct": 93,
-          "p_poi": 0.0067
+          "p_poi": 0.0063
         },
         "mar/24": {
           "zona": "epidemica",
           "pct": 98,
-          "p_poi": 0.0017
+          "p_poi": 0.0016
         },
         "abr/24": {
           "zona": "alerta",
-          "pct": 81,
-          "p_poi": 0.1718
+          "pct": 82,
+          "p_poi": 0.1669
         },
         "mai/24": {
           "zona": "epidemica",
           "pct": 91,
-          "p_poi": 0.0228
+          "p_poi": 0.0217
         },
         "jun/24": {
           "zona": "alerta",
-          "pct": 88,
-          "p_poi": 0.0677
+          "pct": 89,
+          "p_poi": 0.0651
         },
         "jul/24": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.0677
+          "p_poi": 0.0651
         },
         "ago/24": {
           "zona": "alerta",
           "pct": 86,
-          "p_poi": 0.0677
+          "p_poi": 0.0651
         },
         "set/24": {
           "zona": "epidemica",
           "pct": 95,
-          "p_poi": 0.0067
+          "p_poi": 0.0063
         },
         "out/24": {
           "zona": "epidemica",
@@ -4239,113 +4309,118 @@
         },
         "nov/24": {
           "zona": "alerta",
-          "pct": 79,
-          "p_poi": 0.1718
+          "pct": 80,
+          "p_poi": 0.1669
         },
         "dez/24": {
           "zona": "endemica",
-          "pct": 53,
-          "p_poi": 0.8841
+          "pct": 55,
+          "p_poi": 0.8811
         },
         "jan/25": {
           "zona": "alerta",
           "pct": 77,
-          "p_poi": 0.3651
+          "p_poi": 0.3583
         },
         "fev/25": {
           "zona": "endemica",
           "pct": 30,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "mar/25": {
           "zona": "endemica",
           "pct": 70,
-          "p_poi": 0.6343
+          "p_poi": 0.6278
         },
         "abr/25": {
           "zona": "endemica",
-          "pct": 40,
-          "p_poi": 0.8841
+          "pct": 39,
+          "p_poi": 0.8811
         },
         "mai/25": {
           "zona": "baixa",
-          "pct": 26,
-          "p_poi": 0.8841
+          "pct": 25,
+          "p_poi": 0.8811
         },
         "jun/25": {
           "zona": "endemica",
-          "pct": 28,
-          "p_poi": 0.8841
+          "pct": 27,
+          "p_poi": 0.8811
         },
         "jul/25": {
           "zona": "endemica",
-          "pct": 65,
-          "p_poi": 0.8841
+          "pct": 66,
+          "p_poi": 0.8811
         },
         "ago/25": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "set/25": {
           "zona": "endemica",
-          "pct": 37,
-          "p_poi": 0.8841
+          "pct": 36,
+          "p_poi": 0.8811
         },
         "out/25": {
           "zona": "endemica",
-          "pct": 60,
-          "p_poi": 0.8841
+          "pct": 61,
+          "p_poi": 0.8811
         },
         "nov/25": {
           "zona": "baixa",
           "pct": 23,
-          "p_poi": 0.8841
+          "p_poi": 0.8811
         },
         "dez/25": {
           "zona": "endemica",
-          "pct": 56,
-          "p_poi": 0.8841
+          "pct": 57,
+          "p_poi": 0.8811
         },
         "fev/26": {
           "zona": "endemica",
-          "pct": 33,
-          "p_poi": 0.8841
+          "pct": 32,
+          "p_poi": 0.8811
         },
         "mar/26": {
           "zona": "endemica",
-          "pct": 74,
-          "p_poi": 0.3651
+          "pct": 75,
+          "p_poi": 0.3583
         },
         "abr/26": {
           "zona": "endemica",
-          "pct": 58,
-          "p_poi": 0.8841
+          "pct": 59,
+          "p_poi": 0.8811
         },
         "mai/26": {
           "zona": "endemica",
-          "pct": 63,
-          "p_poi": 0.8841
+          "pct": 64,
+          "p_poi": 0.8811
         },
         "jun/26": {
           "zona": "endemica",
-          "pct": 35,
-          "p_poi": 0.8841
+          "pct": 34,
+          "p_poi": 0.8811
         },
         "jul/26": {
           "zona": "endemica",
-          "pct": 67,
-          "p_poi": 0.6343
+          "pct": 68,
+          "p_poi": 0.6278
         },
         "ago/26": {
           "zona": "endemica",
-          "pct": 72,
-          "p_poi": 0.6343
+          "pct": 73,
+          "p_poi": 0.6278
         },
         "set/26": {
           "zona": "endemica",
-          "pct": 49,
-          "p_poi": 0.8841
+          "pct": 50,
+          "p_poi": 0.8811
+        },
+        "out/26": {
+          "zona": "endemica",
+          "pct": 70,
+          "p_poi": 0.6278
         }
       }
     }
