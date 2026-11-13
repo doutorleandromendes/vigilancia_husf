@@ -8,6 +8,7 @@ Uso:
   python gerar_competencia.py --mes mai/26 --skip-r      # pula scripts R
   python gerar_competencia.py --seed-historico
   python gerar_competencia.py --seed-checklist
+  python gerar_competencia.py --seed-isc-processo jul/26   # série do checklist de ISC desde jul/26
 """
 
 import argparse, json, sys, subprocess, shutil
@@ -18,6 +19,7 @@ import husf_pipeline.config as cfg
 from husf_pipeline.parsers._util import XlsxProvider, parse_mes_arg, mes_label
 from husf_pipeline.parsers import censo_mdr, censo_isc, diarreia, dots, censo
 from husf_pipeline.parsers import vig_competencia
+from husf_pipeline.parsers import isc_processo
 from husf_pipeline.parsers import cve_mestre, cve_utic, dialise, controles
 from husf_pipeline.parsers.controles import parse_alcool_enfermarias
 from husf_pipeline.parsers import isolamentos
@@ -117,6 +119,56 @@ def run_r_scripts(label):
         print("     Execute manualmente: Rscript husf_stats.R")
 
 
+def _sura_api():
+    """(base_url, key, inst) do atb-sistema — mesmas variáveis da vigilância diária."""
+    import os
+    base = (os.environ.get('VIG_URL') or os.environ.get('CVE_SURA_URL')
+            or getattr(cfg, 'VIG_URL', 'https://app.lcmendes.med.br'))
+    key = os.environ.get('VIG_API_KEY') or getattr(cfg, 'VIG_API_KEY', None)
+    inst = (os.environ.get('VIG_INST') or os.environ.get('CVE_INST')
+            or getattr(cfg, 'VIG_INST', 'HUSF'))
+    return base, key, inst
+
+
+def seed_isc_processo(desde):
+    """Preenche a série iscProcesso de `desde` (ex.: jul/26) até a competência
+    atual do data_iras.json, buscando mês a mês no atb-sistema. Idempotente:
+    regrava os pontos dos meses buscados."""
+    from husf_pipeline.parsers._util import MESES_PT_ABBR
+    d, path = _load_prev_json()
+    atual = d.get('periodo', '')                      # 'Outubro 2026'
+    i0, a0 = parse_mes_arg(desde)
+    nomes = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho',
+             'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
+    import unicodedata
+    _n = lambda t: unicodedata.normalize('NFD', t).encode('ascii', 'ignore').decode().lower()
+    pm, pa = _n(atual).split()
+    i1, a1 = nomes.index(pm), int(pa)
+    base, key, inst = _sura_api()
+    serie = {pt['p']: {k: v for k, v in pt.items() if k != 'c'} for pt in d.get('iscProcesso', [])}
+    i, a = i0, a0
+    while (a, i) <= (a1, i1):
+        lbl = mes_label(i, a)
+        try:
+            pt = isc_processo.build(isc_processo.fetch(base, inst, f'{a}-{i + 1:02d}', key))
+            if pt:
+                serie[lbl] = {'p': lbl, **pt}
+                print(f"  {lbl}: {pt['ck']} checklists" + (f" · adesão {pt['ades']['c']}/{pt['ades']['n']}" if pt.get('ades') else ' · sem mapa'))
+            else:
+                print(f'  {lbl}: sem dado')
+        except Exception as e:
+            print(f'  {lbl}: ERRO {e}')
+        i += 1
+        if i == 12: i, a = 0, a + 1
+    chave = lambda p: (int(p.split('/')[1]), MESES_PT_ABBR.index(p.split('/')[0]))
+    pts = sorted(serie.values(), key=lambda pt: chave(pt['p']))
+    if pts:
+        pts[-1]['c'] = 1
+    d['iscProcesso'] = pts
+    _save_json(d, path)
+    print(f'  iscProcesso: {len(pts)} competência(s) gravadas em {path}')
+
+
 # ── Run mensal ────────────────────────────────────────────────────────────────
 
 def run(mes_str, dry_run=False, skip_r=False, fonte='vig'):
@@ -173,6 +225,22 @@ def run(mes_str, dry_run=False, skip_r=False, fonte='vig'):
         rp('diarreia',    diarreia.parse,    sp['diarreia'])
         rp('dots',        dots.parse,        sp['dots'])
         rp('isolamentos', isolamentos.parse, sp['isolamentos'])
+
+    # ── Prevenção de ISC (checklist digitalizado + mapa cirúrgico, atb-sistema) ──
+    # Indicador novo (nov/26): falha aqui NÃO aborta o mês — só não atualiza a série.
+    try:
+        _b, _k, _i = _sura_api()
+        _pt = isc_processo.build(isc_processo.fetch(_b, _i, f'{ano}-{mes_idx + 1:02d}', _k))
+        if _pt:
+            out['isc_processo'] = _pt
+            _ad = _pt.get('ades')
+            print(f"  OK  isc_processo — {_pt['ck']} checklists"
+                  + (f" · adesão {_ad['c']}/{_ad['n']}" if _ad else ' · mapa cirúrgico não importado'))
+        else:
+            print('  --  isc_processo: sem checklist nem mapa cirúrgico no mês')
+    except Exception as e:
+        print(f'  ERR isc_processo: {e}')
+        errs.append(f'isc_processo: {e}')
 
     rp('censo',       censo.parse,       sp['censo'])
     rp('cve_mestre',  cve_mestre.parse,  xl['cve_mestre'])
@@ -455,6 +523,8 @@ def main():
                    help='Semeia serie historica de alcool das enfermarias (uma vez)')
     g.add_argument('--seed-isolamentos', action='store_true',
                    help='Semeia serie historica de isolamentos (uma vez)')
+    g.add_argument('--seed-isc-processo', metavar='DESDE',
+                   help='Semeia a série do checklist de ISC desde a competência (ex.: jul/26)')
     g.add_argument('--seed-alcool-uti', action='store_true',
                    help='Recalcula HM álcool UTIs das bags do SHL (uma vez)')
     p.add_argument('--dry-run',  action='store_true',
@@ -476,6 +546,8 @@ def main():
         seed_isolamentos()
     elif args.seed_alcool_uti:
         seed_alcool_uti()
+    elif args.seed_isc_processo:
+        seed_isc_processo(args.seed_isc_processo)
     else:
         run(args.mes, dry_run=args.dry_run, skip_r=args.skip_r, fonte=args.fonte)
 
