@@ -1032,6 +1032,82 @@ function DiarreiaSection(props){
   );
 }
 
+// ── IscSection — Sítio Cirúrgico: resultado (CVE) + processo (Checklist de ISC) ──
+// D.isc.limpas/cesar: taxas regulatórias (CVE Plan. 1). D.iscProcesso: série do
+// checklist digitalizado no atb-sistema (husf_pipeline/parsers/isc_processo.py),
+// {n, c} por indicador — a conformidade é calculada no app (isc-regras.mjs).
+function IscSection(props){
+  var D=props.D, I=D.isc||{}, P=D.iscProcesso||[];
+  function pc(x){ return x&&x.n?Math.round(1000*x.c/x.n)/10:null; }
+  function fmt(v){ return v==null?'—':v.toFixed(1)+'%'; }
+  function cor(v){ return v==null?MUTED:v>=90?GREEN:v>=75?AMBER:RED; }
+  var lim=(I.limpas||[]).map(function(p){return{p:p.p,v:p.taxa,c:p.c};});
+  var ces=(I.cesar||[]).map(function(p){return{p:p.p,v:p.taxa,c:p.c};});
+  var adesS=P.map(function(p){return{p:p.p,v:p.mapa?pc(p.ades):null,c:p.c};});
+  var abpS=P.map(function(p){return{p:p.p,v:pc((p.itens||{}).profilaxia),c:p.c};});
+  var L=P.filter(function(p){return p.c;})[0]||P[P.length-1];
+  var ITENS=[['banho','Banho pré-operatório'],['tricotomia','Tricotomia'],['glicemia','Glicemia aferida no início'],
+    ['degermacao','Degermação com clorexidina'],['antissepsia','Antissepsia com clorexidina alcoólica'],
+    ['maos','Antissepsia cirúrgica das mãos'],['paramentacao','Paramentação completa'],['profilaxia','Adesão à antibioticoprofilaxia']];
+  var COMP=[['realizada','Realizada'],['droga','Droga do protocolo'],['tempo','Infusão ≤ 60 min antes da incisão'],
+    ['dose','Dose'],['redose','Dose complementar quando > 4 h']];
+  var EQ=[['cardio','Cirurgia cardíaca'],['neuro','Neurocirurgia'],['ces','Cesárea']];
+  var card={background:WHITE,border:'1px solid '+BRDR,borderRadius:8,padding:16,boxShadow:'0 1px 3px rgba(0,0,0,0.06)'};
+  var mono="'IBM Plex Mono',monospace";
+  function Linha(rot,x,forte){
+    var v=pc(x);
+    return h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'5px 0',borderBottom:'1px solid #f0f2f5'}},
+      h('span',{style:{fontSize:11,color:forte?NAVY:SLATE,fontWeight:forte?600:400}},rot),
+      h('span',{style:{fontFamily:mono,fontSize:forte?16:12,fontWeight:700,color:cor(v)}},fmt(v),
+        h('span',{style:{fontSize:9,color:MUTED,fontWeight:400,marginLeft:6}},x&&x.n?x.c+'/'+x.n:'sem registro')));
+  }
+  return h('div',{className:'fi'},
+    h(SH,{t:'Resultado — taxa de ISC (CVE, Plan. 1)'}),
+    (lim.length||ces.length)?h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:6}},
+      lim.length?h(BarS,{title:'ISC em cirurgias limpas (%)',data:lim,unit:'%',h:160,
+        note:'Casos / cirurgias limpas (Classe I) do mês · não inclui cesáreas'}):null,
+      ces.length?h(BarS,{title:'ISC pós-cesárea (%)',data:ces,unit:'%',h:160,
+        note:'Casos / cesáreas do mês'}):null
+    ):h('div',{style:{color:MUTED,fontSize:12,padding:8}},'Sem série de resultado.'),
+    h('div',{style:{fontSize:9,color:MUTED,margin:'0 0 8px'}},'Taxas por equipe e comparativo anual: ',
+      h('a',{href:'https://doutorleandromendes.github.io/vigilancia_husf/isc_v4.html',target:'_blank',rel:'noopener'},'painel de ISC')),
+    h(SH,{t:'Processo — Checklist de ISC (HUSF-FOR-CIH-006-01)'}),
+    !L?h('div',{style:{color:MUTED,fontSize:12,padding:8}},'Sem checklist digitalizado ainda.'):
+    h('div',{},
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:10}},
+        h(BarS,{title:'Adesão ao checklist (%)',data:adesS,unit:'%',maxY:100,h:160,
+          note:'Cardíacas, neuro e cesáreas do mapa cirúrgico com checklist · mês sem mapa importado fica em branco'}),
+        h(BarS,{title:'Adesão à antibioticoprofilaxia (%)',data:abpS,unit:'%',maxY:100,h:160,
+          note:'Checklists de cirurgia limpa/potencialmente contaminada · todos os componentes registrados conformes'}),
+        h('div',{style:card},
+          h('div',{style:{fontFamily:"'IBM Plex Sans',sans-serif",fontSize:11,fontWeight:600,color:NAVY,marginBottom:6}},'Competência '+L.p),
+          L.mapa?Linha('Adesão ao checklist',L.ades,true):
+            h('div',{style:{fontSize:11,color:AMBER,padding:'5px 0'}},'Mapa cirúrgico do mês não importado — adesão indisponível'),
+          L.mapa?h('div',{},EQ.map(function(e){return h('div',{key:e[0]},Linha(e[1],(L.adesEq||{})[e[0]]));})):null,
+          h('div',{style:{fontSize:9,color:MUTED,marginTop:8,lineHeight:1.5}},
+            L.ck+' checklist(s) digitalizado(s)'+(L.mapa&&L.cirMapa?' · '+L.cirMapa+' cirurgias no mapa':'')+
+            (L.soltos?' · '+L.soltos+' sem cirurgia aplicável no mapa':''))
+        )
+      ),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+        h('div',{style:card},
+          h('div',{style:{fontSize:11,fontWeight:600,color:NAVY,marginBottom:4}},'Conformidade por item — '+L.p),
+          ITENS.map(function(it){return h('div',{key:it[0]},Linha(it[1],(L.itens||{})[it[0]],it[0]==='profilaxia'));})),
+        h('div',{style:card},
+          h('div',{style:{fontSize:11,fontWeight:600,color:NAVY,marginBottom:4}},'Antibioticoprofilaxia — componentes — '+L.p),
+          COMP.map(function(it){return h('div',{key:it[0]},Linha(it[1],(L.abp||{})[it[0]]));}),
+          h('div',{style:{fontSize:9,color:MUTED,marginTop:8,lineHeight:1.5}},
+            (L.excl?L.excl+' contaminada(s)/infectada(s) fora da avaliação · ':'')+
+            (L.redoseDesn?L.redoseDesn+' dose(s) complementar(es) sem indicação (≤ 4 h) · ':'')+
+            'Tempo não avaliado em cesárea (aceita após o clampeamento); dose só quando registrada.')
+        )
+      ),
+      h('div',{style:{fontSize:9,color:MUTED,marginTop:8}},
+        'Fonte: checklist digitalizado e mapa cirúrgico do atb-sistema (/controles/isc/indicadores). Pergunta em branco sai do denominador do item.')
+    )
+  );
+}
+
 function ClinicaSection(props){
   var D=props.D,which=props.which;
   var labels={clinicaMedica:'Clínica Médica',clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos'};
@@ -1525,6 +1601,7 @@ var NAV_DEFAULT=[
   {id:'clinicaCirurgica',l:'Clínica Cirúrgica',g:'Enfermarias',ic:'▤'},
   {id:'epm',l:'EPM / Apartamentos',g:'Enfermarias',ic:'▤'},
   {id:'diarreia',l:'Diarreia Hospitalar',g:'Vigilâncias Especiais',ic:'◎'},
+  {id:'isc',l:'Sítio Cirúrgico (ISC)',g:'Vigilâncias Especiais',ic:'✂'},
   {id:'sura',l:'Uso Racional de ATB',g:'Stewardship',ic:'◑'},
   {id:'isolamentos',l:'Precauções de Contato',g:'Stewardship',ic:'⊘'}
 ];
@@ -1550,7 +1627,7 @@ var TITLES={overview:'Visão Geral — IrAS & MDR',mdrInst:'Multirresistentes �
   abio:'Antibiograma Institucional',utiAB:'UTI A/B',utic:'UTI C',
   utiNeo:'UTI Neonatal',hd:'Hemodiálise / Nefrologia',clinicaMedica:'Clínica Médica',
   clinicaCirurgica:'Clínica Cirúrgica',epm:'EPM / Apartamentos',
-  diarreia:'Diarreia Hospitalar',sura:'Sistema de Uso Racional de ATB',
+  diarreia:'Diarreia Hospitalar',isc:'Infecção de Sítio Cirúrgico — resultado e processo',sura:'Sistema de Uso Racional de ATB',
   isolamentos:'Precauções de Contato e Isolamentos'};
 
 // ── Config de gráficos por seção (default reproduz o layout atual) ────────────
@@ -2004,6 +2081,7 @@ function App(){
       case 'clinicaCirurgica': return h(ClinicaSection,{D:D,which:'clinicaCirurgica'});
       case 'epm':              return h(ClinicaSection,{D:D,which:'epm'});
       case 'diarreia':         return h(DiarreiaSection,{D:D});
+      case 'isc':              return h(IscSection,{D:D});
       case 'sura':             return h(SuraSection,{D:D});
       case 'isolamentos':      return h(IsolamentosSection,{D:D});
       default: return null;

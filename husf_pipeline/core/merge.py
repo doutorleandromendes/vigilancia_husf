@@ -270,6 +270,11 @@ def build_month(prev_json, label, parsers_out, manual):
         d.setdefault('checklistCVC', {}).setdefault(sk, [])
         d['checklistCVC'][sk] = append_checklist(d['checklistCVC'][sk], label, sv)
 
+    # ── Prevenção de ISC — checklist (parsers/isc_processo.py) ─────────────
+    ipp = parsers_out.get('isc_processo')
+    if ipp:
+        d['iscProcesso'] = appISC(d.get('iscProcesso', []), {'p': label, **ipp})
+
     # ── SURA ──────────────────────────────────────────────────────────────
     sura = man('sura')
     if sura and isinstance(sura, dict):
