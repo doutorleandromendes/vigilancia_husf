@@ -2,7 +2,8 @@
   "_doc": "De-para TasyRel -> planilha ATB da farmacia. Edite este arquivo, nao o codigo.",
   "_regras": {
     "setores": "chave = nome do setor no TasyRel (normalizado sem acento/caixa); valor = coluna da planilha, ou null para ignorar",
-    "materiais": "chave = codigo do material no Tasy; valor = [antimicrobiano, apresentacao] exatamente como na planilha, ou null para ignorar"
+    "materiais": "chave = codigo do material no Tasy (relatorio BIFF); valor = [antimicrobiano, apresentacao] exatamente como na planilha, ou null para ignorar",
+    "materiais_nome": "chave = nome completo do material no relatorio texto (normalizado sem acento/caixa/espacos extras); mesmo valor. Nome ausente aqui = 'nao mapeado' na auditoria"
   },
 
   "setores": {
@@ -25,7 +26,10 @@
     "UTI ADULTO B": "UTI ADULTO A e B",
     "UTI ADULTO C": "UTI ADULTO C",
     "UTI INFANTIL": "UTI NEOPED",
-    "UTI NEONATAL": "UTI NEOPED"
+    "UTI NEONATAL": "UTI NEOPED",
+    "CENTRO CIRURGICO PART/CONV": "CENTRO CIRÚRGICO",
+    "CUIDADOS INTERMEDIARIOS-NEO": "CUIDADOS INTERMEDIÁRIOS NEO",
+    "ENFERMARIA PARTICULAR MISTA": "EPM ( Convênios)"
   },
 
   "materiais": {
@@ -77,5 +81,52 @@
     "59292": null,
     "69884": null,
     "53169": null
+  },
+  "materiais_nome": {
+    "_doc": "Derivado dos codigos acima (nomes truncados jun-ago/2026 x nomes completos out/2026). Entradas marcadas NOVO nao tinham codigo mapeado.",
+    "Aciclovir 250mg IV. Fr Amp":                                   ["Aciclovir", "FR AMP 250MG"],
+    "Amicacina 100mg c/ 2mL Amp":                                   ["Amicacina", "FR AMP 100 mg"],
+    "Amicacina 500mg c/ 2mL Amp":                                   ["Amicacina", "FR AMP 500 mg"],
+    "Amoxicilina + Clavulanato de Potassio 1g IV Fr Amp":           ["Amoxacilina + Clavulanato", "FR AMP 1,0G"],
+    "Amoxicilina + Clavulanato potassico 250mg/5 ml Suspensão":     ["Amoxacilina + Clavulanato", "FR AMP 1,0G"],
+    "Amoxicilina  + Clavulanato potassico 400mg/5 ml Suspensão":    ["Amoxacilina + Clavulanato", "FR AMP 1,0G"],
+    "Ampicilina Sódica + Sulbactam 3g Fr Amp":                      ["Ampicilina-sulbactam (base ampicilina)", "FR AMP 3G"],
+    "Ampicilina Sódica 1g Fr Amp":                                  ["Ampicilina  (pura)", "TODAS"],
+    "Ampicilina Sódica 500mg Fr Amp":                               ["Ampicilina  (pura)", "TODAS"],
+    "Azitromicina 500 mg cp":                                       ["Azitromicina", "CP 500MG"],
+    "Azitromicina 600 mg Pó p/Suspensão Oral Fr":                   ["Azitromicina", "CP 500MG"],
+    "Benzilpenicilina Benzatina 1.200.000UI Fr Amp":                ["Benzilpenicilina Benzatina", "FR AMP 1.200.000"],
+    "Cefalexina 500mg Cap":                                         ["Cefalexina", "CP 500MG"],
+    "Cefalotina Sódica 1g Fr Amp":                                  ["Cefalotina", "FR AMP 1,0G"],
+    "Cefazolina Sódica 1g Fr Amp":                                  ["Cefazolina", "FR AMP 1,0G"],
+    "Cefepime Cloridrato 1g Fr Amp":                                ["Cefepima", "FR AMP 1G"],
+    "Ceftriaxona 1g IV Fr Amp":                                     ["Ceftriaxone", "FR AMP 1G"],
+    "Ceftriaxona 500mg IM c/Diluente2mL Fr Amp":                    ["Ceftriaxone", "FR AMP 1G"],
+    "Cefuroxima Sódica 750mg IV Fr Amp":                            ["Cefuroxima", "FR AMP 750MG"],
+    "Ciprofloxacino 200mg c/100mL Bolsa":                           ["Ciprofloxacina", "FR AMP 200 MG"],
+    "Ciprofloxacino 500mg cp":                                      ["Ciprofloxacina", "CP 500 MG"],
+    "Claritromicina 500 mg I.V Fr":                                 ["Claritromicina", "FR AMP 500MG"],
+    "Clindamicina Fosfato 600mg c/4mL Amp":                         ["Clindamicina", "AMP 600MG"],
+    "Doxiciclina monoidratada 100mg drg.":                          ["Doxiciclina monoidratada", "CP 100MG"],
+    "Fluconazol 2mg/mL Fr c/100ml":                                 ["Fluconazol", "FR 200MG"],
+    "Gentamicina 80mg c/2mL Amp":                                   ["Gentamicina", "AMP 80 MG"],
+    "Levofloxacina 750 mg Bolsa":                                   ["Levofloxacina", "FR AMP 750 MG"],
+    "Meropenen 1000mg Fr Amp":                                      ["Meropenem", "FR AMP 1G"],
+    "Metronidazol 500mg c/100mL Bolsa":                             ["Metronidazol", "FR 500MG"],
+    "Oxacilina Sodica 500mg Fr Amp":                                ["Oxacilina", "FR AMP 500MG"],
+    "Penicilina G Cristalina 5.000.000UI Fr":                       ["Penicilina G potássica", "5.000.000UI FR"],
+    "Piperacilina + Tazobactam 4,5g  Fr Amp":                       ["Piperacilina-tazobactam (base piperacilina)", "FR AMP 4,5G"],
+    "Polimixina B 500.000UI inj. Fr Amp":                           ["Sulfato de Polimixina B", "FR AMP 500.000 UI (50 MG)"],
+    "Sulfametoxazol 800mg/trimetoprima 160mg cp":                   ["Sulfametoxazol 800 mg/Trimetoprima 160mg", "CP 160MG"],
+    "Sulfametoxazol 80mg/ml/trimetr16mg/ml 5ML Amp":                ["Sulfametoxazol 800 mg/Trimetoprima 160mg", "AMP 5ml"],
+    "Teicoplanina 400mg Fr Amp":                                    ["Teicoplanina", "FR AMP 400 MG"],
+    "Vancomicina Cloridrato 500mg  Fr Amp":                         ["Vancomicina", "FR AMP 500 MG"],
+
+    "_NOVO_ e correcoes (revisar)": "abaixo",
+    "Penicilina G Potassica + Procaína 400000 UI (Despacilina) Frasco Ampola": ["Penicilina G + Procaína", "400MG"],
+    "Fluconazol 150 mg cp":                                         ["Fluconazol", "CP 150MG"],
+    "Ceftazidima 1g inj. ( ABL/Blausiegel/Eurofarma/Glaxo/U.Q )":   ["Ceftazidima", "FR AMP 1G"],
+    "Torgena 2000mg/500mg (ceftazidima/avibactam)":                 ["Ceftazidima-avibactam (base ceftazidima)", "FR AMP 2,5G"],
+    "Tigeciclina 50mg Frasco Ampola":                               ["Tigeciclina", "FR AMP 50 MG"]
   }
 }

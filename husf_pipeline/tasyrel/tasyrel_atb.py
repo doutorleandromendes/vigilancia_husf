@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-tasyrel_atb.py — converte o relatório "Utilização de Materiais/Medicamentos"
-do TasyRel (.XLS BIFF2) na matriz da planilha de consumo de ATB da farmácia.
+tasyrel_atb.py — converte o relatório de consumo de ATB do TasyRel na matriz
+da planilha de consumo de ATB da farmácia. Aceita dois formatos:
+  - "Utilização de Materiais/Medicamentos" (.XLS BIFF2, material = código)
+  - "Medicamentos e Materiais Utilizados" (texto tabulado com extensão .XLS,
+    material = nome completo; de-para em mapa_atb.json → "materiais_nome")
 
 Uso:
     python3 tasyrel_atb.py atb_julho.XLS --planilha ATB2023.xlsx
@@ -84,21 +87,102 @@ def norm(txt):
     return " ".join(txt.upper().split())
 
 
-def ler_relatorio(caminho):
-    """Devolve (lançamentos, cabeçalho). Cada lançamento: setor, cod, nome, qtde, valor."""
+def _num_br(txt):
+    """'1.234,56' -> 1234.56 ; devolve None se não for número."""
+    t = str(txt).strip().replace(".", "").replace(",", ".")
     try:
-        cel = ler_biff2(caminho)
-    except Exception:
+        return float(t)
+    except ValueError:
+        return None
+
+
+def _ler_texto_tabulado(caminho, encoding="cp1252"):
+    """Relatório 'Medicamentos e Materiais Utilizados' exportado como texto
+    tabulado (extensão .XLS). Não tem código de material, e o setor aparece
+    como linha de subtotal DEPOIS dos seus itens.
+
+    Linha de dados: nome no campo 3, exatamente dois números depois (qtde, valor).
+    Rodapé de setor: nome sem minúsculas cuja qtde fecha a soma dos itens
+    acumulados desde o rodapé anterior. Qualquer sobra no fim aborta.
+    """
+    import re
+    linhas = Path(caminho).read_bytes().decode(encoding, "replace").splitlines()
+    periodo, lancamentos, pendentes, setores = "", [], [], []
+    for ln in linhas:
+        f = ln.split("\t")
+        m = re.search(r"(\d{2}/\d{2}/\d{4}) at[ée] (\d{2}/\d{2}/\d{4})", ln)
+        if m and not periodo:
+            periodo = f"Período de {m.group(1)} até {m.group(2)}"
+            continue
+        if len(f) < 5:
+            continue
+        nome = f[3].strip()
+        if not nome or norm(nome) == "SETOR ATENDIMENTO":
+            continue
+        nums = [x for x in (_num_br(c) for c in f[4:] if c.strip()) if x is not None]
+        if len(nums) != 2:
+            raise ValueError(f"linha com formato inesperado: {ln!r}")
+        qtde, valor = nums
+        soma = sum(p["qtde"] for p in pendentes)
+        if pendentes and not re.search(r"[a-zà-ÿ]", nome) and abs(qtde - soma) < 0.005:
+            for p in pendentes:
+                p["setor"] = nome
+            lancamentos.extend(pendentes)
+            setores.append((nome, qtde))
+            pendentes = []
+        else:
+            pendentes.append({"setor": None, "cod": "", "nome": nome,
+                              "qtde": qtde, "valor": valor})
+    if pendentes:
+        raise ValueError(
+            f"{len(pendentes)} itens sem rodapé de setor que feche a soma "
+            f"(primeiro: {pendentes[0]['nome']!r}); o layout do relatório mudou?")
+    return periodo, lancamentos, setores
+
+
+def _mes_ano(periodo):
+    if "/" not in periodo:
+        return None, None
+    partes = periodo.replace("Período de ", "").split()[0].split("/")
+    if len(partes) == 3:
+        return MESES[int(partes[1]) - 1], partes[2]
+    return None, None
+
+
+def ler_relatorio(caminho):
+    """Devolve (lançamentos, cabeçalho). Cada lançamento: setor, cod, nome, qtde, valor.
+
+    Aceita os dois formatos que o TasyRel já entregou:
+      - binário (BIFF), relatório 'Utilização de Materiais/Medicamentos' (cod - nome)
+      - texto tabulado, relatório 'Medicamentos e Materiais Utilizados' (só nome)
+    """
+    inicio = Path(caminho).read_bytes()[:8]
+    if inicio.startswith(b"\xd0\xcf\x11\xe0"):          # OLE2 (BIFF8)
         cel = _ler_xls_fallback(caminho)
+    else:
+        try:
+            cel = ler_biff2(caminho)
+        except Exception:
+            cel = {}
+
+    if not cel:
+        try:
+            periodo, lancamentos, setores = _ler_texto_tabulado(caminho)
+        except UnicodeError:
+            lancamentos = []
+        if not lancamentos:
+            sys.exit(f"ERRO: {caminho} não é um relatório reconhecido "
+                     "(nem BIFF, nem texto tabulado do TasyRel).")
+        mes, ano = _mes_ano(periodo)
+        return lancamentos, {"periodo": periodo, "mes": mes, "ano": ano,
+                             "total_geral_qtde": None,
+                             "formato": "texto",
+                             "setores_conferidos": len(setores)}
 
     nlin = max(l for l, _ in cel) + 1
     periodo = next((v for (l, c), v in cel.items()
                     if isinstance(v, str) and v.startswith("Período")), "")
-    mes = ano = None
-    if "/" in periodo:
-        partes = periodo.replace("Período de ", "").split()[0].split("/")
-        if len(partes) == 3:
-            mes, ano = MESES[int(partes[1]) - 1], partes[2]
+    mes, ano = _mes_ano(periodo)
 
     lancamentos, totais_setor = [], []
     for lin in range(nlin):
@@ -123,7 +207,7 @@ def ler_relatorio(caminho):
 
     total_geral = next((q for r, q, v in totais_setor if r.startswith("Total Geral")), None)
     return lancamentos, {"periodo": periodo, "mes": mes, "ano": ano,
-                         "total_geral_qtde": total_geral}
+                         "total_geral_qtde": total_geral, "formato": "biff"}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -170,8 +254,13 @@ def consolidar(lancamentos, mapa, colunas, linhas):
         "qtde_ignorada": 0.0,
         "qtde_perdida": 0.0,
     }
-    m_set, m_mat = mapa["setores"], mapa["materiais"]
+    m_set = mapa["setores"]
     m_set_n = {norm(k): v for k, v in m_set.items()}
+    # código (relatório BIFF) e nome normalizado (relatório texto) no mesmo dicionário;
+    # códigos são só dígitos, nomes nunca são, então não colidem
+    m_mat = dict(mapa.get("materiais", {}))
+    m_mat.update({norm(k): v for k, v in mapa.get("materiais_nome", {}).items()
+                  if not k.startswith("_")})
 
     for lc in lancamentos:
         q = lc["qtde"]
@@ -184,16 +273,17 @@ def consolidar(lancamentos, mapa, colunas, linhas):
             auditoria["qtde_perdida"] += q
             continue
 
-        if lc["cod"] not in m_mat:
-            d = auditoria["materiais_nao_mapeados"].setdefault(
-                f'{lc["cod"]} - {lc["nome"]}', 0)
-            auditoria["materiais_nao_mapeados"][f'{lc["cod"]} - {lc["nome"]}'] = d + q
+        chave_mat = lc["cod"] or norm(lc["nome"])
+        rot_mat = f'{lc["cod"]} - {lc["nome"]}' if lc["cod"] else lc["nome"]
+        if chave_mat not in m_mat:
+            d = auditoria["materiais_nao_mapeados"].setdefault(rot_mat, 0)
+            auditoria["materiais_nao_mapeados"][rot_mat] = d + q
             auditoria["qtde_perdida"] += q
             continue
 
-        destino = m_mat[lc["cod"]]
+        destino = m_mat[chave_mat]
         if destino is None or col_nome is None:
-            k = f'{lc["cod"]} - {lc["nome"]}'
+            k = rot_mat
             auditoria["materiais_ignorados"][k] = auditoria["materiais_ignorados"].get(k, 0) + q
             auditoria["qtde_ignorada"] += q
             continue
@@ -201,7 +291,7 @@ def consolidar(lancamentos, mapa, colunas, linhas):
         chave_lin = (norm(destino[0]), norm(destino[1]))
         if chave_lin not in linhas or norm(col_nome) not in colunas:
             auditoria["destinos_inexistentes"].append(
-                {"cod": lc["cod"], "destino": destino, "coluna": col_nome, "qtde": q})
+                {"cod": rot_mat, "destino": destino, "coluna": col_nome, "qtde": q})
             auditoria["qtde_perdida"] += q
             continue
 
@@ -278,6 +368,9 @@ def main():
     if cab["total_geral_qtde"]:
         print(f"Total Geral do TasyRel: {cab['total_geral_qtde']:.0f} "
               f"(confere: {abs(cab['total_geral_qtde'] - aud['qtde_total_relatorio']) < 0.5})")
+    if cab.get("formato") == "texto":
+        print(f"Formato texto: {cab['setores_conferidos']} subtotais de setor "
+              "fecharam com a soma dos itens (o relatório não traz Total Geral)")
 
     for rotulo, chave in [("SETORES NÃO MAPEADOS", "setores_nao_mapeados"),
                           ("MATERIAIS NÃO MAPEADOS", "materiais_nao_mapeados"),

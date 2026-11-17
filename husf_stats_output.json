@@ -1,144 +1,136 @@
 {
   "meta": {
-    "gerado_em": "2026-10-12T13:20:07",
-    "periodo": "Setembro 2026",
+    "gerado_em": "2026-11-10T12:34:16",
+    "periodo": "Outubro 2026",
     "script": "husf_stats.R v4.1",
-    "n_meses_dot": 20,
-    "n_meses_mdr": 18,
+    "n_meses_dot": 21,
+    "n_meses_mdr": 19,
     "hist_disponivel": true,
     "ccf_ativo": true
   },
   "dot_mensal_por_par": {
     "cef_utiab": {
       "mann_kendall": {
-        "tau": -0.2,
-        "Z": -1.2,
-        "p": 0.23,
+        "tau": -0.19,
+        "Z": -1.178,
+        "p": 0.2389,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.4264
+        "p": 0.4143
       }
     },
     "cef_utic": {
       "mann_kendall": {
-        "tau": 0.274,
-        "Z": 1.655,
-        "p": 0.098,
+        "tau": 0.286,
+        "Z": 1.782,
+        "p": 0.0748,
         "tendencia": "crescente",
         "sig": false
       },
       "joinpoint": {
-        "jp_lbl": 18,
-        "ci_l": 3,
-        "ci_u": 18,
-        "sb": 0.513,
-        "sa": 20.912,
-        "p": 0.0854
+        "jp": {},
+        "p": 0.1545
       }
     },
     "cef_clin": {
       "mann_kendall": {
-        "tau": -0.211,
-        "Z": -1.265,
-        "p": 0.2058,
+        "tau": -0.181,
+        "Z": -1.117,
+        "p": 0.2639,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.1476
+        "p": 0.1727
       }
     },
     "cef_cir": {
       "mann_kendall": {
-        "tau": -0.189,
-        "Z": -1.136,
-        "p": 0.2561,
+        "tau": -0.229,
+        "Z": -1.419,
+        "p": 0.1558,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.3726
+        "p": 0.3304
       }
     },
     "cef_apto": {
       "mann_kendall": {
-        "tau": -0.284,
-        "Z": -1.72,
-        "p": 0.0855,
+        "tau": -0.305,
+        "Z": -1.902,
+        "p": 0.0571,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.1168
+        "p": 0.1306
       }
     },
     "cef_epm": {
       "mann_kendall": {
-        "tau": -0.084,
-        "Z": -0.487,
-        "p": 0.6265,
+        "tau": -0.067,
+        "Z": -0.393,
+        "p": 0.6946,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.3858
+        "p": 0.3814
       }
     },
     "pip_utiab": {
       "mann_kendall": {
-        "tau": -0.074,
-        "Z": -0.422,
-        "p": 0.6732,
+        "tau": -0.105,
+        "Z": -0.634,
+        "p": 0.526,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
-        "jp_lbl": 18,
-        "ci_l": 3,
-        "ci_u": 18,
-        "sb": -1.823,
-        "sa": 24.409,
-        "p": 0.0871
+        "jp": {},
+        "p": 0.1637
       }
     },
     "pip_utic": {
       "mann_kendall": {
-        "tau": -0.063,
-        "Z": -0.357,
-        "p": 0.7212,
+        "tau": -0.114,
+        "Z": -0.695,
+        "p": 0.4874,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.4374
+        "p": 0.3961
       }
     },
     "pip_clin": {
       "mann_kendall": {
-        "tau": -0.137,
-        "Z": -0.811,
-        "p": 0.4173,
+        "tau": -0.19,
+        "Z": -1.178,
+        "p": 0.2389,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.1139
+        "p": 0.2202
       }
     },
     "pip_cir": {
       "mann_kendall": {
-        "tau": 0.2,
-        "Z": 1.2,
-        "p": 0.23,
+        "tau": 0.171,
+        "Z": 1.057,
+        "p": 0.2906,
         "tendencia": "crescente",
         "sig": false
       },
@@ -146,201 +138,231 @@
         "jp_lbl": 13,
         "ci_l": 10,
         "ci_u": 18,
-        "sb": 3.429,
-        "sa": -4.757,
-        "p": 0.019
+        "sb": 3.317,
+        "sa": -4.123,
+        "p": 0.0146
       }
     },
     "pip_apto": {
       "mann_kendall": {
-        "tau": -0.363,
-        "Z": -2.206,
-        "p": 0.0274,
+        "tau": -0.29,
+        "Z": -1.812,
+        "p": 0.07,
         "tendencia": "decrescente",
-        "sig": true
+        "sig": false
       },
       "joinpoint": {
-        "jp": {},
-        "p": 0.2938
+        "jp_lbl": 19,
+        "ci_l": 3,
+        "ci_u": 19,
+        "sb": -1.757,
+        "sa": 15.349,
+        "p": 0.0619
       }
     },
     "pip_epm": {
       "mann_kendall": {
-        "tau": -0.174,
-        "Z": -1.038,
-        "p": 0.2992,
+        "tau": -0.195,
+        "Z": -1.208,
+        "p": 0.2271,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.1591
+        "p": 0.1651
       }
     },
     "cbp_utiab": {
       "mann_kendall": {
-        "tau": -0.389,
-        "Z": -2.368,
-        "p": 0.0179,
+        "tau": -0.39,
+        "Z": -2.446,
+        "p": 0.0144,
         "tendencia": "decrescente",
         "sig": true
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.1623
+        "p": 0.2859
       }
     },
     "cbp_utic": {
       "mann_kendall": {
-        "tau": -0.232,
-        "Z": -1.395,
-        "p": 0.163,
+        "tau": -0.219,
+        "Z": -1.359,
+        "p": 0.1742,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
-        "jp": {},
-        "p": 0.1044
+        "jp_lbl": 3,
+        "ci_l": 3,
+        "ci_u": 13,
+        "sb": -42.769,
+        "sa": -0.769,
+        "p": 0.0872
       }
     },
     "cbp_clin": {
       "mann_kendall": {
-        "tau": -0.147,
-        "Z": -0.876,
-        "p": 0.381,
+        "tau": -0.181,
+        "Z": -1.117,
+        "p": 0.2639,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp_lbl": 12,
         "ci_l": 7,
-        "ci_u": 17,
-        "sb": 2.358,
-        "sa": -4.919,
-        "p": 0.0229
+        "ci_u": 16,
+        "sb": 2.227,
+        "sa": -4.359,
+        "p": 0.0206
       }
     },
     "cbp_cir": {
       "mann_kendall": {
-        "tau": -0.347,
-        "Z": -2.109,
-        "p": 0.035,
+        "tau": -0.314,
+        "Z": -1.963,
+        "p": 0.0497,
         "tendencia": "decrescente",
         "sig": true
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.177
+        "p": 0.2435
       }
     },
     "cbp_epm": {
       "mann_kendall": {
-        "tau": -0.179,
-        "Z": -1.071,
-        "p": 0.2843,
+        "tau": -0.214,
+        "Z": -1.329,
+        "p": 0.184,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.1319
+        "p": 0.1223
       }
     },
     "gpp_utiab": {
       "mann_kendall": {
-        "tau": -0.147,
+        "tau": -0.143,
         "Z": -0.876,
-        "p": 0.381,
+        "p": 0.3812,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp_lbl": 7,
-        "ci_l": 5,
+        "ci_l": 4,
         "ci_u": 16,
-        "sb": 9.318,
-        "sa": -4.712,
-        "p": 0.0731
+        "sb": 8.848,
+        "sa": -4.17,
+        "p": 0.0773
       }
     },
     "gpp_utic": {
       "mann_kendall": {
-        "tau": -0.221,
-        "Z": -1.33,
-        "p": 0.1834,
+        "tau": -0.248,
+        "Z": -1.54,
+        "p": 0.1235,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
-        "jp_lbl": 17,
-        "ci_l": 3,
-        "ci_u": 18,
-        "sb": -6.267,
-        "sa": 47.09,
-        "p": 0.0218
+        "jp": {},
+        "p": 0.1556
       }
     },
     "gpp_clin": {
       "mann_kendall": {
-        "tau": -0.095,
-        "Z": -0.552,
-        "p": 0.5813,
+        "tau": -0.105,
+        "Z": -0.634,
+        "p": 0.526,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp_lbl": 11,
         "ci_l": 10,
-        "ci_u": 17,
-        "sb": 4.193,
-        "sa": -6.529,
-        "p": 0.0032
+        "ci_u": 15,
+        "sb": 3.798,
+        "sa": -5.249,
+        "p": 0.007
       }
     },
     "gpp_cir": {
       "mann_kendall": {
-        "tau": -0.2,
-        "Z": -1.2,
-        "p": 0.23,
-        "tendencia": "decrescente",
-        "sig": false
-      },
-      "joinpoint": {
-        "jp_lbl": 14,
-        "ci_l": 3,
-        "ci_u": 14,
-        "sb": 2.472,
-        "sa": -13.901,
-        "p": 0.021
-      }
-    },
-    "gpp_apto": {
-      "mann_kendall": {
-        "tau": -0.063,
-        "Z": -0.357,
-        "p": 0.7212,
+        "tau": -0.133,
+        "Z": -0.815,
+        "p": 0.4149,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.4055
+        "p": 0.129
+      }
+    },
+    "gpp_apto": {
+      "mann_kendall": {
+        "tau": -0.01,
+        "Z": -0.03,
+        "p": 0.9759,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.2552
       }
     },
     "gpp_epm": {
       "mann_kendall": {
-        "tau": 0.011,
-        "Z": 0.032,
-        "p": 0.9741,
+        "tau": 0.048,
+        "Z": 0.272,
+        "p": 0.7858,
         "tendencia": "crescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.33
+        "p": 0.3606
       }
     },
     "pb_utiab": {
+      "mann_kendall": {
+        "tau": -0.09,
+        "Z": -0.544,
+        "p": 0.5868,
+        "tendencia": "decrescente",
+        "sig": false
+      },
+      "joinpoint": {
+        "jp_lbl": 16,
+        "ci_l": 3,
+        "ci_u": 18,
+        "sb": 1.248,
+        "sa": -9.104,
+        "p": 0.0345
+      }
+    },
+    "pb_utic": {
+      "mann_kendall": {
+        "tau": -0.51,
+        "Z": -3.201,
+        "p": 0.0014,
+        "tendencia": "decrescente",
+        "sig": true
+      },
+      "joinpoint": {
+        "jp": {},
+        "p": 0.3415
+      }
+    },
+    "pb_cir": {
       "mann_kendall": {
         "tau": 0,
         "Z": 0,
@@ -349,42 +371,12 @@
         "sig": false
       },
       "joinpoint": {
-        "jp_lbl": 16,
-        "ci_l": 3,
-        "ci_u": 17,
-        "sb": 1.263,
-        "sa": -9.356,
-        "p": 0.0875
-      }
-    },
-    "pb_utic": {
-      "mann_kendall": {
-        "tau": -0.468,
-        "Z": -2.855,
-        "p": 0.0043,
-        "tendencia": "decrescente",
-        "sig": true
-      },
-      "joinpoint": {
-        "jp": {},
-        "p": 0.3612
-      }
-    },
-    "pb_cir": {
-      "mann_kendall": {
-        "tau": -0.011,
-        "Z": -0.032,
-        "p": 0.9741,
-        "tendencia": "decrescente",
-        "sig": false
-      },
-      "joinpoint": {
         "jp_lbl": 13,
         "ci_l": 11,
         "ci_u": 14,
-        "sb": 2.078,
-        "sa": -4.306,
-        "p": 0.0066
+        "sb": 1.943,
+        "sa": -3.541,
+        "p": 0.0079
       }
     }
   },
@@ -525,100 +517,96 @@
   "mdr_mensal": {
     "utiAB_kpc": {
       "mann_kendall": {
-        "tau": 0.176,
-        "Z": 0.985,
-        "p": 0.3247,
+        "tau": 0.123,
+        "Z": 0.7,
+        "p": 0.4841,
         "tendencia": "crescente",
         "sig": false
       },
       "joinpoint": {
         "jp_lbl": 14,
         "ci_l": 4,
-        "ci_u": 16,
-        "sb": 0.655,
-        "sa": -2.174,
-        "p": 0.0093
+        "ci_u": 15,
+        "sb": 0.615,
+        "sa": -1.647,
+        "p": 0.0089
       }
     },
     "utiAB_esbl": {
       "mann_kendall": {
-        "tau": -0.02,
-        "Z": -0.076,
-        "p": 0.9396,
+        "tau": -0.018,
+        "Z": -0.07,
+        "p": 0.9442,
         "tendencia": "decrescente",
         "sig": false
       },
       "joinpoint": {
         "jp_lbl": 13,
-        "ci_l": 10.9,
-        "ci_u": 16,
-        "sb": -1.177,
-        "sa": 4.323,
-        "p": 0.0051
+        "ci_l": 11,
+        "ci_u": 14,
+        "sb": -1.021,
+        "sa": 2.957,
+        "p": 0.0172
       }
     },
     "utiAB_acin": {
       "mann_kendall": {
-        "tau": 0.15,
-        "Z": 0.833,
-        "p": 0.4047,
+        "tau": 0.146,
+        "Z": 0.84,
+        "p": 0.4011,
         "tendencia": "crescente",
         "sig": false
       },
       "joinpoint": {
         "jp": {},
-        "p": 0.2994
+        "p": 0.3634
       }
     },
     "utic_kpc": {
       "mann_kendall": {
-        "tau": 0.752,
-        "Z": 4.318,
-        "p": 0,
+        "tau": 0.591,
+        "Z": 3.499,
+        "p": 0.0005,
         "tendencia": "crescente",
         "sig": true
       },
       "joinpoint": {
         "jp_lbl": 16,
-        "ci_l": 9,
-        "ci_u": 16,
+        "ci_l": 13,
+        "ci_u": 17,
         "sb": 0.756,
-        "sa": -3.072,
-        "p": 0.006
+        "sa": -3.062,
+        "p": 0.0001
       }
     },
     "utic_esbl": {
       "mann_kendall": {
-        "tau": 0.582,
-        "Z": 3.333,
-        "p": 0.0009,
+        "tau": 0.626,
+        "Z": 3.708,
+        "p": 0.0002,
         "tendencia": "crescente",
         "sig": true
       },
       "joinpoint": {
-        "jp_lbl": 9,
-        "ci_l": 8,
+        "jp_lbl": 8,
+        "ci_l": 7,
         "ci_u": 10,
-        "sb": -0.089,
-        "sa": 2.904,
+        "sb": -0.339,
+        "sa": 2.59,
         "p": 0
       }
     },
     "utic_acin": {
       "mann_kendall": {
-        "tau": 0.444,
-        "Z": 2.538,
-        "p": 0.0112,
+        "tau": 0.433,
+        "Z": 2.554,
+        "p": 0.0107,
         "tendencia": "crescente",
         "sig": true
       },
       "joinpoint": {
-        "jp_lbl": 12,
-        "ci_l": 9,
-        "ci_u": 15,
-        "sb": 0.097,
-        "sa": 2.239,
-        "p": 0.0024
+        "jp": {},
+        "p": 0.1151
       }
     }
   },
@@ -628,21 +616,21 @@
         "mu0": 17.03,
         "s0": 7.44,
         "h": 29.76,
-        "S": [0, 0, 1.723, 7.191, 3.871, 16.952],
+        "S": [0, 0, 1.723, 7.191, 3.871, 16.952, 14.763],
         "alarme": false
       },
       "kpc": {
         "mu0": 5.23,
         "s0": 3.52,
         "h": 14.09,
-        "S": [0, 9.311, 9.808, 10.305, 5.491, 0.607],
+        "S": [0, 9.311, 9.808, 10.305, 5.491, 0.607, 0],
         "alarme": false
       },
       "acin": {
         "mu0": 7,
         "s0": 4.8,
         "h": 19.19,
-        "S": [0, 3.278, 1.366, 5.072, 6.562, 1.389],
+        "S": [0, 3.278, 1.366, 5.072, 6.562, 1.389, 0.236],
         "alarme": false
       }
     },
@@ -651,21 +639,21 @@
         "mu0": 3.45,
         "s0": 3.77,
         "h": 15.08,
-        "S": [4.866, 20.734, 36.307, 54.385, 73.051, 92.208],
+        "S": [4.866, 20.734, 36.307, 54.385, 73.051, 92.208, 113.794],
         "alarme": true
       },
       "kpc": {
         "mu0": 1.6,
         "s0": 2.06,
         "h": 8.22,
-        "S": [4.171, 8.609, 19.918, 27.322, 28.693, 30.144],
+        "S": [4.171, 8.609, 19.918, 27.322, 28.693, 30.144, 27.516],
         "alarme": true
       },
       "acin": {
         "mu0": 1.32,
         "s0": 1.1,
         "h": 4.38,
-        "S": [0, 12.267, 20.853, 25.675, 35.808, 50.271],
+        "S": [0, 12.267, 20.853, 25.675, 35.808, 50.271, 52.254],
         "alarme": true
       }
     }
@@ -673,19 +661,19 @@
   "ic_poisson_2026": {
     "utiAB": {
       "esbl": {
-        "taxa": 30.37,
-        "ic95_l": 23.49,
-        "ic95_u": 38.64
+        "taxa": 34.51,
+        "ic95_l": 27.15,
+        "ic95_u": 43.26
       },
       "kpc": {
-        "taxa": 15.19,
-        "ic95_l": 10.45,
-        "ic95_u": 21.33
+        "taxa": 16.11,
+        "ic95_l": 11.22,
+        "ic95_u": 22.4
       },
       "acin": {
-        "taxa": 17.49,
-        "ic95_l": 12.38,
-        "ic95_u": 24
+        "taxa": 19.33,
+        "ic95_l": 13.93,
+        "ic95_u": 26.13
       }
     },
     "utic": {
@@ -708,60 +696,60 @@
   },
   "ccf": {
     "Carbapenêmico x KPC (UTI A/B)": {
-      "n": 18,
-      "lag": 1,
-      "r": 0.3981,
+      "n": 19,
+      "lag": 6,
+      "r": 0.3894,
       "sig": false,
-      "ccf_vec": [-0.0695, 0.3981, 0.2151, -0.1713, 0.0279, 0.1558, 0.3628]
+      "ccf_vec": [-0.0678, 0.3875, 0.2174, -0.1255, 0.0417, 0.076, 0.3894]
     },
     "Carbapenêmico x KPC (UTI C)": {
-      "n": 18,
-      "lag": 6,
-      "r": -0.0155,
+      "n": 19,
+      "lag": 2,
+      "r": 0.0624,
       "sig": false,
-      "ccf_vec": [-0.1458, -0.2678, -0.083, -0.0983, -0.2637, -0.2807, -0.0155]
+      "ccf_vec": [-0.158, -0.2821, 0.0624, -0.0708, -0.2696, -0.188, -0.0413]
     },
     "Pip/Tazo x ESBL (UTI A/B)": {
-      "n": 18,
+      "n": 19,
       "lag": 2,
-      "r": 0.4173,
+      "r": 0.4017,
       "sig": false,
-      "ccf_vec": [0.1401, -0.4906, 0.4173, 0.1581, -0.0711, -0.0067, 0.1151]
+      "ccf_vec": [0.1284, -0.4272, 0.4017, 0.1626, -0.0916, -0.0356, 0.117]
     },
     "Polimixina B x Acinetobacter (UTI A/B)": {
-      "n": 18,
+      "n": 19,
       "lag": 0,
-      "r": 0.6062,
-      "sig": true,
-      "ccf_vec": [0.6062, 0.022, -0.186, 0.0624, 0.2643, -0.4138, 0.2987]
+      "r": 0.4534,
+      "sig": false,
+      "ccf_vec": [0.4534, 0.0044, -0.1914, 0.0682, 0.2564, -0.375, 0.2973]
     },
     "Ceftriaxona (Cl.Medica) x ESBL (UTI A/B)": {
-      "n": 18,
+      "n": 19,
       "lag": 5,
-      "r": 0.5721,
+      "r": 0.5662,
       "sig": true,
-      "ccf_vec": [-0.1824, -0.0559, -0.0874, -0.2705, 0.0188, 0.5721, 0.2801]
+      "ccf_vec": [-0.1791, -0.0578, -0.0603, -0.2737, -0.0768, 0.5662, 0.2686]
     },
     "Ceftriaxona (EPM) x ESBL (UTI A/B)": {
-      "n": 18,
+      "n": 19,
       "lag": 5,
-      "r": 0.3638,
+      "r": 0.3285,
       "sig": false,
-      "ccf_vec": [-0.0829, 0.1242, -0.2919, -0.4042, -0.1794, 0.3638, 0.0543]
+      "ccf_vec": [-0.0806, 0.1125, -0.2206, -0.4132, -0.1833, 0.3285, 0.069]
     },
     "Ceftriaxona (Aptos) x ESBL (UTI A/B)": {
-      "n": 18,
+      "n": 19,
       "lag": 5,
-      "r": 0.562,
+      "r": 0.3953,
       "sig": false,
-      "ccf_vec": [-0.1633, 0.0921, 0.1033, 0.1791, -0.0475, 0.562, 0.0201]
+      "ccf_vec": [-0.1727, 0.0589, 0.118, 0.1658, -0.0321, 0.3953, 0.0281]
     },
     "Glicopeptideo x KPC (UTI A/B)": {
-      "n": 18,
+      "n": 19,
       "lag": 1,
       "r": 0.4957,
       "sig": true,
-      "ccf_vec": [-0.3431, 0.4957, 0.2618, -0.0013, -0.0249, -0.0007, 0.3209]
+      "ccf_vec": [-0.3429, 0.4957, 0.264, 0.0276, -0.0271, -0.0315, 0.2433]
     }
   }
 }
